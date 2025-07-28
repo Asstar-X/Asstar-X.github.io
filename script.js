@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 添加粒子效果
     createParticles();
+    loadProjects();
 });
 
 // 创建粒子效果
@@ -266,3 +267,43 @@ function createScrollProgress() {
 
 // 初始化滚动进度条
 createScrollProgress(); 
+
+// 通用项目加载函数
+function loadProjects(gridId, maxShow = 3) {
+    fetch('projects/list.json')
+        .then(res => res.json())
+        .then(projectFiles => {
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+            grid.innerHTML = '';
+            for (let i = 0; i < Math.min(maxShow, projectFiles.length); i++) {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                const fileName = projectFiles[i].replace(/\.md$/, '');
+                card.innerHTML = `
+                    <div class="project-visual"><div class="project-orb"></div></div>
+                    <h3>${fileName}</h3>
+                `;
+                card.style.cursor = 'pointer';
+                card.onclick = function() {
+                    window.location.href = `project-view.html?file=projects/${encodeURIComponent(projectFiles[i])}`;
+                };
+                grid.appendChild(card);
+            }
+            // 显示或隐藏查看更多内容按钮
+            const moreContainer = document.getElementById('more-projects-container');
+            if (moreContainer) {
+                if (projectFiles.length > maxShow) {
+                    moreContainer.style.display = '';
+                    const btn = document.getElementById('more-projects-btn');
+                    if (btn) {
+                        btn.onclick = function() {
+                            window.location.href = 'projects.html';
+                        };
+                    }
+                } else {
+                    moreContainer.style.display = 'none';
+                }
+            }
+        });
+} 

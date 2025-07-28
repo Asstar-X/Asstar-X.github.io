@@ -79,28 +79,11 @@
         <section id="projects" class="projects">
             <div class="container">
                 <h2 class="section-title">AI Lab</h2>
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <div class="project-visual">
-                            <div class="project-orb"></div>
-                        </div>
-                        <h3>数字艺术</h3>
-                        <p>探索数字与艺术的完美融合</p>
-                    </div>
-                    <div class="project-card">
-                        <div class="project-visual">
-                            <div class="project-orb"></div>
-                        </div>
-                        <h3>技术创新</h3>
-                        <p>突破技术边界，创造未来</p>
-                    </div>
-                    <div class="project-card">
-                        <div class="project-visual">
-                            <div class="project-orb"></div>
-                        </div>
-                        <h3>用户体验</h3>
-                        <p>以人为本，设计未来</p>
-                    </div>
+                <div class="projects-grid" id="projects-grid">
+                    <!-- 动态加载的项目卡片将插入这里 -->
+                </div>
+                <div id="more-projects-container" style="text-align:center; margin-top:20px; display:none;">
+                    <button id="more-projects-btn" style="padding:10px 24px; font-size:16px; border-radius:8px; border:none; background:#00d4ff; color:#fff; cursor:pointer;">查看更多内容</button>
                 </div>
             </div>
         </section>
@@ -135,5 +118,8 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+      loadProjects('projects-grid', 3);
+    </script>
 </body>
 </html> 

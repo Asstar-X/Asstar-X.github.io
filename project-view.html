@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目详情 - AI Lab</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .back-btn {
+            margin: 32px 0 16px 0;
+            padding: 10px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: #00d4ff;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,212,255,0.15);
+        }
+        .project-detail {
+            background: rgba(20,30,40,0.85);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 32px;
+            box-shadow: 0 4px 24px rgba(0,212,255,0.08);
+            color: #fff;
+            font-size: 1.15em;
+            line-height: 1.8;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    <main>
+        <div class="container">
+            <button class="back-btn" onclick="window.history.back()">返回</button>
+            <h2 class="section-title">项目详情</h2>
+            <div class="project-detail" id="project-detail">
+                加载中...
+            </div>
+        </div>
+    </main>
+    <script>
+    // 获取URL参数
+    function getQueryParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+    const file = getQueryParam('file');
+    const detail = document.getElementById('project-detail');
+    if (file) {
+        fetch(file)
+            .then(res => res.text())
+            .then(md => {
+                detail.innerHTML = md.replace(/\n/g, '<br>');
+            })
+            .catch(() => {
+                detail.innerHTML = '加载失败，文件不存在或网络错误。';
+            });
+    } else {
+        detail.innerHTML = '未指定项目文件。';
+    }
+    </script>
+</body>
+</html> 

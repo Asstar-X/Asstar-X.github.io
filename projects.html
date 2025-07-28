@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lab - 全部项目</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .back-btn {
+            margin: 32px 0 16px 0;
+            padding: 10px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: #00d4ff;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,212,255,0.15);
+        }
+        .projects-grid {
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    <main>
+        <div class="container">
+            <button class="back-btn" onclick="window.location.href='index.html'">返回首页</button>
+            <h2 class="section-title">AI Lab - 全部项目</h2>
+            <div class="projects-grid" id="projects-grid">
+                <!-- 动态加载的项目卡片将插入这里 -->
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+    <script>
+      loadProjects('projects-grid', Infinity);
+    </script>
+</body>
+</html> 
