@@ -1,139 +1,64 @@
 # Asstar - 探索未知的边界
 
-一个具有外星科技感的现代化官方网站，采用深色主题和未来感设计。
+![Asstar Logo](./images/logo.jpg) <!-- 替换为你的网站 logo 链接 -->
 
-## 🌟 特性
-
-- **外星科技感设计**: 深色主题配合星空背景和发光效果
-- **响应式布局**: 完美适配桌面端和移动端
-- **流畅动画**: 包含视差滚动、粒子效果、浮动球体等动画
-- **现代交互**: 平滑滚动、悬停效果、按钮涟漪动画
-- **优雅排版**: 使用Orbitron和Exo 2字体，营造科技感
-
-## 🚀 技术栈
-
-- HTML5
-- CSS3 (动画、渐变、滤镜)
-- JavaScript (ES6+)
-- Google Fonts (Orbitron, Exo 2)
-
-## 📁 文件结构
-
-```
-Asstar.github.io/
-├── index.html          # 主页面
-├── styles.css          # 样式文件
-├── script.js           # JavaScript交互
-└── README.md           # 项目说明
-```
-
-## 🎨 设计特色
-
-### 视觉效果
-- 三层星空背景动画
-- 渐变色彩搭配 (#00d4ff, #ff6b6b, #a8e6cf)
-- 发光和模糊效果
-- 浮动球体动画
-
-### 交互体验
-- 平滑滚动导航
-- 鼠标跟随粒子效果
-- 按钮点击涟漪动画
-- 元素进入视口动画
-
-### 响应式设计
-- 移动端优化
-- 弹性布局
-- 自适应字体大小
-
-## 🌐 部署到GitHub Pages
-
-1. **推送代码到GitHub**
-   ```bash
-   git add .
-   git commit -m "Initial commit: Asstar website"
-   git push origin main
-   ```
-
-2. **启用GitHub Pages**
-   - 进入GitHub仓库设置
-   - 找到"Pages"选项
-   - 选择"Deploy from a branch"
-   - 选择main分支
-   - 保存设置
-
-3. **访问网站**
-   - 网站将在几分钟内部署完成
-   - 访问地址: `https://你的用户名.github.io/Asstar.github.io`
-
-## 🎯 自定义
-
-### 修改颜色主题
-在 `styles.css` 中修改以下CSS变量：
-```css
---primary-color: #00d4ff;
---secondary-color: #ff6b6b;
---accent-color: #a8e6cf;
-```
-
-### 添加新内容
-在 `index.html` 中添加新的section：
-```html
-<section id="new-section" class="new-section">
-    <div class="container">
-        <h2 class="section-title">新标题</h2>
-        <!-- 内容 -->
-    </div>
-</section>
-```
-
-### 修改动画效果
-在 `script.js` 中调整动画参数：
-```javascript
-// 修改粒子数量
-for (let i = 0; i < 50; i++) { // 改为你想要的数字
-    createParticle(particleContainer);
-}
-```
-
-## 📱 浏览器兼容性
-
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-
-## 🤝 贡献
-
-欢迎提交Issue和Pull Request来改进这个项目！
-
-## 📄 许可证
-
-MIT License - 详见LICENSE文件
+**Asstar** 是一个激发灵感与探索的在线平台，致力于带领用户跨越已知边界，探寻未知的无限可能。我们为好奇心旺盛的探险家、创作者和学习者打造了一个独特而引人入胜的空间。
 
 ---
 
-**Asstar** - 探索未知的边界 ✨ 
+## 🌟 关于 Asstar
 
-## 🛠️ 自动生成项目文件列表
+Asstar 是一个以探索为核心的网站，通过前沿技术、沉浸式体验和多样化内容，带你发现科学、艺术、技术等领域的无限魅力。我们希望每位用户都能在这里找到灵感，点燃好奇心，开启属于自己的探索之旅。
 
-如果你想让前端自动加载 projects 目录下所有 .md 文件，而不是手动维护文件名列表，可以使用 Node.js 脚本自动生成 `projects/list.json` 文件。
+- **核心理念**: 探索、发现、创造
+- **目标用户**: 好奇心驱动的探险家、创作者和终身学习者
+- **愿景**: 打破常规，连接未知，激发无限可能
 
-### 使用方法
-1. 在项目根目录下新建 `generateProjectList.js`，内容如下：
-```js
-const fs = require('fs');
-const path = require('path');
+---
 
-const dir = path.join(__dirname, 'projects');
-const files = fs.readdirSync(dir)
-  .filter(f => f.endsWith('.md'));
+## 🚀 核心功能
 
-fs.writeFileSync(path.join(dir, 'list.json'), JSON.stringify(files, null, 2), 'utf-8');
-console.log('项目文件列表已生成: projects/list.json');
-```
-2. 运行脚本：
-```bash
-node generateProjectList.js
-```
-3. 前端 fetch `projects/list.json`，动态加载文件名。 
+- **探索模块**: 浏览涵盖科学、艺术、技术等多领域的精选内容，激发你的灵感。
+- **沉浸式体验**: 动态的界面设计和流畅的交互，带来无缝的浏览体验。
+- **个性化推荐**: 根据你的兴趣定制内容，打造专属的探索旅程。
+- **社区互动**: 连接全球的探索者，分享发现、交流创意。
+- **[其他功能]**: [根据你的网站补充，例如实时数据展示、专题活动等]
+
+---
+
+## 📸 网站预览
+
+![网站截图](./images/website_photo.jpg) <!-- 替换为你的网站截图链接 -->
+
+> **立即体验**: 访问 [Asstar 官网](https://asstar-x.github.io/) 开启你的探索之旅！ <!-- 替换为你的网站链接 -->
+
+---
+
+## 📖 如何开始
+
+1. **访问网站**: 打开 [Asstar 官网](https://asstar-x.github.io/) 并注册/登录账户。
+2. **发现内容**: 浏览推荐内容，或通过搜索查找你感兴趣的主题。
+3. **定制旅程**: 调整个人偏好，获取专属推荐。
+4. **加入社区**: 参与讨论，与志同道合的探索者分享你的发现！
+
+---
+
+## 🤝 加入我们
+
+我们欢迎每一位热爱探索的用户！通过以下方式与我们互动：
+
+- **官网**: [Asstar](https://asstar-x.github.io/)
+- **邮箱**: yxy138646@163.com
+- **社区**: [加入我们的群组](WX：AiSpinLab)
+- **反馈**: 在 GitHub Issues 中提交建议或想法
+
+---
+
+## 📄 许可证
+
+本项目采用 [MIT 许可证](LICENSE) - 详情请见 LICENSE 文件。
+
+---
+
+**Asstar - 探索未知的边界**  
+与我们一起，踏上发现之旅，探索无限可能！
