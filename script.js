@@ -1,3 +1,14 @@
+// 平滑滚动到指定部分
+function scrollToSection(sectionId) {
+    const target = document.getElementById(sectionId);
+    if (target) {
+        target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
 // 平滑滚动
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
