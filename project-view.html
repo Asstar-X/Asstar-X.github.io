@@ -135,13 +135,16 @@
     
     // 初始化 Gitalk
     document.addEventListener('DOMContentLoaded', () => {
+        // 生成唯一的评论ID，基于文件名
+        const commentId = file ? file.replace(/[^a-zA-Z0-9]/g, '_') : 'default';
+        
         const gitalk = new Gitalk({
             clientID: 'Ov23liD0HiS3qP7U9xGy',
             clientSecret: '86848d5587310e717a810d8853b51c896f27a9b3',
             repo: 'Asstar-X.github.io',
             owner: 'Asstar-X',
             admin: ['Asstar-X'],
-            id: window.location.pathname, // 使用页面路径作为ID
+            id: commentId, // 使用基于文件名的唯一ID
             distractionFreeMode: false,
             createIssueManually: true,
             enableHotKey: true,
