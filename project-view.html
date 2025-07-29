@@ -6,6 +6,8 @@
     <title>项目详情 - AI Lab</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Gitalk CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
     <style>
         .back-btn {
             margin: 32px 0 16px 0;
@@ -29,6 +31,60 @@
             line-height: 1.8;
             min-height: 200px;
         }
+        .comments-section {
+            margin-top: 40px;
+            background: rgba(20,30,40,0.85);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0,212,255,0.08);
+        }
+        /* Gitalk 样式适配 */
+        .gt-container {
+            background: transparent !important;
+        }
+        .gt-header {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+        }
+        .gt-comment {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+            margin-bottom: 16px !important;
+        }
+        .gt-comment-content {
+            color: #fff !important;
+        }
+        .gt-comment-username {
+            color: #00d4ff !important;
+        }
+        .gt-comment-date {
+            color: #888 !important;
+        }
+        .gt-btn {
+            background: linear-gradient(45deg, #00d4ff, #0099cc) !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+        .gt-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 15px rgba(0,212,255,0.4) !important;
+        }
+        .gt-form {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+        }
+        .gt-form textarea {
+            background: rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+        }
+        .gt-form textarea:focus {
+            border-color: #00d4ff !important;
+            box-shadow: 0 0 10px rgba(0,212,255,0.3) !important;
+        }
     </style>
 </head>
 <body>
@@ -42,16 +98,28 @@
             <div class="project-detail" id="project-detail">
                 加载中...
             </div>
+            
+            <!-- Gitalk 评论区 -->
+            <div class="comments-section">
+                <h3 style="color: #00d4ff; margin-bottom: 20px;">💬 评论区</h3>
+                <div id="gitalk-container"></div>
+            </div>
         </div>
     </main>
+    
+    <!-- Gitalk JS -->
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
     <script>
     // 获取URL参数
     function getQueryParam(name) {
         const url = new URL(window.location.href);
         return url.searchParams.get(name);
     }
+    
     const file = getQueryParam('file');
     const detail = document.getElementById('project-detail');
+    
+    // 加载项目详情
     if (file) {
         fetch(file)
             .then(res => res.text())
@@ -64,6 +132,24 @@
     } else {
         detail.innerHTML = '未指定项目文件。';
     }
+    
+    // 初始化 Gitalk
+    document.addEventListener('DOMContentLoaded', () => {
+        const gitalk = new Gitalk({
+            clientID: 'Ov23liD0HiS3qP7U9xGy', // 需要替换为你的 GitHub OAuth App Client ID
+            clientSecret: '86848d5587310e717a810d8853b51c896f27a9b3', // 需要替换为你的 GitHub OAuth App Client Secret
+            repo: 'https://github.com/Asstar-X/Asstar-X.github.io', // 你的 GitHub 仓库名
+            owner: 'Asstar-X', // 你的 GitHub 用户名
+            admin: ['Asstar-X'], // 管理员用户名列表
+            id: file || 'default', // 页面唯一标识，使用文件名
+            distractionFreeMode: false, // 专注模式
+            createIssueManually: true, // 手动创建 issue
+            enableHotKey: true, // 启用快捷键
+            language: 'zh-CN', // 语言
+        });
+        
+        gitalk.render('gitalk-container');
+    });
     </script>
 </body>
 </html> 
