@@ -3,96 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asstar</title>
+    <title>Asstar - 探索未知的边界</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="stars2"></div>
-    <div class="stars3"></div>
-    
-    <!-- 新增：浮动几何体 -->
-    <div class="geometric-shapes">
-        <div class="geometric-shape"></div>
-        <div class="geometric-shape"></div>
-        <div class="geometric-shape"></div>
-        <div class="geometric-shape"></div>
+    <!-- 宇宙背景层 -->
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
     </div>
-    
-    <!-- 新增：能量波纹 -->
-    <div class="energy-ripples">
-        <div class="energy-ripple"></div>
-        <div class="energy-ripple"></div>
-        <div class="energy-ripple"></div>
-    </div>
-    
-    <!-- 新增：粒子轨迹 -->
-    <div class="particle-trails">
-        <div class="particle-trail"></div>
-        <div class="particle-trail"></div>
-        <div class="particle-trail"></div>
-    </div>
-    
-    <!-- 新增：全息网格 -->
-    <div class="holographic-grid"></div>
-    
+
+    <!-- 导航栏 -->
     <header class="header">
         <nav class="nav">
             <div class="logo">
+                <div class="logo-symbol">✦</div>
                 <span class="logo-text">ASSTAR</span>
-                <div class="logo-glow"></div>
             </div>
             <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#about">关于</a></li>
-                <li><a href="#projects">AI Lab</a></li>
-                <li><a href="#contact">联系</a></li>
+                <li><a href="#home" class="nav-link">首页</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+                <li><a href="#projects" class="nav-link">AI Lab</a></li>
+                <li><a href="#contact" class="nav-link">联系</a></li>
             </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </nav>
     </header>
 
     <main>
+        <!-- 英雄区域 -->
         <section id="home" class="hero">
-            <div class="hero-content">
-                <h1 class="hero-title">
-                    <span class="title-line">探索</span>
-                    <span class="title-line">未知的</span>
-                    <span class="title-line">边界</span>
-                </h1>
-                <p class="hero-subtitle">欢迎来到Asstar，一个充满无限可能的数字宇宙</p>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToSection('about')">开始探索</button>
-                    <button class="btn btn-secondary" onclick="scrollToSection('contact')">了解更多</button>
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">探索 • 创新 • 未来</div>
+                    <h1 class="hero-title">
+                        <span class="title-word">探索</span>
+                        <span class="title-word">未知的</span>
+                        <span class="title-word">边界</span>
+                    </h1>
+                    <p class="hero-subtitle">欢迎来到Asstar，一个充满无限可能的数字宇宙</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="scrollToSection('about')">
+                            <span class="btn-text">开始探索</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                            <span class="btn-text">了解更多</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="hero-visual">
-                <div class="floating-orb">
-                    <div class="orb-core"></div>
-                    <div class="orb-ring"></div>
-                    <div class="orb-ring"></div>
+                <div class="hero-visual">
+                    <div class="cosmic-orb">
+                        <div class="orb-core"></div>
+                        <div class="orb-rings">
+                            <div class="orb-ring"></div>
+                            <div class="orb-ring"></div>
+                            <div class="orb-ring"></div>
+                        </div>
+                        <div class="orb-particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- 关于区域 -->
         <section id="about" class="about">
             <div class="container">
-                <h2 class="section-title">关于 Asstar</h2>
+                <div class="section-header">
+                    <h2 class="section-title">关于 Asstar</h2>
+                    <div class="section-line"></div>
+                </div>
                 <div class="about-content">
                     <div class="about-text">
-                        <p>Asstar代表着对未知的探索和对技术的无限追求。我们致力于创造具有未来感的数字体验，将科幻与现实完美融合。</p>
-                        <p>在这里，每一个像素都承载着对未来的想象，每一行代码都书写着创新的故事。</p>
+                        <p class="about-paragraph">Asstar代表着对未知的探索和对技术的无限追求。我们致力于创造具有未来感的数字体验，将科幻与现实完美融合。</p>
+                        <p class="about-paragraph">在这里，每一个像素都承载着对未来的想象，每一行代码都书写着创新的故事。</p>
                     </div>
                     <div class="about-stats">
-                        <div class="stat">
+                        <div class="stat-card">
+                            <div class="stat-icon">∞</div>
                             <div class="stat-number">∞</div>
                             <div class="stat-label">可能性</div>
                         </div>
-                        <div class="stat">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
                             <div class="stat-number">100%</div>
                             <div class="stat-label">创新</div>
                         </div>
-                        <div class="stat">
+                        <div class="stat-card">
+                            <div class="stat-icon">🚀</div>
                             <div class="stat-number">25/7</div>
                             <div class="stat-label">探索</div>
                         </div>
@@ -101,34 +111,54 @@
             </div>
         </section>
 
+        <!-- AI Lab区域 -->
         <section id="projects" class="projects">
             <div class="container">
-                <h2 class="section-title">AI Lab</h2>
+                <div class="section-header">
+                    <h2 class="section-title">AI Lab</h2>
+                    <div class="section-line"></div>
+                </div>
                 <div class="projects-grid" id="projects-grid">
                     <!-- 动态加载的项目卡片将插入这里 -->
                 </div>
-                <div id="more-projects-container" style="text-align:center; margin-top:20px; display:none;">
-                    <button id="more-projects-btn" style="padding:10px 24px; font-size:16px; border-radius:8px; border:none; background:#00d4ff; color:#fff; cursor:pointer;">查看更多内容</button>
+                <div id="more-projects-container" class="more-projects">
+                    <button id="more-projects-btn" class="btn btn-outline">
+                        <span class="btn-text">查看更多内容</span>
+                        <span class="btn-icon">→</span>
+                    </button>
                 </div>
             </div>
         </section>
 
+        <!-- 联系区域 -->
         <section id="contact" class="contact">
             <div class="container">
-                <h2 class="section-title">联系我们</h2>
+                <div class="section-header">
+                    <h2 class="section-title">联系我们</h2>
+                    <div class="section-line"></div>
+                </div>
                 <div class="contact-content">
-                    <div class="contact-info">
-                        <div class="contact-item">
+                    <div class="contact-cards">
+                        <div class="contact-card">
                             <div class="contact-icon">📧</div>
-                            <span>yxy138646@gmail.com</span>
+                            <div class="contact-info">
+                                <h3>邮箱</h3>
+                                <p>yxy138646@gmail.com</p>
+                            </div>
                         </div>
-                        <div class="contact-item">
+                        <div class="contact-card">
                             <div class="contact-icon">🌐</div>
-                            <span>WeChat: AiSpinLab</span>
+                            <div class="contact-info">
+                                <h3>微信</h3>
+                                <p>AiSpinLab</p>
+                            </div>
                         </div>
-                        <div class="contact-item">
+                        <div class="contact-card">
                             <div class="contact-icon">🚀</div>
-                            <span>探索无限可能</span>
+                            <div class="contact-info">
+                                <h3>探索</h3>
+                                <p>无限可能</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -136,9 +166,16 @@
         </section>
     </main>
 
+    <!-- 页脚 -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Asstar. 探索未知的边界。</p>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-symbol">✦</div>
+                    <span class="logo-text">ASSTAR</span>
+                </div>
+                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
+            </div>
         </div>
     </footer>
 
