@@ -136,16 +136,16 @@
     // 初始化 Gitalk
     document.addEventListener('DOMContentLoaded', () => {
         const gitalk = new Gitalk({
-            clientID: 'Ov23liD0HiS3qP7U9xGy', // 需要替换为你的 GitHub OAuth App Client ID
-            clientSecret: '86848d5587310e717a810d8853b51c896f27a9b3', // 需要替换为你的 GitHub OAuth App Client Secret
-            repo: 'https://github.com/Asstar-X/Asstar-X.github.io', // 你的 GitHub 仓库名
-            owner: 'Asstar-X', // 你的 GitHub 用户名
-            admin: ['Asstar-X'], // 管理员用户名列表
-            id: file || 'default', // 页面唯一标识，使用文件名
-            distractionFreeMode: false, // 专注模式
-            createIssueManually: true, // 手动创建 issue
-            enableHotKey: true, // 启用快捷键
-            language: 'zh-CN', // 语言
+            clientID: 'Ov23liD0HiS3qP7U9xGy',
+            clientSecret: '86848d5587310e717a810d8853b51c896f27a9b3',
+            repo: 'Asstar-X.github.io',
+            owner: 'Asstar-X',
+            admin: ['Asstar-X'],
+            id: window.location.pathname, // 使用页面路径作为ID
+            distractionFreeMode: false,
+            createIssueManually: true,
+            enableHotKey: true,
+            language: 'zh-CN',
         });
         
         gitalk.render('gitalk-container');
