@@ -602,19 +602,6 @@ section {
 .stat-card:nth-child(1) .stat-icon {
     color: var(--primary-color);
     text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-    position: relative;
-}
-
-.stat-card:nth-child(1) .stat-icon::before {
-    content: '∞';
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: transparent;
-    -webkit-text-stroke: 1px var(--primary-color);
-    text-stroke: 1px var(--primary-color);
-    opacity: 0.3;
-    z-index: -1;
 }
 
 .stat-card:nth-child(2) .stat-icon {
