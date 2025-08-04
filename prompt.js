@@ -4,6 +4,8 @@ class ChatManager {
         this.messages = [];
         this.isTyping = false;
         this.configManager = new ConfigManager();
+        this.currentTemplate = 'system'; // 'system' 或 'user'
+        this.renderMode = 'text'; // 'text' 或 'markdown'
         
         this.chatMessages = document.getElementById('chat-messages');
         this.chatInput = document.getElementById('chat-input');
@@ -11,6 +13,11 @@ class ChatManager {
         this.typingIndicator = document.getElementById('typing-indicator');
         this.clearButton = document.getElementById('clear-button');
         this.modelSelectButton = document.getElementById('model-select-button');
+        this.templateToggleButton = document.getElementById('template-toggle-button');
+        
+        // 渲染模式选项
+        this.renderTextOption = document.getElementById('render-text');
+        this.renderMarkdownOption = document.getElementById('render-markdown');
         
         // 模型选择模态框元素
         this.modelModal = document.getElementById('model-modal');
@@ -21,6 +28,13 @@ class ChatManager {
         this.useDefaultKey = document.getElementById('use-default-key');
         this.useCustomKey = document.getElementById('use-custom-key');
         this.customApiKey = document.getElementById('custom-api-key');
+        
+        // 提示词模版选择模态框元素
+        this.templateModal = document.getElementById('template-modal');
+        this.templateList = document.getElementById('template-list');
+        this.templateModalClose = document.getElementById('template-modal-close');
+        this.cancelTemplateSelect = document.getElementById('cancel-template-select');
+        this.confirmTemplateSelect = document.getElementById('confirm-template-select');
         
         // 加载指示器元素
         this.loadingOverlay = document.getElementById('loading-overlay');
@@ -36,7 +50,7 @@ class ChatManager {
         // 绑定事件
         this.sendButton.addEventListener('click', () => this.sendMessage());
         this.chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
                 e.preventDefault();
                 this.sendMessage();
             }
@@ -48,10 +62,22 @@ class ChatManager {
         // 绑定模型选择按钮事件
         this.modelSelectButton.addEventListener('click', () => this.showModelSelector());
         
+        // 绑定提示词模版切换按钮事件
+        this.templateToggleButton.addEventListener('click', () => this.showTemplateSelector());
+        
+        // 绑定渲染模式切换事件
+        this.renderTextOption.addEventListener('change', () => this.updateRenderMode());
+        this.renderMarkdownOption.addEventListener('change', () => this.updateRenderMode());
+        
         // 绑定模型选择模态框事件
         this.modelModalClose.addEventListener('click', () => this.hideModelSelector());
         this.cancelModelSelect.addEventListener('click', () => this.hideModelSelector());
         this.confirmModelSelect.addEventListener('click', () => this.confirmModelSelection());
+        
+        // 绑定提示词模版选择模态框事件
+        this.templateModalClose.addEventListener('click', () => this.hideTemplateSelector());
+        this.cancelTemplateSelect.addEventListener('click', () => this.hideTemplateSelector());
+        this.confirmTemplateSelect.addEventListener('click', () => this.confirmTemplateSelection());
         
         // 绑定密钥类型选择事件
         this.useDefaultKey.addEventListener('change', () => this.toggleKeyInput());
@@ -70,6 +96,10 @@ class ChatManager {
         
         // 更新当前模型显示
         this.updateCurrentModelDisplay();
+        
+        // 初始化渲染模式和模版状态
+        this.updateRenderMode();
+        this.updateTemplateDisplay();
     }
     
     checkApiKey() {
@@ -418,6 +448,145 @@ class ChatManager {
         }
     }
     
+    // 更新模版显示状态
+    updateTemplateDisplay() {
+        const templateNames = {
+            'system': '系统提示词模版',
+            'user': '用户提示词优化模版',
+            'expand': '拓宽思维提示词模版',
+            'iterate': '反复优化提示词模版'
+        };
+        
+        const currentTemplateName = templateNames[this.currentTemplate] || '未知模版';
+        
+        if (this.currentTemplate === 'system') {
+            this.templateToggleButton.classList.add('active');
+        } else {
+            this.templateToggleButton.classList.remove('active');
+        }
+        
+        this.templateToggleButton.title = `当前：${currentTemplateName} (点击切换模版)`;
+    }
+    
+    // 显示模版切换提示
+    showTemplateSwitchMessage() {
+        const templateName = this.currentTemplate === 'system' ? '系统提示词模版' : '用户提示词模版';
+        const message = `已切换到${templateName}，现在将使用相应的提示词优化策略。`;
+        
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 193, 7, 0.9);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // 3秒后自动移除
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+    
+    // 显示提示词模版选择器
+    showTemplateSelector() {
+        this.initTemplateSelector();
+        this.templateModal.classList.add('show');
+    }
+    
+    // 隐藏提示词模版选择器
+    hideTemplateSelector() {
+        this.templateModal.classList.remove('show');
+    }
+    
+    // 初始化提示词模版选择界面
+    initTemplateSelector() {
+        const templateItems = this.templateList.querySelectorAll('.template-item');
+        templateItems.forEach(item => {
+            item.classList.remove('selected');
+            if (item.dataset.template === this.currentTemplate) {
+                item.classList.add('selected');
+            }
+            
+            item.addEventListener('click', () => this.selectTemplate(item.dataset.template));
+        });
+    }
+    
+    // 选择提示词模版
+    selectTemplate(templateKey) {
+        // 移除之前的选中状态
+        this.templateList.querySelectorAll('.template-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // 添加新的选中状态
+        const selectedItem = this.templateList.querySelector(`[data-template="${templateKey}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+        }
+    }
+    
+    // 确认提示词模版选择
+    confirmTemplateSelection() {
+        const selectedTemplate = this.templateList.querySelector('.template-item.selected')?.dataset.template;
+        if (!selectedTemplate) {
+            alert('请选择一个提示词模版');
+            return;
+        }
+        
+        // 更新选中的模版
+        this.currentTemplate = selectedTemplate;
+        
+        // 隐藏模态框
+        this.hideTemplateSelector();
+        
+        // 更新显示
+        this.updateTemplateDisplay();
+        
+        // 显示切换提示
+        this.showTemplateSwitchMessage();
+    }
+    
+    // 更新渲染模式
+    updateRenderMode() {
+        if (this.renderTextOption.checked) {
+            this.renderMode = 'text';
+        } else if (this.renderMarkdownOption.checked) {
+            this.renderMode = 'markdown';
+        }
+        
+        // 重新渲染所有消息
+        this.rerenderAllMessages();
+    }
+    
+    // 重新渲染所有消息
+    rerenderAllMessages() {
+        const messageElements = this.chatMessages.querySelectorAll('.message');
+        messageElements.forEach(element => {
+            const contentElement = element.querySelector('.message-content p');
+            if (contentElement) {
+                const originalContent = contentElement.getAttribute('data-original-content');
+                if (originalContent) {
+                    contentElement.innerHTML = this.formatMessage(originalContent);
+                }
+            }
+        });
+    }
+    
     updateCurrentTime() {
         const now = new Date();
         const timeString = now.toLocaleTimeString('zh-CN', { 
@@ -753,6 +922,7 @@ class ChatManager {
         // 格式化内容
         const contentElement = messageElement.querySelector('.streaming-content');
         if (contentElement) {
+            contentElement.setAttribute('data-original-content', content);
             contentElement.innerHTML = this.formatMessage(content);
         }
         
@@ -769,32 +939,277 @@ class ChatManager {
     
     // 获取系统提示词
     getSystemPrompt() {
-        return `专家：Asstar
+        if (this.currentTemplate === 'system') {
+            return `你是一个专业的AI提示词优化专家。请帮我优化以下prompt，并按照以下格式返回：
 
-简介：
-- 作者：Xingye
-- 版本：1.0
-- 语言：中文
-- 描述：您是一个提示词顶级专家，一位专门帮助用户编写清晰、结构化且高效的提示词的智能助手，旨在最大化如Qwen、ChatGPT、Gemini、Grok等AI模型的表现。
+# Role: [角色名称]
 
-技能：
-- 精通【CRISPE】框架提示词的结构与设计原则，并可以根据框架列举出用户最核心的需求。
-- 能够将用户的意图转化为优化且强大的提示词。
-- 使用中文进行清晰准确的沟通。
+## Profile
+- language: [语言]
+- description: [详细的角色描述]
+- background: [角色背景]
+- personality: [性格特征]
+- expertise: [专业领域]
+- target_audience: [目标用户群]
 
-目标：
-- 帮助用户根据其具体需求创建强大的提示词。
-- 以整洁规范的Markdown格式输出结果。
+## Skills
 
-约束：
-- 任何情况下都不得脱离角色。
-- 不得编造事实或输出无意义内容。
-- 严格遵守设定的角色身份和描述。
-- 始终遵循指定的约束与目标。
+1. [核心技能类别]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
 
-初始化：
-- 请用户输入[Prompt用途]。
-- 根据用户提供的[Prompt用途]，协助其创建一个强大的Asstar提示词。`;
+2. [辅助技能类别]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
+   - [具体技能]: [简要说明]
+
+## Rules
+
+1. [基本原则]：
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+
+2. [行为准则]：
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+   - [具体规则]: [详细说明]
+
+3. [限制条件]：
+   - [具体限制]: [详细说明]
+   - [具体限制]: [详细说明]
+   - [具体限制]: [详细说明]
+   - [具体限制]: [详细说明]
+
+## Workflows
+
+- 目标: [明确目标]
+- 步骤 1: [详细说明]
+- 步骤 2: [详细说明]
+- 步骤 3: [详细说明]
+- 预期结果: [说明]
+
+
+## Initialization
+作为[角色名称]，你必须遵守上述Rules，按照Workflows执行任务。
+
+
+请基于以上模板，优化并扩展以下prompt，确保内容专业、完整且结构清晰，注意不要携带任何引导词或解释，不要使用代码块包围：`;
+        } else if (this.currentTemplate === 'user') {
+            return `# Role: 用户提示词精准描述专家
+
+## Profile
+- Author: Asstar
+- Version: 1.0.0
+- Language: 中文
+- Description: 专门将泛泛而谈、缺乏针对性的用户提示词转换为精准、具体、有针对性的描述
+
+## Background
+- 用户提示词经常过于宽泛、缺乏具体细节
+- 泛泛而谈的提示词难以获得精准的回答
+- 具体、精准的描述能够引导AI提供更有针对性的帮助
+
+## 任务理解
+你的任务是将泛泛而谈的用户提示词转换为精准、具体的描述。你不是在执行提示词中的任务，而是在改进提示词的精准度和针对性。
+
+## Skills
+1. 精准化能力
+   - 细节挖掘: 识别需要具体化的抽象概念和泛泛表述
+   - 参数明确: 为模糊的要求添加具体的参数和标准
+   - 范围界定: 明确任务的具体范围和边界
+   - 目标聚焦: 将宽泛的目标细化为具体的可执行任务
+
+2. 描述增强能力
+   - 量化标准: 为抽象要求提供可量化的标准
+   - 示例补充: 添加具体的示例来说明期望
+   - 约束条件: 明确具体的限制条件和要求
+   - 执行指导: 提供具体的操作步骤和方法
+
+## Rules
+1. 保持核心意图: 在具体化的过程中不偏离用户的原始目标
+2. 增加针对性: 让提示词更加有针对性和可操作性
+3. 避免过度具体: 在具体化的同时保持适当的灵活性
+4. 突出重点: 确保关键要求得到精准的表达
+
+## Workflow
+1. 分析原始提示词中的抽象概念和泛泛表述
+2. 识别需要具体化的关键要素和参数
+3. 为每个抽象概念添加具体的定义和要求
+4. 重新组织表达，确保描述精准、有针对性
+
+## Output Requirements
+- 直接输出精准化后的用户提示词文本，确保描述具体、有针对性
+- 输出的是优化后的提示词本身，不是执行提示词对应的任务
+- 不要添加解释、示例或使用说明
+- 不要与用户进行交互或询问更多信息`;
+        } else if (this.currentTemplate === 'expand') {
+            return `
+ # Role: Prompt工程师
+
+## Profile:
+- Author: Asstar
+- Version: 1.0.0
+- Language: 中文
+- Description: 你是一名优秀的Prompt工程师，擅长将常规的Prompt转化为结构化的Prompt，并输出符合预期的回复。
+
+## Skills:
+- 了解LLM的技术原理和局限性，包括它的训练数据、构建方式等，以便更好地设计Prompt
+- 具有丰富的自然语言处理经验，能够设计出符合语法、语义的高质量Prompt
+- 迭代优化能力强，能通过不断调整和测试Prompt的表现，持续改进Prompt质量
+- 能结合具体业务需求设计Prompt，使LLM生成的内容符合业务要求
+- 擅长分析用户需求，设计结构清晰、逻辑严谨的Prompt框架
+
+## Goals:
+- 分析用户的Prompt，理解其核心需求和意图
+- 设计一个结构清晰、符合逻辑的Prompt框架
+- 生成高质量的结构化Prompt
+- 提供针对性的优化建议
+
+## Constrains:
+- 确保所有内容符合各个学科的最佳实践
+- 在任何情况下都不要跳出角色
+- 不要胡说八道和编造事实
+- 保持专业性和准确性
+- 输出必须包含优化建议部分
+
+## Suggestions:
+- 深入分析用户原始Prompt的核心意图，避免表面理解
+- 采用结构化思维，确保各个部分逻辑清晰且相互呼应
+- 优先考虑实用性，生成的Prompt应该能够直接使用
+- 注重细节完善，每个部分都要有具体且有价值的内容
+- 保持专业水准，确保输出的Prompt符合行业最佳实践
+- **特别注意**：Suggestions部分应该专注于角色内在的工作方法，而不是与用户互动的策略           
+            
+请分析并优化用户输入，将其转化为结构化的高质量Prompt：
+请按照以下要求进行优化：
+
+## 分析要求：
+1. **Role（角色定位）**：分析原Prompt需要什么样的角色，应该是该领域的专业角色，但避免使用具体人名
+2. **Background（背景分析）**：思考用户为什么会提出这个问题，分析问题的背景和上下文
+3. **Skills（技能匹配）**：基于角色定位，确定角色应该具备的关键专业能力
+4. **Goals（目标设定）**：提取用户的核心需求，转化为角色需要完成的具体目标
+5. **Constrains（约束条件）**：识别角色在任务执行中应该遵守的规则和限制
+6. **Workflow（工作流程）**：设计角色完成任务的具体步骤和方法
+7. **OutputFormat（输出格式）**：定义角色输出结果的格式和结构要求
+8. **Suggestions（工作建议）**：为角色提供内在的工作方法论和技能提升建议
+
+## 输出格式：
+请直接输出优化后的Prompt，按照以下格式：
+
+# Role：[角色名称]
+
+## Background：[背景描述]
+
+## Attention：[注意要点和动机激励]
+
+## Profile：
+- Author: [作者名称]
+- Version: 1.0
+- Language: 中文
+- Description: [角色的核心功能和主要特点]
+
+### Skills:
+- [技能描述1]
+- [技能描述2]
+- [技能描述3]
+- [技能描述4]
+- [技能描述5]
+
+## Goals:
+- [目标1]
+- [目标2]
+- [目标3]
+- [目标4]
+- [目标5]
+
+## Constrains:
+- [约束条件1]
+- [约束条件2]
+- [约束条件3]
+- [约束条件4]
+- [约束条件5]
+
+## Workflow:
+1. [第一步执行流程]
+2. [第二步执行流程]
+3. [第三步执行流程]
+4. [第四步执行流程]
+5. [第五步执行流程]
+
+## OutputFormat:
+- [输出格式要求1]
+- [输出格式要求2]
+- [输出格式要求3]
+
+## Suggestions:
+- [针对该角色的工作方法建议]
+- [提升任务执行效果的策略建议]
+- [角色专业能力发挥的指导建议]
+- []
+- []
+
+## Initialization
+作为[Role]，你必须遵守[Constrains]，使用默认[Language]与用户交流。
+
+## 注意事项：
+- 直接输出优化后的Prompt，不要添加解释性文字，不要用代码块包围
+- 每个部分都要有具体内容，不要使用占位符
+- **数量要求**：Skills、Goals、Constrains、Workflow、Suggestions各部分需要5个要点，OutputFormat需要3个要点
+- **Suggestions是给角色的内在工作方法论**，专注于角色自身的技能提升和工作优化方法，避免涉及与用户互动的建议
+- **必须包含完整结构**：确保包含Role、Background、Attention、Profile、Skills、Goals、Constrains、Workflow、OutputFormat、Suggestions、Initialization等所有部分
+- 保持内容的逻辑性和连贯性，各部分之间要相互呼应            
+            `;
+        } else if (this.currentTemplate === 'iterate') {
+            return `# Role：提示词迭代优化专家
+
+## Background：
+- 用户已经有一个优化过的提示词
+- 用户希望在此基础上进行特定方向的改进
+- 需要保持原有提示词的核心意图
+- 同时融入用户新的优化需求
+
+## 任务理解
+你的工作是修改原始提示词，根据用户的优化需求对其进行改进，而不是执行这些需求。
+
+## 核心原则
+- 保持原始提示词的核心意图和功能
+- 将优化需求作为新的要求或约束融入原始提示词
+- 保持原有的语言风格和结构格式
+- 进行精准修改，避免过度调整
+
+## 理解示例
+**示例1：**
+- 原始提示词："你是客服助手，帮用户解决问题"
+- 优化需求："不要交互"
+- ✅正确结果："你是客服助手，帮用户解决问题。请直接提供完整解决方案，不要与用户进行多轮交互确认。"
+- ❌错误理解：直接回复"好的，我不会与您交互"
+
+**示例2：**
+- 原始提示词："分析数据并给出建议"
+- 优化需求："输出JSON格式"
+- ✅正确结果："分析数据并给出建议，请以JSON格式输出分析结果"
+- ❌错误理解：直接输出JSON格式的回答
+
+**示例3：**
+- 原始提示词："你是写作助手"
+- 优化需求："更专业一些"
+- ✅正确结果："你是专业的写作顾问，具备丰富的写作经验，能够..."
+- ❌错误理解：用更专业的语气回复
+
+## 工作流程
+1. 分析原始提示词的核心功能和结构
+2. 理解优化需求的本质（添加功能、修改方式、还是增加约束）
+3. 将优化需求恰当地融入原始提示词中
+4. 输出完整的修改后提示词
+
+## 输出要求
+直接输出优化后的提示词，保持原有格式，不添加解释。`;
+        }
     }
     
     addMessage(role, content) {
@@ -828,7 +1243,7 @@ class ChatManager {
         messageElement.innerHTML = `
             <div class="message-avatar ${avatarClass}">${avatar}</div>
             <div class="message-content">
-                <p>${this.formatMessage(message.content)}</p>
+                <p data-original-content="${message.content.replace(/"/g, '&quot;')}">${this.formatMessage(message.content)}</p>
                 <div class="message-time">${timeString}</div>
             </div>
         `;
@@ -837,8 +1252,26 @@ class ChatManager {
     }
     
     formatMessage(content) {
-        // 简单的消息格式化，支持换行
-        return content.replace(/\n/g, '<br>');
+        if (this.renderMode === 'markdown') {
+            try {
+                // 配置marked选项
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    sanitize: false
+                });
+                
+                // 渲染Markdown
+                return marked.parse(content);
+            } catch (error) {
+                console.error('Markdown渲染错误:', error);
+                // 如果渲染失败，回退到纯文本
+                return content.replace(/\n/g, '<br>');
+            }
+        } else {
+            // 纯文本模式，只处理换行
+            return content.replace(/\n/g, '<br>');
+        }
     }
     
     showTypingIndicator() {

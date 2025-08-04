@@ -6,6 +6,7 @@
     <title>Asstar Prompt</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* 提示词页面特定样式 */
         .prompt-container {
@@ -121,6 +122,64 @@
         .model-select-button:hover {
             background: rgba(0, 212, 255, 0.2);
             transform: translateY(-1px);
+        }
+
+        .template-toggle-button {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ffc107;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .template-toggle-button:hover {
+            background: rgba(255, 193, 7, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .template-toggle-button.active {
+            background: rgba(255, 193, 7, 0.3);
+            border-color: #ffc107;
+        }
+
+        .render-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .render-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .render-option:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .render-option input[type="radio"] {
+            accent-color: var(--primary-color);
+        }
+
+        .render-option input[type="radio"]:checked + span {
+            color: var(--primary-color);
+            font-weight: 500;
         }
 
         .chat-messages {
@@ -522,6 +581,146 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
+        /* 提示词模版选择模态框 */
+        .template-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .template-modal.show {
+            display: flex;
+        }
+
+        .template-modal-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+        }
+
+        .template-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .template-modal-title {
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .template-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .template-modal-close:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .template-list {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .template-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .template-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #ffc107;
+            transform: translateY(-2px);
+        }
+
+        .template-item.selected {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .template-item-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .template-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .template-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .template-features {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .template-features h5 {
+            color: var(--text-primary);
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .template-features ul {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin: 0;
+            padding-left: 1.2rem;
+            line-height: 1.4;
+        }
+
+        .template-features li {
+            margin-bottom: 0.25rem;
+        }
+
         /* 加载指示器 */
         .loading-overlay {
             position: fixed;
@@ -687,6 +886,9 @@
                     <p>专业的Prompt编写助手</p>
                 </div>
                 <div class="chat-actions">
+                    <button class="template-toggle-button" id="template-toggle-button" title="切换提示词模版">
+                        <span>📝</span>
+                    </button>
                     <button class="model-select-button" id="model-select-button" title="选择AI模型">
                         <span>🤖</span>
                     </button>
@@ -707,6 +909,16 @@
             </div>
 
             <div class="chat-input-container">
+                <div class="render-options">
+                    <label class="render-option">
+                        <input type="radio" name="render-mode" value="text" id="render-text" checked>
+                        <span>纯文本</span>
+                    </label>
+                    <label class="render-option">
+                        <input type="radio" name="render-mode" value="markdown" id="render-markdown">
+                        <span>Markdown</span>
+                    </label>
+                </div>
                 <div class="chat-input-wrapper">
                     <textarea 
                         class="chat-input" 
@@ -758,6 +970,99 @@
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" id="cancel-model-select">取消</button>
                 <button class="modal-btn modal-btn-primary" id="confirm-model-select">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示词模版选择模态框 -->
+    <div class="template-modal" id="template-modal">
+        <div class="template-modal-content">
+            <div class="template-modal-header">
+                <h3 class="template-modal-title">选择提示词模版</h3>
+                <button class="template-modal-close" id="template-modal-close">&times;</button>
+            </div>
+            
+            <div class="template-list" id="template-list">
+                <div class="template-item" data-template="system">
+                    <div class="template-item-header">
+                        <div class="template-icon">🔧</div>
+                        <div>
+                            <h4 class="template-name">系统提示词模版</h4>
+                            <p class="template-description">专门用于创建全新的提示词，适合从零开始构建结构化、高效的AI提示词</p>
+                        </div>
+                    </div>
+                    <div class="template-features">
+                        <h5>适用场景：</h5>
+                        <ul>
+                            <li>创建全新的AI助手提示词</li>
+                            <li>设计特定任务的提示词框架</li>
+                            <li>构建角色扮演类提示词</li>
+                            <li>开发专业领域AI助手</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="template-item" data-template="user">
+                    <div class="template-item-header">
+                        <div class="template-icon">✏️</div>
+                        <div>
+                            <h4 class="template-name">用户提示词优化模版</h4>
+                            <p class="template-description">专门用于优化和改进现有的提示词，提升其效果和清晰度</p>
+                        </div>
+                    </div>
+                    <div class="template-features">
+                        <h5>适用场景：</h5>
+                        <ul>
+                            <li>改进现有的提示词效果</li>
+                            <li>修复提示词中的问题</li>
+                            <li>优化提示词的结构和表达</li>
+                            <li>提升提示词的成功率</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="template-item" data-template="expand">
+                    <div class="template-item-header">
+                        <div class="template-icon">🧠</div>
+                        <div>
+                            <h4 class="template-name">拓宽思维提示词模版</h4>
+                            <p class="template-description">帮助用户从多角度思考问题，拓展思维边界，获得更全面的解决方案</p>
+                        </div>
+                    </div>
+                    <div class="template-features">
+                        <h5>适用场景：</h5>
+                        <ul>
+                            <li>需要多角度分析的问题</li>
+                            <li>创新思维和创意发想</li>
+                            <li>复杂问题的全面思考</li>
+                            <li>突破思维定式的场景</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="template-item" data-template="iterate">
+                    <div class="template-item-header">
+                        <div class="template-icon">🔄</div>
+                        <div>
+                            <h4 class="template-name">反复优化提示词模版</h4>
+                            <p class="template-description">通过多轮迭代优化，逐步完善提示词，达到最佳效果</p>
+                        </div>
+                    </div>
+                    <div class="template-features">
+                        <h5>适用场景：</h5>
+                        <ul>
+                            <li>需要持续改进的复杂任务</li>
+                            <li>多轮优化和迭代开发</li>
+                            <li>精益求精的提示词设计</li>
+                            <li>追求最佳效果的场景</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" id="cancel-template-select">取消</button>
+                <button class="modal-btn modal-btn-primary" id="confirm-template-select">确认</button>
             </div>
         </div>
     </div>
