@@ -1,0 +1,34 @@
+name: Update GitHub Trending Data
+
+on:
+  schedule:
+    # 每天凌晨2点更新
+    - cron: '0 2 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-trending:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Fetch GitHub Trending data
+      run: node fetch-trending.js
+      
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add trending-data.json
+        git commit -m "Update GitHub trending data [skip ci]" || echo "No changes to commit"
+        git push 
