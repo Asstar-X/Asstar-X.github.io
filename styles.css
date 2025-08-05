@@ -104,6 +104,17 @@ body {
     50% { opacity: 0.4; }
 }
 
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ===== 导航栏 ===== */
 .header {
     position: fixed;
@@ -190,6 +201,9 @@ body {
     flex-direction: column;
     cursor: pointer;
     gap: 4px;
+    padding: 0.5rem;
+    z-index: 1001;
+    transition: all 0.3s ease;
 }
 
 .nav-toggle span {
@@ -197,6 +211,20 @@ body {
     height: 2px;
     background: var(--text-primary);
     transition: all 0.3s ease;
+    border-radius: 1px;
+}
+
+/* 汉堡按钮动画效果 */
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
 }
 
 /* ===== 英雄区域 ===== */
@@ -794,6 +822,40 @@ section {
 @media (max-width: 768px) {
     .nav-links {
         display: none;
+    }
+    
+    /* 移动端菜单展开样式 */
+    .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        padding: 1rem 0;
+        gap: 0;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .nav-links.open .nav-link {
+        padding: 1rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    
+    .nav-links.open .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    .nav-links.open .nav-link:hover {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--primary-color);
     }
     
     .nav-toggle {

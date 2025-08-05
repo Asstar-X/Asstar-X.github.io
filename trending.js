@@ -50,7 +50,7 @@ class GitHubTrending {
 
     async fetchTrendingData() {
         try {
-            // 首先尝试从本地JSON文件获取数据
+            // 从本地JSON文件获取数据（由Python爬虫更新）
             const response = await fetch('trending-data.json');
             if (response.ok) {
                 const data = await response.json();
@@ -60,19 +60,6 @@ class GitHubTrending {
             }
         } catch (error) {
             console.warn('无法加载本地数据文件:', error);
-        }
-
-        try {
-            // 尝试从真实API获取数据
-            const response = await fetch(`/api/github-trending?period=${this.currentPeriod}`);
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success) {
-                    return result.data;
-                }
-            }
-        } catch (error) {
-            console.warn('无法连接到真实API，使用模拟数据:', error);
         }
 
         // 如果API不可用，使用模拟数据
@@ -340,28 +327,7 @@ class GitHubTrending {
         }, 6 * 60 * 60 * 1000);
     }
 
-    // 获取真实GitHub数据的函数（需要后端支持）
-    async fetchRealGitHubData() {
-        // 这里需要设置一个后端服务来获取GitHub Trending数据
-        // 由于GitHub API的CORS限制，前端无法直接访问
-        // 建议使用以下方案之一：
-        // 1. 设置一个简单的后端服务（Node.js/Python等）
-        // 2. 使用GitHub Actions定期更新数据文件
-        // 3. 使用第三方服务如GitHub Trending API
-        
-        const response = await fetch('/api/github-trending', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch trending data');
-        }
-
-        return await response.json();
-    }
 }
 
 // 初始化应用

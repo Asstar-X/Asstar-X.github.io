@@ -190,6 +190,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // 添加粒子效果
     createParticles();
     loadProjects();
+    
+    // 汉堡菜单交互
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+            // 添加汉堡按钮动画效果
+            navToggle.classList.toggle('active');
+        });
+        
+        // 点击导航链接后关闭菜单
+        navLinks.addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-link')) {
+                navLinks.classList.remove('open');
+                navToggle.classList.remove('active');
+            }
+        });
+        
+        // 点击页面其他区域关闭菜单
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('open');
+                navToggle.classList.remove('active');
+            }
+        });
+    }
 });
 
 // 创建粒子效果
