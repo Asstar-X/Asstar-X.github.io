@@ -37,7 +37,9 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: .
+        # ❌ 不要用 GITHUB_TOKEN
+        # ✅ 改用你创建的 PAT
+        github_token: ${{ secrets.ACCESS_TOKEN }}
+        publish_dir: ./dist        # 👈 建议：通常构建输出在 dist 或 build 目录
         publish_branch: gh-pages
-        force_orphan: true 
+        force_orphan: true
