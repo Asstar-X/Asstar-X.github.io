@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asstar 太空宇宙</title>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* 页面基础布局 */
+    html, body { height: 100%; margin: 0; background: #02030a; }
+    .space-root { position: fixed; inset: 0; overflow: hidden; }
+    canvas { display: block; }
+
+    /* 叠加UI */
+    .ui-bar { position: absolute; top: 16px; left: 16px; display: flex; gap: 8px; z-index: 3; }
+    .ui-btn { backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.12); background: rgba(10,14,25,0.55); color: #e6f1ff; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-family: "Exo 2", ui-sans-serif; transition: all .2s; }
+    .ui-btn:hover { background: rgba(22,28,45,0.7); transform: translateY(-1px); }
+
+    .add-planet-btn { position: absolute; right: 16px; bottom: 16px; z-index: 3; padding: 12px 16px; font-weight: 600; box-shadow: 0 8px 30px rgba(0,0,0,.35); }
+
+    .legend { position: absolute; top: 16px; right: 16px; z-index: 3; backdrop-filter: blur(6px); background: rgba(10,14,25,0.55); border: 1px solid rgba(255,255,255,0.08); padding: 10px 12px; border-radius: 10px; color: #cfe3ff; font-size: 12px; line-height: 1.4; }
+    .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+    /* 详情面板 */
+    .panel { position: absolute; right: 16px; top: 64px; z-index: 3; width: min(360px, calc(100% - 32px)); backdrop-filter: blur(10px); background: linear-gradient(180deg, rgba(10,14,25,0.75), rgba(6,8,16,0.75)); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: #eaf2ff; box-shadow: 0 10px 40px rgba(0,0,0,.4); display: none; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .panel-title { font-family: Orbitron, ui-sans-serif; letter-spacing: .5px; font-weight: 800; }
+    .close { cursor: pointer; opacity: .8; }
+    .panel-body { padding: 14px 16px; display: grid; gap: 12px; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 999px; background: rgba(53, 130, 255, 0.18); color: #cfe3ff; border: 1px solid rgba(53,130,255,.3); margin-right: 6px; font-size: 12px; }
+    .meta { color: #b7c8e6; font-size: 13px; }
+    .meta strong { color: #eaf2ff; }
+    .panel-actions { padding: 10px 16px 16px; display: flex; gap: 8px; }
+
+    /* 添加行星弹窗 */
+    .modal-mask { position: fixed; inset: 0; background: rgba(2,3,10,0.6); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 4; }
+    .modal { width: min(520px, calc(100% - 40px)); background: #0b1020; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; color: #eaf2ff; box-shadow: 0 15px 60px rgba(0,0,0,.45); }
+    .modal header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.07); font-weight: 700; }
+    .modal .body { padding: 16px 18px; display: grid; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 12px; color: #bcd0ef; }
+    .field input, .field textarea { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #eaf2ff; padding: 10px 12px; border-radius: 10px; font: inherit; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: rgba(64,132,255,.7); box-shadow: 0 0 0 3px rgba(64,132,255,.15); }
+    .modal footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,.07); }
+    .btn-danger { background: rgba(255, 75, 110, .12); border: 1px solid rgba(255,75,110,.35); color: #ffd9e2; }
+    .btn-primary { background: linear-gradient(180deg,#3b82f6,#2563eb); border: none; color: white; }
+
+    /* 提示 */
+    .hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; color: #a9bfe6; font-size: 12px; letter-spacing: .3px; z-index: 2; background: rgba(10,14,25,0.45); padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body>
+  <div class="space-root">
+    <div id="three-root"></div>
+
+    <div class="ui-bar">
+      <button class="ui-btn" data-camera="free">自由视角</button>
+      <button class="ui-btn" data-camera="top">俯瞰</button>
+      <button class="ui-btn" data-camera="ring">环轨</button>
+      <button class="ui-btn" data-camera="deep">深空</button>
+    </div>
+
+    <div class="legend">
+      <div><span class="dot" style="background:#74a7ff"></span>创意星</div>
+      <div><span class="dot" style="background:#9ef7d3"></span>知识星</div>
+      <div><span class="dot" style="background:#ffd37e"></span>科技星</div>
+      <div><span class="dot" style="background:#ff9fb6"></span>八卦星</div>
+    </div>
+
+    <div class="panel" id="planet-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="panel-title">行星</div>
+        <div class="close ui-btn" id="panel-close">关闭</div>
+      </div>
+      <div class="panel-body">
+        <div class="meta" id="panel-desc"></div>
+        <div id="panel-tags"></div>
+        <div class="meta">微信群：<a id="panel-link" target="_blank" rel="noopener">点击加入</a></div>
+        <div class="meta">当前群人数：<strong id="panel-count">-</strong></div>
+      </div>
+      <div class="panel-actions">
+        <button class="ui-btn" id="panel-edit">编辑</button>
+        <button class="ui-btn btn-danger" id="panel-delete">删除</button>
+      </div>
+    </div>
+
+    <button class="ui-btn add-planet-btn" id="add-planet-btn">＋ 添加行星</button>
+
+    <div class="modal-mask" id="modal-mask">
+      <div class="modal">
+        <header>
+          <span id="modal-title">添加行星</span>
+          <span class="close" id="modal-close">✕</span>
+        </header>
+        <div class="body">
+          <div class="field">
+            <label>名称</label>
+            <input id="f-name" placeholder="例如：创意星" />
+          </div>
+          <div class="field">
+            <label>描述</label>
+            <textarea id="f-desc" rows="3" placeholder="为行星添加一句话描述"></textarea>
+          </div>
+          <div class="field">
+            <label>标签（逗号分隔）</label>
+            <input id="f-tags" placeholder="设计,艺术,手工" />
+          </div>
+          <div class="field">
+            <label>微信群链接（或邀请说明）</label>
+            <input id="f-link" placeholder="https://... 或 备注说明" />
+          </div>
+          <div class="field">
+            <label>群人数</label>
+            <input id="f-count" type="number" min="0" step="1" placeholder="例如：128" />
+          </div>
+        </div>
+        <footer>
+          <button class="ui-btn" id="modal-cancel">取消</button>
+          <button class="ui-btn btn-primary" id="modal-save">保存</button>
+        </footer>
+      </div>
+    </div>
+
+    <div class="hint">拖动旋转，滚轮缩放，点击行星查看详情</div>
+  </div>
+
+  <script type="module" src="space.js"></script>
+</body>
+</html>
+
+
