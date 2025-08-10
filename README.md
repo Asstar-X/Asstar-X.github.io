@@ -1,6 +1,7 @@
 # Asstar - 探索未知的边界
 
-![Asstar Logo](./images/logo.jpg) <!-- 替换为你的网站 logo 链接 -->
+<img src="./images/logo.jpg" alt="Asstar Logo" width="200"> <!-- 替换为你的网站 logo 链接 -->
+
 
 **Asstar** 是一个激发灵感与探索的在线平台，致力于带领用户跨越已知边界，探寻未知的无限可能。我们为好奇心旺盛的探险家、创作者和学习者打造了一个独特而引人入胜的空间。
 
