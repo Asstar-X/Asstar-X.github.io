@@ -1,7 +1,7 @@
 # Asstar - 探索未知的边界
 
 <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-  <img src="./images/logo.jpg" alt="Asstar Logo" style="width: 700px; height: auto; flex: 0 0 auto;">
+  <img src="./images/logo.jpg" alt="Asstar Logo" style="width: 300px; height: auto; flex: 0 0 auto;">
   <div style="flex: 1; min-width: 300px;">
     Asstar 是一个激发灵感与探索的在线平台，致力于带领用户跨越已知边界，探寻未知的无限可能。我们为好奇心旺盛的探险家、创作者和学习者打造了一个独特而引人入胜的空间。
   </div>
