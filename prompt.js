@@ -453,7 +453,7 @@ class ChatManager {
         const templateNames = {
             'system': '系统提示词模版',
             'user': '用户提示词优化模版',
-            'expand': '拓宽思维提示词模版',
+            'expand': 'CoT拓提示词模版',
             'iterate': '反复优化提示词模版'
         };
         
