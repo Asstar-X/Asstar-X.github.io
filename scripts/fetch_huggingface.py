@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
 HuggingFace Model Trending Data Fetcher
-使用Python爬虫抓取HuggingFace Trending数据并保存为JSON格式
+使用 Hugging Face Hub API 抓取模型列表并保存为 JSON
+
+类别：
+- trending: sort=trending
+- likes: sort=likes
+- downloads: sort=downloads
 """
 
 import requests
 import json
 import time
 from datetime import datetime
-from bs4 import BeautifulSoup
-import re
 import os
 from typing import Dict, List, Any
+from urllib.parse import urlencode
 
 class HuggingFaceScraper:
     def __init__(self):
@@ -19,6 +23,10 @@ class HuggingFaceScraper:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
+        # 适度的超时与重试
+        self.timeout_seconds = 20
+        self.max_retries = 3
+        self.api_base = 'https://huggingface.co/api/models'
         
     def fetch_trending_data(self, category: str = 'trending') -> Dict[str, Any]:
         """
@@ -31,46 +39,49 @@ class HuggingFaceScraper:
             包含抓取结果的字典
         """
         try:
-            # 构建URL
-            url = 'https://huggingface.co/models'
-            sort_params = {
-                'trending': '?sort=trending',
-                'likes': '?sort=likes',
-                'downloads': '?sort=downloads'
+            # 构建 API URL
+            params = {
+                'sort': category if category in ('trending', 'likes', 'downloads') else 'trending',
+                'limit': 25,
             }
-            
-            if sort_params[category]:
-                url += sort_params[category]
-                
-            print(f"Fetching HuggingFace {category} data")
+            url = f"{self.api_base}?{urlencode(params)}"
+
+            print(f"Fetching HuggingFace {category} data via API")
             print(f"URL: {url}")
-            
-            # 发送请求
-            response = self.session.get(url)
-            response.raise_for_status()
-            
-            # 解析HTML
-            soup = BeautifulSoup(response.content, 'html.parser')
-            trending_models = []
-            
-            # 查找所有模型条目
-            model_cards = soup.find_all('article', class_='Box-row')
-            
-            for index, card in enumerate(model_cards):
-                if index >= 25:  # 限制数量
+
+            # 带重试的请求
+            last_error: Exception | None = None
+            response = None
+            for attempt in range(1, self.max_retries + 1):
+                try:
+                    response = self.session.get(url, timeout=self.timeout_seconds)
+                    response.raise_for_status()
                     break
-                    
-                model_data = self._parse_model_card(card)
-                if model_data:
-                    trending_models.append(model_data)
-            
+                except Exception as req_error:
+                    last_error = req_error
+                    print(f"Attempt {attempt} failed: {req_error}")
+                    time.sleep(2 * attempt)
+
+            if response is None:
+                raise RuntimeError(f"All retries failed: {last_error}")
+
+            items = response.json() if response.content else []
+            if not isinstance(items, list):
+                items = []
+
+            trending_models: List[Dict[str, Any]] = []
+            for index, item in enumerate(items[:25]):
+                parsed = self._map_api_item_to_model(item)
+                if parsed:
+                    trending_models.append(parsed)
+
             return {
                 'success': True,
                 'data': trending_models,
                 'category': category,
                 'timestamp': datetime.now().isoformat()
             }
-            
+
         except Exception as error:
             print(f"Error fetching {category} data: {error}")
             return {
@@ -80,69 +91,42 @@ class HuggingFaceScraper:
                 'message': str(error)
             }
     
-    def _parse_model_card(self, card) -> Dict[str, Any]:
-        """
-        解析单个模型卡片元素
-        
-        Args:
-            card: BeautifulSoup article元素
-            
-        Returns:
-            模型数据字典
-        """
+    def _map_api_item_to_model(self, item: Dict[str, Any]) -> Dict[str, Any] | None:
+        """将 HF API 返回的模型条目映射为前端所需结构。"""
         try:
-            # 获取模型名称和URL
-            model_link = card.find('h4').find('a') if card.find('h4') else None
-            if not model_link:
+            model_id = item.get('modelId') or item.get('id') or ''
+            if not model_id:
                 return None
-                
-            model_name = model_link.get_text(strip=True)
-            model_url = 'https://huggingface.co' + model_link.get('href')
-            
-            # 获取描述
-            description_elem = card.find('p', class_='text-gray-700')
-            description = description_elem.get_text(strip=True) if description_elem else 'No description available'
-            
-            # 获取任务类型
-            task_elem = card.find('span', class_='text-sm')
-            task = task_elem.get_text(strip=True) if task_elem else 'Unknown'
-            
-            # 获取参数数量
-            params_elem = card.find('span', string=re.compile(r'\d+[Bb]'))
-            parameters = params_elem.get_text(strip=True) if params_elem else 'Unknown'
-            
-            # 获取点赞数
-            likes_elem = card.find('span', string=re.compile(r'\d+[kKmM]'))
-            likes = likes_elem.get_text(strip=True) if likes_elem else '0'
-            
-            # 获取下载数
-            downloads_elem = card.find('span', string=re.compile(r'\d+[kKmM]'))
-            downloads = downloads_elem.get_text(strip=True) if downloads_elem else '0'
-            
-            # 获取标签
+
+            url = f"https://huggingface.co/{model_id}"
+            description = item.get('description') or item.get('cardData', {}).get('description') or 'No description available'
+            task = item.get('pipeline_tag') or 'Unknown'
+            # likes / downloads 为数字，这里转为带千分位的字符串
+            likes_num = item.get('likes') or 0
+            downloads_num = item.get('downloads') or 0
+            likes = f"{int(likes_num):,}"
+            downloads = f"{int(downloads_num):,}"
+            # 参数量：API 通常没有明确参数量字段，这里尝试从 tags 或 cardData 中获取，否则 Unknown
+            parameters = item.get('cardData', {}).get('parameters') or 'Unknown'
+            # 标签：优先使用 tags，其次从 cardData.tags
             tags = []
-            tag_elements = card.find_all('span', class_='text-xs')
-            for tag_elem in tag_elements:
-                tag_text = tag_elem.get_text(strip=True)
-                if tag_text and len(tag_text) > 2:
-                    tags.append(tag_text)
-            
-            # 限制标签数量
-            tags = tags[:5]
-            
+            if isinstance(item.get('tags'), list):
+                tags = [t for t in item['tags'] if isinstance(t, str)][:5]
+            elif isinstance(item.get('cardData', {}).get('tags'), list):
+                tags = [t for t in item['cardData']['tags'] if isinstance(t, str)][:5]
+
             return {
-                'name': model_name,
+                'name': model_id,
                 'description': description,
                 'task': task,
                 'parameters': parameters,
                 'likes': likes,
                 'downloads': downloads,
-                'url': model_url,
-                'tags': tags
+                'url': url,
+                'tags': tags,
             }
-            
         except Exception as error:
-            print(f"Error parsing model card: {error}")
+            print(f"Error mapping api item: {error}")
             return None
     
     def update_all_huggingface_data(self):
@@ -174,8 +158,16 @@ class HuggingFaceScraper:
                 'totalModels': sum(len(models) for models in all_data.values())
             }
             
-            # 保存到文件
+            # 如果所有分类都为空，尝试保留旧文件，避免写入空列表覆盖
             output_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'huggingface-data.json')
+            if data_to_save.get('totalModels', 0) == 0:
+                if os.path.exists(output_path):
+                    print("No models fetched; preserving existing huggingface-data.json")
+                    return
+                else:
+                    print("No models fetched and no existing file; writing empty structure anyway")
+
+            # 保存到文件
             with open(output_path, 'w', encoding='utf-8') as f:
                 json.dump(data_to_save, f, indent=2, ensure_ascii=False)
             
