@@ -39,33 +39,51 @@ class HuggingFaceScraper:
             包含抓取结果的字典
         """
         try:
-            # 构建 API URL
-            params = {
-                'sort': category if category in ('trending', 'likes', 'downloads') else 'trending',
-                'limit': 25,
-            }
-            url = f"{self.api_base}?{urlencode(params)}"
+            # 构建 API URL（trending 在 API 上不可用，做多候选兜底）
+            url_candidates: List[str] = []
+            if category == 'trending':
+                # 1) 非官方：尝试 trending=true
+                url_candidates.append(f"{self.api_base}?{urlencode({'trending': 'true', 'limit': 25})}")
+                # 2) 最近更新排序
+                url_candidates.append(f"{self.api_base}?{urlencode({'sort': 'lastModified', 'direction': '-1', 'limit': 25})}")
+                # 3) 点赞排序作为最终兜底
+                url_candidates.append(f"{self.api_base}?{urlencode({'sort': 'likes', 'limit': 25})}")
+            else:
+                url_candidates.append(f"{self.api_base}?{urlencode({'sort': category, 'limit': 25})}")
+
+            items: List[Dict[str, Any]] = []
+            last_error: Exception | None = None
+            picked_url: str | None = None
 
             print(f"Fetching HuggingFace {category} data via API")
-            print(f"URL: {url}")
-
-            # 带重试的请求
-            last_error: Exception | None = None
-            response = None
-            for attempt in range(1, self.max_retries + 1):
-                try:
-                    response = self.session.get(url, timeout=self.timeout_seconds)
-                    response.raise_for_status()
+            for candidate in url_candidates:
+                print(f"Trying URL: {candidate}")
+                response = None
+                for attempt in range(1, self.max_retries + 1):
+                    try:
+                        response = self.session.get(candidate, timeout=self.timeout_seconds)
+                        response.raise_for_status()
+                        data = response.json() if response.content else []
+                        if isinstance(data, list) and len(data) > 0:
+                            items = data
+                            picked_url = candidate
+                            break
+                        else:
+                            # 即使 200 也可能返回空，继续尝试下一个候选
+                            last_error = Exception("Empty list returned")
+                    except Exception as req_error:
+                        last_error = req_error
+                        print(f"Attempt {attempt} failed: {req_error}")
+                        time.sleep(2 * attempt)
+                if items:
                     break
-                except Exception as req_error:
-                    last_error = req_error
-                    print(f"Attempt {attempt} failed: {req_error}")
-                    time.sleep(2 * attempt)
 
-            if response is None:
-                raise RuntimeError(f"All retries failed: {last_error}")
+            if not items and last_error:
+                raise RuntimeError(f"All candidates failed or returned empty: {last_error}")
 
-            items = response.json() if response.content else []
+            if picked_url:
+                print(f"Picked URL: {picked_url}")
+
             if not isinstance(items, list):
                 items = []
 
