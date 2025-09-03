@@ -54,7 +54,10 @@ class HuggingFaceTrending {
             if (response.ok) {
                 const data = await response.json();
                 if (data[this.currentCategory]) {
-                    return data[this.currentCategory];
+                    const arr = data[this.currentCategory];
+                    if (Array.isArray(arr) && arr.length > 0) {
+                        return arr;
+                    }
                 }
             }
         } catch (error) {
