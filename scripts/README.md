@@ -1,19 +1,34 @@
-# GitHub Trending 数据爬虫
+# GitHub Trending & HuggingFace 数据爬虫
 
-这个目录包含了用于抓取GitHub Trending数据的Python爬虫脚本。
+这个目录包含了用于抓取GitHub Trending和HuggingFace Model Trending数据的Python爬虫脚本。
 
 ## 功能说明
 
+### GitHub Trending
 - 抓取GitHub Trending页面的热门项目数据
 - 支持每日、每周、每月三种时间周期
 - 自动解析项目信息（名称、描述、语言、星标数等）
 - 将数据保存为JSON格式供前端使用
 
+### HuggingFace Model Trending
+- 抓取HuggingFace模型页面的热门模型数据
+- 支持Trending、Most Likes、Most Downloads三种分类
+- 自动解析模型信息（名称、描述、任务类型、参数数量、点赞数、下载数等）
+- 将数据保存为JSON格式供前端使用
+
 ## 文件说明
 
-- `fetch_trending.py` - 主要的爬虫脚本
+### GitHub Trending
+- `fetch_trending.py` - GitHub Trending爬虫脚本
+- `test_fetch.py` - GitHub Trending测试脚本
+
+### HuggingFace Model Trending
+- `fetch_huggingface.py` - HuggingFace Model Trending爬虫脚本
+- `test_huggingface.py` - HuggingFace Model Trending测试脚本
+- `update_huggingface.sh` - 自动化更新脚本
+
+### 通用
 - `requirements.txt` - Python依赖包
-- `test_fetch.py` - 测试脚本
 - `README.md` - 说明文档
 
 ## 使用方法
@@ -25,20 +40,39 @@ cd scripts
 pip install -r requirements.txt
 ```
 
-### 2. 运行爬虫
+### 2. 运行GitHub Trending爬虫
 
 ```bash
 python fetch_trending.py
 ```
 
-### 3. 手动测试
+### 3. 运行HuggingFace Model Trending爬虫
 
 ```bash
+python fetch_huggingface.py
+```
+
+### 4. 手动测试
+
+```bash
+# 测试GitHub Trending
 python test_fetch.py
+
+# 测试HuggingFace Model Trending
+python test_huggingface.py
+```
+
+### 5. 自动化更新
+
+```bash
+# 使用shell脚本自动更新HuggingFace数据
+chmod +x update_huggingface.sh
+./update_huggingface.sh
 ```
 
 ## 数据更新
 
+### GitHub Trending
 爬虫会自动抓取以下数据：
 - 项目名称和URL
 - 项目描述
@@ -49,13 +83,31 @@ python test_fetch.py
 
 数据会保存到 `../trending-data.json` 文件中，前端页面会自动读取这个文件。
 
+### HuggingFace Model Trending
+爬虫会自动抓取以下数据：
+- 模型名称和URL
+- 模型描述
+- 任务类型
+- 参数数量
+- 点赞数
+- 下载数
+- 标签信息
+
+数据会保存到 `../huggingface-data.json` 文件中，前端页面会自动读取这个文件。
+
 ## 自动化部署
 
 建议使用GitHub Actions或cron任务定期运行爬虫：
 
 ```bash
-# 每6小时运行一次
+# GitHub Trending - 每6小时运行一次
 0 */6 * * * cd /path/to/scripts && python fetch_trending.py
+
+# HuggingFace Model Trending - 每天运行一次
+0 2 * * * cd /path/to/scripts && python fetch_huggingface.py
+
+# 或者使用自动化脚本
+0 2 * * * cd /path/to/scripts && ./update_huggingface.sh
 ```
 
 ## 注意事项

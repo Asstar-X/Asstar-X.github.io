@@ -1,0 +1,42 @@
+name: Update HuggingFace Model Trending Data
+
+on:
+  schedule:
+    # 每天凌晨3点运行（UTC时间）
+    - cron: '0 3 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-huggingface:
+    runs-on: ubuntu-latest
+    
+    # 🔑 添加权限：允许写入仓库内容（git push 所需）
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # 注意：checkout 默认使用 GITHUB_TOKEN，权限由上面控制
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml
+
+      - name: Run HuggingFace scraper
+        run: |
+          python scripts/fetch_huggingface.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add huggingface-data.json
+          # 只有当有变更时才提交
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update HuggingFace trending data [skip ci]"
+          git push
