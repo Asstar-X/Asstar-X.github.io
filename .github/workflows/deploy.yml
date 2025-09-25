@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout
@@ -37,9 +39,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       with:
-        # ❌ 不要用 GITHUB_TOKEN
-        # ✅ 改用你创建的 PAT
-        github_token: ${{ secrets.ACCESS_TOKEN }}
-        publish_dir: ./dist        # 👈 建议：通常构建输出在 dist 或 build 目录
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
         publish_branch: gh-pages
         force_orphan: true
