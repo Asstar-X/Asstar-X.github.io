@@ -32,6 +32,7 @@ show_help() {
     echo "  ./manage.sh setup               # 设置自动化"
     echo "  ./manage.sh update github       # 更新GitHub Trending数据"
     echo "  ./manage.sh update huggingface  # 更新HuggingFace数据"
+    echo "  ./manage.sh update papers       # 更新HuggingFace Papers数据"
     echo "  ./manage.sh update all          # 更新所有数据"
     echo ""
 }
@@ -98,6 +99,9 @@ setup_automation() {
     if [ ! -f ".github/workflows/update-huggingface.yml" ]; then
         missing_files+=(".github/workflows/update-huggingface.yml")
     fi
+    if [ ! -f ".github/workflows/update-huggingface-papers.yml" ]; then
+        missing_files+=(".github/workflows/update-huggingface-papers.yml")
+    fi
     
     if [ ! -f "scripts/fetch_trending.py" ]; then
         missing_files+=("scripts/fetch_trending.py")
@@ -123,7 +127,8 @@ setup_automation() {
     chmod +x scripts/fetch_huggingface.py
     chmod +x scripts/test_fetch.py
     chmod +x scripts/test_huggingface.py
-    chmod +x scripts/update_huggingface.sh
+    chmod +x scripts/update_huggingface.sh 2>/dev/null || true
+    chmod +x scripts/fetch_huggingface_papers.py
     
     # 测试Python脚本
     echo -e "${CYAN}🧪 测试Python爬虫脚本...${NC}"
@@ -176,16 +181,22 @@ update_data() {
             echo -e "${BLUE}🔄 更新HuggingFace Model Trending数据...${NC}"
             python3 scripts/fetch_huggingface.py
             ;;
+        "papers")
+            echo -e "${BLUE}🔄 更新HuggingFace Papers数据...${NC}"
+            python3 scripts/fetch_huggingface_papers.py
+            ;;
         "all")
             echo -e "${BLUE}🔄 更新所有数据...${NC}"
             echo -e "${CYAN}更新GitHub Trending数据...${NC}"
             python3 scripts/fetch_trending.py
             echo -e "${CYAN}更新HuggingFace Model Trending数据...${NC}"
             python3 scripts/fetch_huggingface.py
+            echo -e "${CYAN}更新HuggingFace Papers数据...${NC}"
+            python3 scripts/fetch_huggingface_papers.py
             ;;
         *)
             echo -e "${RED}❌ 错误: 未知的数据类型 '$data_type'${NC}"
-            echo -e "${YELLOW}支持的类型: github, huggingface, all${NC}"
+            echo -e "${YELLOW}支持的类型: github, huggingface, papers, all${NC}"
             exit 1
             ;;
     esac
@@ -244,10 +255,13 @@ show_status() {
     local files=(
         ".github/workflows/update-trending.yml"
         ".github/workflows/update-huggingface.yml"
+        ".github/workflows/update-huggingface-papers.yml"
         "scripts/fetch_trending.py"
         "scripts/fetch_huggingface.py"
+        "scripts/fetch_huggingface_papers.py"
         "trending-data.json"
         "huggingface-data.json"
+        "huggingface-papers-data.json"
     )
     
     for file in "${files[@]}"; do
@@ -268,8 +282,12 @@ show_status() {
     fi
     
     if [ -f "huggingface-data.json" ]; then
-        local last_updated=$(grep -e '"lastUpdated":"[^"]*"' huggingface-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
+        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' huggingface-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}HuggingFace:${NC} 最后更新 $last_updated"
+    fi
+    if [ -f "huggingface-papers-data.json" ]; then
+        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' huggingface-papers-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+        echo -e "  ${CYAN}HuggingFace Papers:${NC} 最后更新 $last_updated"
     fi
     
     echo ""
