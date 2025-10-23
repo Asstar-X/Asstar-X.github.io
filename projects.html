@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lab - 全部项目 | Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 宇宙背景层 -->
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <div class="logo-symbol">✦</div>
+                <span class="logo-text">ASSTAR</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home" class="nav-link">首页</a></li>
+                <li><a href="index.html#about" class="nav-link">关于</a></li>
+                <li><a href="index.html#projects" class="nav-link">AI Lab</a></li>
+                <li><a href="index.html#contact" class="nav-link">联系</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- AI Lab区域 -->
+        <section class="projects">
+            <div class="container">
+                <div class="section-header">
+                    <h1 class="section-title">AI Lab - 全部项目</h1>
+                    <div class="section-line"></div>
+                </div>
+                <div class="projects-grid" id="projects-grid">
+                    <!-- 动态加载的项目卡片将插入这里 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-symbol">✦</div>
+                    <span class="logo-text">ASSTAR</span>
+                </div>
+                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      loadProjects('projects-grid', Infinity);
+    </script>
+</body>
+</html> 
