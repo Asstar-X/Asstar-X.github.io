@@ -171,7 +171,7 @@ class GitHubTrendingScraper:
             }
             
             # 保存到文件
-            output_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'trending-data.json')
+            output_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'feeds', 'trending-data.json')
             with open(output_path, 'w', encoding='utf-8') as f:
                 json.dump(data_to_save, f, indent=2, ensure_ascii=False)
             

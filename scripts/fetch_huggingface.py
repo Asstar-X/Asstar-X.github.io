@@ -177,7 +177,7 @@ class HuggingFaceScraper:
             }
             
             # 如果所有分类都为空，尝试保留旧文件，避免写入空列表覆盖
-            output_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'huggingface-data.json')
+            output_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'feeds', 'huggingface-data.json')
             if data_to_save.get('totalModels', 0) == 0:
                 if os.path.exists(output_path):
                     print("No models fetched; preserving existing huggingface-data.json")

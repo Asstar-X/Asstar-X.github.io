@@ -33,6 +33,7 @@ show_help() {
     echo "  ./manage.sh update github       # 更新GitHub Trending数据"
     echo "  ./manage.sh update huggingface  # 更新HuggingFace数据"
     echo "  ./manage.sh update papers       # 更新HuggingFace Papers数据"
+    echo "  ./manage.sh update focus        # 更新财经焦点数据"
     echo "  ./manage.sh update all          # 更新所有数据"
     echo ""
 }
@@ -103,12 +104,24 @@ setup_automation() {
         missing_files+=(".github/workflows/update-huggingface-papers.yml")
     fi
     
+    if [ ! -f ".github/workflows/update-focus.yml" ]; then
+        missing_files+=(".github/workflows/update-focus.yml")
+    fi
+    
     if [ ! -f "scripts/fetch_trending.py" ]; then
         missing_files+=("scripts/fetch_trending.py")
     fi
     
     if [ ! -f "scripts/fetch_huggingface.py" ]; then
         missing_files+=("scripts/fetch_huggingface.py")
+    fi
+    
+    if [ ! -f "scripts/fetch_huggingface_papers.py" ]; then
+        missing_files+=("scripts/fetch_huggingface_papers.py")
+    fi
+    
+    if [ ! -f "scripts/fetch_focus.py" ]; then
+        missing_files+=("scripts/fetch_focus.py")
     fi
     
     if [ ${#missing_files[@]} -gt 0 ]; then
@@ -129,6 +142,8 @@ setup_automation() {
     chmod +x scripts/test_huggingface.py
     chmod +x scripts/update_huggingface.sh 2>/dev/null || true
     chmod +x scripts/fetch_huggingface_papers.py
+    chmod +x scripts/fetch_focus.py
+    chmod +x scripts/test_focus.py
     
     # 测试Python脚本
     echo -e "${CYAN}🧪 测试Python爬虫脚本...${NC}"
@@ -145,6 +160,13 @@ setup_automation() {
         echo -e "${GREEN}✅ HuggingFace爬虫测试通过${NC}"
     else
         echo -e "${RED}❌ HuggingFace爬虫测试失败${NC}"
+    fi
+    
+    echo -e "${YELLOW}测试焦点新闻爬虫...${NC}"
+    if python3 scripts/test_focus.py; then
+        echo -e "${GREEN}✅ 焦点新闻爬虫测试通过${NC}"
+    else
+        echo -e "${RED}❌ 焦点新闻爬虫测试失败${NC}"
     fi
     
     # 提交更改
@@ -185,6 +207,10 @@ update_data() {
             echo -e "${BLUE}🔄 更新HuggingFace Papers数据...${NC}"
             python3 scripts/fetch_huggingface_papers.py
             ;;
+        "focus")
+            echo -e "${BLUE}🔄 更新财经焦点数据...${NC}"
+            python3 scripts/fetch_focus.py
+            ;;
         "all")
             echo -e "${BLUE}🔄 更新所有数据...${NC}"
             echo -e "${CYAN}更新GitHub Trending数据...${NC}"
@@ -193,10 +219,12 @@ update_data() {
             python3 scripts/fetch_huggingface.py
             echo -e "${CYAN}更新HuggingFace Papers数据...${NC}"
             python3 scripts/fetch_huggingface_papers.py
+            echo -e "${CYAN}更新财经焦点数据...${NC}"
+            python3 scripts/fetch_focus.py
             ;;
         *)
             echo -e "${RED}❌ 错误: 未知的数据类型 '$data_type'${NC}"
-            echo -e "${YELLOW}支持的类型: github, huggingface, papers, all${NC}"
+            echo -e "${YELLOW}支持的类型: github, huggingface, papers, focus, all${NC}"
             exit 1
             ;;
     esac
@@ -262,6 +290,7 @@ show_status() {
         "trending-data.json"
         "huggingface-data.json"
         "huggingface-papers-data.json"
+        "focus-data.json"
     )
     
     for file in "${files[@]}"; do
@@ -276,18 +305,23 @@ show_status() {
     echo ""
     echo -e "${YELLOW}📊 数据状态:${NC}"
     
-    if [ -f "trending-data.json" ]; then
-        local last_updated=$(grep -o '"lastUpdated":"[^"]*"' trending-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
+    if [ -f "feeds/trending-data.json" ]; then
+        local last_updated=$(grep -o '"lastUpdated":"[^"]*"' feeds/trending-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}GitHub Trending:${NC} 最后更新 $last_updated"
     fi
     
-    if [ -f "huggingface-data.json" ]; then
-        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' huggingface-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+    if [ -f "feeds/huggingface-data.json" ]; then
+        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' feeds/huggingface-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}HuggingFace:${NC} 最后更新 $last_updated"
     fi
-    if [ -f "huggingface-papers-data.json" ]; then
-        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' huggingface-papers-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+    if [ -f "feeds/huggingface-papers-data.json" ]; then
+        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' feeds/huggingface-papers-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}HuggingFace Papers:${NC} 最后更新 $last_updated"
+    fi
+    
+    if [ -f "feeds/focus-data.json" ]; then
+        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' feeds/focus-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+        echo -e "  ${CYAN}财经焦点:${NC} 最后更新 $last_updated"
     fi
     
     echo ""

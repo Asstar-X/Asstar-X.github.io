@@ -94,7 +94,7 @@
 
         async fetchGithub() {
             try {
-                const res = await fetch('trending-data.json');
+                const res = await fetch('feeds/trending-data.json');
                 if (res.ok) {
                     const json = await res.json();
                     if (json[this.period] && Array.isArray(json[this.period])) return json[this.period];
@@ -117,7 +117,7 @@
 
         async fetchHuggingface() {
             try {
-                const res = await fetch('huggingface-data.json');
+                const res = await fetch('feeds/huggingface-data.json');
                 if (res.ok) {
                     const json = await res.json();
                     if (json[this.category] && Array.isArray(json[this.category])) return json[this.category];

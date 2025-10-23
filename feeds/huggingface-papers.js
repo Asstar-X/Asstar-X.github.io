@@ -45,7 +45,7 @@ class HuggingFacePapers {
 
     async fetchPapersData() {
         try {
-            const response = await fetch('huggingface-papers-data.json');
+            const response = await fetch('feeds/huggingface-papers-data.json');
             if (response.ok) {
                 const all = await response.json();
                 const arr = all[this.currentCategory];

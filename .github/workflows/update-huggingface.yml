@@ -3,7 +3,7 @@ name: Update HuggingFace Model Trending Data
 on:
   schedule:
     # 每天凌晨3点运行（UTC时间）
-    - cron: '0 3 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add huggingface-data.json
+          git add feeds/huggingface-data.json
           # 只有当有变更时才提交
           git diff --quiet && git diff --staged --quiet || git commit -m "Update HuggingFace trending data [skip ci]"
           git push

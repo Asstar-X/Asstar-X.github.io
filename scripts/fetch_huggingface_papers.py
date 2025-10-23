@@ -177,7 +177,7 @@ class HFPapersScraper:
 def main():
     scraper = HFPapersScraper()
     data = scraper.update_all()
-    out_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'huggingface-papers-data.json')
+    out_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'feeds', 'huggingface-papers-data.json')
 
     # 如果全部为空，尽量保留旧文件
     if sum(data['totals'].values()) == 0 and os.path.exists(out_path):

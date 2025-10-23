@@ -1,35 +1,42 @@
-name: Update HuggingFace Papers Data
+name: Update Focus News Data
 
 on:
   schedule:
-    # 每天凌晨3点运行（UTC时间）
+    # 每天凌晨4点运行（UTC时间）
     - cron: '0 1 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # 允许手动触发
 
 jobs:
-  update-hf-papers:
+  update-focus:
     runs-on: ubuntu-latest
+    
+    # 🔑 添加权限：允许写入仓库内容（git push 所需）
     permissions:
       contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        # 注意：checkout 默认使用 GITHUB_TOKEN，权限由上面控制
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: |
           pip install requests beautifulsoup4 lxml
-      - name: Run HuggingFace Papers scraper
+
+      - name: Run focus news scraper
         run: |
-          python scripts/fetch_huggingface_papers.py
+          python scripts/fetch_focus.py
+
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add feeds/huggingface-papers-data.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update HuggingFace papers data [skip ci]"
+          git add feeds/focus-data.json
+          # 只有当有变更时才提交
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update focus news data [skip ci]"
           git push
-
-
