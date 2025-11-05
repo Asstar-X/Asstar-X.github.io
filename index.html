@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 宇宙背景层 -->
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <div class="logo-symbol">✦</div>
+                <span class="logo-text">ASSTAR</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link">首页</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+                <li><a href="#projects" class="nav-link">AI Lab</a></li>
+                <li><a href="space.html" class="nav-link">探索</a></li>
+                
+                <li><a href="trending-project.html" class="nav-link">Trending Project</a></li>
+                <li><a href="huggingface-papers.html" class="nav-link">Trending Papers</a></li>
+                <li><a href="tools.html" class="nav-link">工具</a></li>
+                <li><a href="focus.html" class="nav-link">实时焦点</a></li>
+                <li><a href="#contact" class="nav-link">联系</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 英雄区域 -->
+        <section id="home" class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">探索 • 创新 • 未来</div>
+                    <h1 class="hero-title">
+                        <span class="title-word">探索</span>
+                        <span class="title-word">未知的</span>
+                        <span class="title-word">边界</span>
+                    </h1>
+                    <p class="hero-subtitle">欢迎来到Asstar，让意识，先于光速抵达未知。</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="scrollToSection('about')">
+                            <span class="btn-text">开始探索</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                            <span class="btn-text">了解更多</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="cosmic-orb">
+                        <div class="orb-core"></div>
+                        <div class="orb-rings">
+                            <div class="orb-ring"></div>
+                            <div class="orb-ring"></div>
+                            <div class="orb-ring"></div>
+                        </div>
+                        <div class="orb-particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于区域 -->
+        <section id="about" class="about">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">关于 Asstar</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p class="about-paragraph">在这里，硅基与碳基的认知边界被折叠，范式在零维坍缩，又在高维重写。</p>
+                        <p class="about-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
+                    </div>
+                    <div class="about-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">∞</div>
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">可能性</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">创新</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🚀</div>
+                            <div class="stat-number">25/7</div>
+                            <div class="stat-label">探索</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Lab区域 -->
+        <section id="projects" class="projects">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">AI Lab</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="projects-grid" id="projects-grid">
+                    <!-- 动态加载的项目卡片将插入这里 -->
+                </div>
+                <div id="more-projects-container" class="more-projects">
+                    <button id="more-projects-btn" class="btn btn-outline">
+                        <span class="btn-text">查看更多内容</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实时焦点区域 -->
+        <section id="focus" class="projects">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">实时焦点</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="controls" id="focus-controls" style="margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="category-tab active" data-category="finance">财经</button>
+                    <button class="category-tab" data-category="tech">科技</button>
+                    <button class="category-tab" data-category="developer">产品</button>
+                </div>
+                <div id="focus-content"></div>
+            </div>
+        </section>
+
+        <!-- 联系区域 -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">联系我们</h2>
+                    <div class="section-line"></div>
+                </div>
+                <div class="contact-content">
+                    <div class="contact-cards">
+                        <div class="contact-card">
+                            <div class="contact-icon">📧</div>
+                            <div class="contact-info">
+                                <h3>邮箱</h3>
+                                <p>asstarx7@gmail.com</p>
+                            </div>
+                        </div>
+                        <a class="contact-card contact-card--glow" href="https://gityesm.github.io/" target="_blank" rel="noopener noreferrer">
+                            <div class="contact-icon">🎓</div>
+                            <div class="contact-info">
+                                <h3>简介</h3>
+                                <p>了解更多</p>
+                            </div>
+                        </a>
+                        <a class="contact-card contact-card--glow" href="https://stars.chromeexperiments.com/" target="_blank" rel="noopener noreferrer">
+                            <div class="contact-icon">🚀</div>
+                            <div class="contact-info">
+                                <h3>探索</h3>
+                                <p>无限可能</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo-symbol">✦</div>
+                    <span class="logo-text">ASSTAR</span>
+                </div>
+                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      loadProjects('projects-grid', 3);
+    </script>
+    <script>
+      (function() {
+        const state = {
+          category: 'finance', // finance | tech | developer
+          data: null
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+          bindFocusTabs();
+          loadFocus();
+        });
+
+        function bindFocusTabs() {
+          const tabs = document.querySelectorAll('#focus-controls .category-tab');
+          tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+              tabs.forEach(t => t.classList.remove('active'));
+              e.currentTarget.classList.add('active');
+              state.category = e.currentTarget.dataset.category;
+              renderFocus();
+            });
+          });
+        }
+
+        async function loadFocus() {
+          const container = document.getElementById('focus-content');
+          if (!container) return;
+          container.innerHTML = `
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>正在加载实时焦点...</p>
+            </div>
+          `;
+          try {
+            const res = await fetch('feeds/realtime-focus.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('无法加载 feeds/realtime-focus.json');
+            state.data = await res.json();
+            renderFocus();
+          } catch (err) {
+            console.error('加载实时焦点失败', err);
+            container.innerHTML = `
+              <div class="error-message">
+                <p>加载数据时出现错误</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+            const btn = document.getElementById('focus-refresh');
+            if (btn) btn.addEventListener('click', loadFocus);
+          }
+        }
+
+        function renderFocus() {
+          const container = document.getElementById('focus-content');
+          if (!container) return;
+          const all = state.data && state.data.categories ? state.data.categories : {};
+          const cat = all[state.category] || {};
+          const sections = cat.sections || {};
+
+          // 扁平化为卡片列表
+          const cards = [];
+          Object.entries(sections).forEach(([sourceName, sectionArr]) => {
+            if (!Array.isArray(sectionArr)) return;
+            sectionArr.forEach(sec => {
+              const secName = sec.section || '';
+              (sec.items || []).slice(0, 12).forEach(item => {
+                cards.push({
+                  title: item.title || '',
+                  url: item.url || '#',
+                  source: sourceName,
+                  section: secName
+                });
+              });
+            });
+          });
+
+          if (cards.length === 0) {
+            container.innerHTML = `
+              <div class="error-message">
+                <p>暂无数据</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+            const btn = document.getElementById('focus-refresh');
+            if (btn) btn.addEventListener('click', loadFocus);
+            return;
+          }
+
+          const grid = document.createElement('div');
+          grid.className = 'trending-grid';
+          cards.slice(0, 60).forEach(item => grid.appendChild(focusCard(item)));
+          container.innerHTML = '';
+          container.appendChild(grid);
+          animateCards(grid);
+        }
+
+        function focusCard(item) {
+          const card = document.createElement('div');
+          card.className = 'trending-card';
+          card.innerHTML = `
+            <div class="trending-card-content">
+              <div class="model-header">
+                <div class="model-icon">📰</div>
+                <div class="model-info">
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.source)}${item.section?` • ${escapeHtml(item.section)}`:''}</p>
+                </div>
+              </div>
+              <a href="${item.url}" target="_blank" class="model-link">查看详情 <span>→</span></a>
+            </div>
+          `;
+          return card;
+        }
+
+        function animateCards(grid) {
+          const cards = grid.querySelectorAll('.trending-card');
+          cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+              card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, index * 60);
+          });
+        }
+
+        function escapeHtml(s) {
+          return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+      })();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,42 @@
+name: Update Realtime Focus Data
+
+on:
+  schedule:
+    # 每天定时运行（UTC时间）
+    - cron: '0 1 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-realtime-focus:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml
+
+      - name: Run tophub aggregator
+        run: |
+          python scripts/fetch_tophub_all.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add feeds/realtime-focus.json
+          # 只有当有变更时才提交
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update realtime focus data [skip ci]"
+          git push
+
+

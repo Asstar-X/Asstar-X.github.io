@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuggingFace Papers - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .trending-container {
+            padding: 80px 0 60px;
+            min-height: 100vh;
+        }
+        .trending-header { text-align: center; margin-bottom: 40px; }
+        .trending-title { font-family: var(--font-display); font-size: 3rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px; }
+        .trending-subtitle { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 30px; }
+        .category-filter { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; }
+        .category-btn { padding: 12px 24px; border: 2px solid var(--border-color); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-primary); font-weight: 400; }
+        .category-btn:hover { border-color: var(--primary-color); background: rgba(0, 212, 255, 0.1); transform: translateY(-2px); }
+        .category-btn.active { border-color: var(--primary-color); background: var(--gradient-primary); color: white; }
+        .trending-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px; }
+        .trending-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .trending-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2); }
+        .paper-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+        .paper-meta { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px; }
+        .paper-abstract { color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; font-size: 0.95rem; }
+        .tag { padding: 4px 12px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 20px; font-size: 0.8rem; color: var(--primary-color); }
+        .model-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .model-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-color); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        .model-link:hover { color: var(--text-primary); transform: translateX(5px); }
+        .loading { text-align: center; padding: 60px 0; color: var(--text-secondary); }
+        .loading-spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(0, 212, 255, 0.3); border-radius: 50%; border-top-color: var(--primary-color); animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-message { text-align: center; padding: 60px 0; color: var(--secondary-color); }
+        .refresh-btn { margin-top: 20px; padding: 10px 20px; background: var(--gradient-secondary); border: none; border-radius: 8px; color: white; cursor: pointer; transition: all 0.3s ease; }
+        .back-button { position: fixed; top: 20px; left: 20px; background: rgba(30, 60, 114, 0.6); border: 1px solid rgba(135, 206, 235, 0.3); border-radius: 12px; padding: 10px 16px; color: #B0E0E6; text-decoration: none; font-family: var(--font-primary); font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); z-index: 1002; }
+        .back-button:hover { background: rgba(30, 60, 114, 0.8); transform: translateY(-2px); }
+        @media (max-width: 768px) {
+            .trending-title { font-size: 2rem; }
+            .trending-grid { grid-template-columns: 1fr; }
+            .back-button { top: 12px; left: 12px; padding: 8px 12px; font-size: 14px; }
+        }
+    </style>
+    <script>
+      // 提示：Daily/Weekly/Monthly 的日期路径由爬虫生成到本地 JSON
+    </script>
+</head>
+<body>
+    <a href="index.html" class="back-button">← 返回首页</a>
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
+    </div>
+
+    <main>
+        <section class="trending-container">
+            <div class="container">
+                <div class="trending-header">
+                    <h1 class="trending-title">Trending Papers</h1>
+                    <p class="trending-subtitle">每日/每周/每月/趋势 论文速览</p>
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="daily">Daily</button>
+                        <button class="category-btn" data-category="weekly">Weekly</button>
+                        <button class="category-btn" data-category="monthly">Monthly</button>
+                        <button class="category-btn" data-category="trending">Trending</button>
+                    </div>
+                </div>
+                <div id="papers-content">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>正在加载论文...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+    // HuggingFace Papers 功能（内联）
+    class HuggingFacePapers {
+        constructor() {
+            this.currentCategory = 'daily';
+            this.papersData = [];
+            this.init();
+        }
+
+        init() {
+            this.bindEvents();
+            this.loadPapersData();
+            this.startAutoRefresh();
+        }
+
+        bindEvents() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.currentCategory = e.target.dataset.category;
+                    this.loadPapersData();
+                });
+            });
+        }
+
+        async loadPapersData() {
+            const container = document.getElementById('papers-content');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在加载论文...</p>
+                </div>
+            `;
+
+            try {
+                const data = await this.fetchPapersData();
+                this.papersData = data;
+                this.renderPapers();
+            } catch (error) {
+                console.error('加载论文失败:', error);
+                this.showError();
+            }
+        }
+
+        async fetchPapersData() {
+            try {
+                const response = await fetch('feeds/huggingface-papers-data.json', { cache: 'no-store' });
+                if (response.ok) {
+                    const all = await response.json();
+                    const arr = all[this.currentCategory];
+                    if (Array.isArray(arr) && arr.length > 0) return arr;
+                }
+            } catch (e) {
+                console.warn('无法加载本地论文数据:', e);
+            }
+
+            // 兜底模拟数据，防止页面空白
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const weekNumber = this.getISOWeek(now);
+            const yyyyW = `${yyyy}-W${String(weekNumber).padStart(2, '0')}`;
+            const dailyUrl = `https://huggingface.co/papers/date/${yyyy}-${mm}-${dd}`;
+            const weeklyUrl = `https://huggingface.co/papers/week/${yyyyW}`;
+            const monthlyUrl = `https://huggingface.co/papers/month/${yyyy}-${mm}`;
+
+            const mock = {
+                daily: [
+                    { title: 'Sample Paper (Daily)', authors: 'Doe et al.', date: `${yyyy}-${mm}-${dd}`, url: dailyUrl, tags: ['LLM', 'Vision'], abstract: 'A placeholder abstract for daily papers.' }
+                ],
+                weekly: [
+                    { title: 'Sample Paper (Weekly)', authors: 'Doe et al.', week: yyyyW, url: weeklyUrl, tags: ['NLP'], abstract: 'A placeholder abstract for weekly papers.' }
+                ],
+                monthly: [
+                    { title: 'Sample Paper (Monthly)', authors: 'Doe et al.', month: `${yyyy}-${mm}`, url: monthlyUrl, tags: ['GenAI'], abstract: 'A placeholder abstract for monthly papers.' }
+                ],
+                trending: [
+                    { title: 'Sample Paper (Trending)', authors: 'Doe et al.', url: 'https://huggingface.co/papers/trending', tags: ['Trending'], abstract: 'A placeholder abstract for trending papers.' }
+                ]
+            };
+
+            return mock[this.currentCategory] || mock.daily;
+        }
+
+        renderPapers() {
+            const container = document.getElementById('papers-content');
+            if (!this.papersData || this.papersData.length === 0) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p>暂无数据</p>
+                        <button class="refresh-btn" onclick="huggingfacePapersApp.loadPapersData()">重新加载</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'trending-grid';
+
+            this.papersData.forEach((paper) => {
+                const card = document.createElement('div');
+                card.className = 'trending-card';
+                const tags = Array.isArray(paper.tags) ? paper.tags : [];
+                card.innerHTML = `
+                    <div class="trending-card-content">
+                        <div class="paper-title">${paper.title}</div>
+                        <div class="paper-meta">${paper.authors || 'Unknown authors'}</div>
+                        <p class="paper-abstract">${paper.abstract || 'No abstract available.'}</p>
+                        ${tags.length ? `<div class="model-tags">${tags.map(t => `<span class=\"tag\">${t}</span>`).join('')}</div>` : ''}
+                        <a href="${paper.url}" target="_blank" class="model-link">查看论文 <span>→</span></a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(grid);
+        }
+
+        showError() {
+            const container = document.getElementById('papers-content');
+            container.innerHTML = `
+                <div class="error-message">
+                    <p>加载数据时出现错误</p>
+                    <button class="refresh-btn" onclick="huggingfacePapersApp.loadPapersData()">重新加载</button>
+                </div>
+            `;
+        }
+
+        startAutoRefresh() {
+            setInterval(() => this.loadPapersData(), 6 * 60 * 60 * 1000);
+        }
+
+        getISOWeek(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        }
+    }
+
+    let huggingfacePapersApp;
+    function initHuggingfacePapers() { huggingfacePapersApp = new HuggingFacePapers(); }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHuggingfacePapers);
+    } else {
+        initHuggingfacePapers();
+    }
+    </script>
+</body>
+</html>
+

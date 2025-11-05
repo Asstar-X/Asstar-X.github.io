@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时焦点 | Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 宇宙背景层 -->
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
+    </div>
+
+    <a href="index.html" class="back-button">← 返回首页</a>
+
+    <style>
+        .trending-container { padding: 80px 0 60px; min-height: 100vh; }
+        .trending-header { text-align: center; margin-bottom: 40px; }
+        .trending-title { font-family: var(--font-display); font-size: 3rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px; }
+        .trending-subtitle { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 30px; }
+        .source-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .source-tab { padding: 10px 18px; border: 2px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); border-radius: 999px; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-primary); font-weight: 400; }
+        .source-tab:hover { border-color: var(--primary-color); background: rgba(0,212,255,0.1); transform: translateY(-2px); }
+        .source-tab.active { border-color: var(--primary-color); background: var(--gradient-primary); color: white; }
+        .category-filter { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .category-btn { padding: 10px 18px; border: 2px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-family: var(--font-primary); font-weight: 400; }
+        .category-btn:hover { border-color: var(--primary-color); background: rgba(0,212,255,0.1); transform: translateY(-2px); }
+        .category-btn.active { border-color: var(--primary-color); background: var(--gradient-primary); color: white; }
+        .trending-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 20px; }
+        .trending-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .trending-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(255,107,107,0.1)); opacity: 0; transition: opacity 0.3s ease; z-index: 1; }
+        .trending-card:hover::before { opacity: 1; }
+        .trending-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,212,255,0.2); }
+        .trending-card-content { position: relative; z-index: 2; }
+        .model-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .model-icon { width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; }
+        .model-info h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; color: var(--text-primary); }
+        .model-info p { color: var(--text-secondary); font-size: 0.9rem; }
+        .model-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-color); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        .model-link:hover { color: var(--text-primary); transform: translateX(5px); }
+        .loading { text-align: center; padding: 60px 0; color: var(--text-secondary); }
+        .loading-spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(0,212,255,0.3); border-radius: 50%; border-top-color: var(--primary-color); animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-message { text-align: center; padding: 60px 0; color: var(--secondary-color); }
+        .refresh-btn { margin-top: 20px; padding: 10px 20px; background: var(--gradient-secondary); border: none; border-radius: 8px; color: white; cursor: pointer; transition: all 0.3s ease; }
+        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,107,107,0.3); }
+        .back-button { position: fixed; top: 20px; left: 20px; background: rgba(30, 60, 114, 0.6); border: 1px solid rgba(135, 206, 235, 0.3); border-radius: 12px; padding: 10px 16px; color: #B0E0E6; text-decoration: none; font-family: var(--font-primary); font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); z-index: 1002; }
+        .back-button:hover { background: rgba(30, 60, 114, 0.8); transform: translateY(-2px); }
+        @media (max-width: 768px) { .trending-title { font-size: 2rem; } .trending-grid { grid-template-columns: 1fr; } .back-button { top: 12px; left: 12px; padding: 8px 12px; font-size: 14px; } }
+    </style>
+
+    <main>
+        <section class="trending-container">
+            <div class="container">
+                <div class="trending-header">
+                    <h1 class="trending-title">实时焦点</h1>
+                    <p class="trending-subtitle">财经、科技、产品的热门资讯聚合</p>
+                    <div class="source-tabs" id="focus-tabs">
+                        <button class="source-tab active" data-category="finance">财经</button>
+                        <button class="source-tab" data-category="tech">科技</button>
+                        <button class="source-tab" data-category="developer">产品</button>
+                    </div>
+                    <div id="controls"></div>
+                </div>
+                <div id="focus-content"></div>
+            </div>
+        </section>
+    </main>
+
+    
+
+    <script>
+      (function() {
+        const state = {
+          category: 'finance',
+          subSource: null,
+          data: null
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+          bindFocusTabs();
+          loadFocus();
+          addExtras();
+        });
+
+        function bindFocusTabs() {
+          const tabs = document.querySelectorAll('#focus-tabs .source-tab');
+          tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+              tabs.forEach(t => t.classList.remove('active'));
+              e.currentTarget.classList.add('active');
+              state.category = e.currentTarget.dataset.category;
+              state.subSource = null;
+              renderControls();
+              renderFocus();
+            });
+          });
+        }
+
+        async function loadFocus() {
+          const container = document.getElementById('focus-content');
+          if (!container) return;
+          container.innerHTML = `
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>正在加载实时焦点...</p>
+            </div>
+          `;
+          try {
+            const res = await fetch('feeds/realtime-focus.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('无法加载 feeds/realtime-focus.json');
+            state.data = await res.json();
+            renderControls();
+            renderFocus();
+          } catch (err) {
+            console.error('加载实时焦点失败', err);
+            container.innerHTML = `
+              <div class="error-message">
+                <p>加载数据时出现错误</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+            const btn = document.getElementById('focus-refresh');
+            if (btn) btn.addEventListener('click', loadFocus);
+          }
+        }
+
+        function renderControls() {
+          const controls = document.getElementById('controls');
+          if (!controls) return;
+          const all = state.data && state.data.categories ? state.data.categories : {};
+          const cat = all[state.category] || {};
+          const sections = cat.sections || {};
+          const sources = Object.keys(sections);
+          if (!state.subSource || !sources.includes(state.subSource)) {
+            state.subSource = sources[0] || '';
+          }
+          controls.innerHTML = `
+            <div class="category-filter">
+              ${sources.map(name => `<button class="category-btn ${name===state.subSource?'active':''}" data-src="${name}">${name}</button>`).join('')}
+            </div>
+          `;
+          controls.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              controls.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+              e.currentTarget.classList.add('active');
+              state.subSource = e.currentTarget.dataset.src;
+              renderFocus();
+            });
+          });
+        }
+
+        function renderFocus() {
+          const container = document.getElementById('focus-content');
+          if (!container) return;
+          const all = state.data && state.data.categories ? state.data.categories : {};
+          const cat = all[state.category] || {};
+          const sections = cat.sections || {};
+
+          const cards = [];
+          const entries = Object.entries(sections).filter(([sourceName]) => sourceName===state.subSource);
+          entries.forEach(([sourceName, sectionArr]) => {
+            if (!Array.isArray(sectionArr)) return;
+            sectionArr.forEach(sec => {
+              const secName = sec.section || '';
+              (sec.items || []).slice(0, 12).forEach(item => {
+                cards.push({
+                  title: item.title || '',
+                  url: item.url || '#',
+                  source: sourceName,
+                  section: secName
+                });
+              });
+            });
+          });
+
+          if (cards.length === 0) {
+            container.innerHTML = `
+              <div class="error-message">
+                <p>暂无数据</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+            const btn = document.getElementById('focus-refresh');
+            if (btn) btn.addEventListener('click', loadFocus);
+            return;
+          }
+
+          const grid = document.createElement('div');
+          grid.className = 'trending-grid';
+          cards.slice(0, 90).forEach(item => grid.appendChild(focusCard(item)));
+          container.innerHTML = '';
+          container.appendChild(grid);
+          animateCards(grid);
+        }
+
+        function focusCard(item) {
+          const card = document.createElement('div');
+          card.className = 'trending-card';
+          card.innerHTML = `
+            <div class="trending-card-content">
+              <div class="model-header">
+                <div class="model-icon">📰</div>
+                <div class="model-info">
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.source)}${item.section?` • ${escapeHtml(item.section)}`:''}</p>
+                </div>
+              </div>
+              <a href="${item.url}" target="_blank" class="model-link">查看详情 <span>→</span></a>
+            </div>
+          `;
+          return card;
+        }
+
+        function animateCards(grid) {
+          const cards = grid.querySelectorAll('.trending-card');
+          cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+              card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, index * 60);
+          });
+        }
+
+        function addExtras() {
+          document.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('.trending-card');
+            if (target) target.style.transform = 'translateY(-5px) scale(1.02)';
+          });
+          document.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('.trending-card');
+            if (target) target.style.transform = 'translateY(0) scale(1)';
+          });
+          document.addEventListener('keydown', (e) => {
+            const btns = Array.from(document.querySelectorAll('#focus-controls .category-tab'));
+            const active = document.querySelector('#focus-controls .category-tab.active');
+            const idx = btns.indexOf(active);
+            if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
+            else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
+          });
+        }
+
+        function escapeHtml(s) {
+          return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+      })();
+    </script>
+</body>
+</html>
+
+

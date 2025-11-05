@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具 - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .tools-container { padding: 80px 0 60px; min-height: 100vh; }
+        .tools-header { text-align: center; margin-bottom: 40px; }
+        .tools-title { font-family: var(--font-display); font-size: 3rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+        .tools-subtitle { font-size: 1.1rem; color: var(--text-secondary); }
+        .tools-search { margin: 30px auto 0; max-width: 720px; position: relative; }
+        .tools-input { width: 100%; padding: 14px 16px 14px 44px; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none; transition: all .2s ease; }
+        .tools-input:focus { border-color: var(--primary-color); background: rgba(0,212,255,0.06); box-shadow: 0 8px 24px rgba(0,212,255,.08); }
+        .tools-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        .filters { margin: 18px auto 0; max-width: 960px; display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .category-tabs { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+        .tab { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 12px; background: rgba(255,255,255,0.04); color: var(--text-secondary); cursor: pointer; transition: all .2s ease; font-weight: 500; }
+        .tab:hover { border-color: var(--primary-color); color: var(--text-primary); }
+        .tab.active { background: var(--gradient-primary); color: #fff; border-color: transparent; }
+        .source-toggle { display: inline-flex; border: 1px solid var(--border-color); border-radius: 999px; overflow: hidden; }
+        .source-toggle button { padding: 8px 14px; background: transparent; color: var(--text-secondary); border: none; cursor: pointer; transition: all .2s ease; }
+        .source-toggle button.active { background: rgba(0,212,255,0.12); color: var(--text-primary); }
+        .tools-section { margin-top: 36px; }
+        .tools-section h2 { display: none; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+        .tool-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; transition: all .2s ease; position: relative; overflow: hidden; }
+        .tool-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,212,255,.18); border-color: rgba(0,212,255,.35); }
+        .tool-card a { text-decoration: none; color: inherit; display: block; }
+        .tool-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .tool-emoji { font-size: 1.4rem; }
+        .tool-name { font-weight: 600; color: var(--text-primary); }
+        .tool-desc { font-size: .92rem; color: var(--text-secondary); line-height: 1.6; }
+        .tool-meta { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .pill { padding: 4px 10px; border-radius: 999px; font-size: .78rem; border: 1px solid rgba(255,255,255,.14); color: var(--text-secondary); }
+        .back-button { position: fixed; top: 20px; left: 20px; background: rgba(30, 60, 114, 0.6); border: 1px solid rgba(135, 206, 235, 0.3); border-radius: 12px; padding: 10px 16px; color: #B0E0E6; text-decoration: none; font-family: var(--font-primary); font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); z-index: 1002; }
+        .back-button:hover { background: rgba(30, 60, 114, 0.8); transform: translateY(-2px); }
+        @media (max-width: 768px) { .tools-title { font-size: 2rem; } .back-button { top: 12px; left: 12px; padding: 8px 12px; font-size: 14px; } }
+    </style>
+    <script>
+      let currentSource = 'all';
+      let currentCategory = 'all';
+
+      function filterTools(value) {
+        const query = (value || '').trim().toLowerCase();
+        document.querySelectorAll('.tool-card').forEach(card => {
+          const text = card.innerText.toLowerCase();
+          const src = card.getAttribute('data-source') || 'external';
+          const cat = card.getAttribute('data-category') || 'other';
+          const matchSearch = query ? text.includes(query) : true;
+          const matchSrc = currentSource === 'all' ? true : (src === currentSource);
+          const matchCat = currentCategory === 'all' ? true : (cat === currentCategory);
+          card.style.display = (matchSearch && matchSrc && matchCat) ? '' : 'none';
+        });
+      }
+
+      function setCategory(cat, el) {
+        currentCategory = cat;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        if (el) el.classList.add('active');
+        const input = document.querySelector('.tools-input');
+        filterTools(input ? input.value : '');
+      }
+
+      function setSource(src, el) {
+        currentSource = src;
+        document.querySelectorAll('.source-toggle button').forEach(b => b.classList.remove('active'));
+        if (el) el.classList.add('active');
+        const input = document.querySelector('.tools-input');
+        filterTools(input ? input.value : '');
+      }
+    </script>
+    </head>
+<body>
+    <a href="index.html" class="back-button">← 返回首页</a>
+    <div class="cosmic-background">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="nebula-layer"></div>
+        <div class="quantum-field"></div>
+    </div>
+
+    <main>
+        <section class="tools-container">
+            <div class="container">
+                <div class="tools-header">
+                    <h1 class="tools-title">工具</h1>
+                    <p class="tools-subtitle">提效工具箱 · 自研与精选（All Free💕）</p>
+                    <div class="tools-search">
+                        <span class="tools-search-icon">🔎</span>
+                        <input class="tools-input" type="text" placeholder="搜索工具、能力或用途...（如：论文、Prompt、趋势、可视化）" oninput="filterTools(this.value)">
+                    </div>
+                    <div class="filters">
+                        <div class="category-tabs" role="tablist" aria-label="类别筛选">
+                            <button class="tab active" onclick="setCategory('all', this)">全部</button>
+                            <button class="tab" onclick="setCategory('vision', this)">图像</button>
+                            <button class="tab" onclick="setCategory('audio', this)">音频</button>
+                            <button class="tab" onclick="setCategory('nlp', this)">文本</button>
+                            <button class="tab" onclick="setCategory('code', this)">代码</button>
+                        </div>
+                        <div class="source-toggle" role="tablist" aria-label="来源筛选">
+                            <button class="active" onclick="setSource('all', this)">全部</button>
+                            <button onclick="setSource('local', this)">自研</button>
+                            <button onclick="setSource('external', this)">精选</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tools-section">
+                    <div class="tools-grid">
+                                <div class="tool-card" data-source="local" data-category="nlp">
+                                    <a href="lab/prompt-optimizer.html">
+                                        <div class="tool-head"><span class="tool-emoji">🧩</span><span class="tool-name">Prompt优化器</span></div>
+                                        <div class="tool-desc">将想法转化为高质量提示词，支持模板选择与多模型调用。</div>
+                                        <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                                    </a>
+                                </div>
+                        <div class="tool-card" data-source="local" data-category="vision">
+                            <a href="lab/svg-monitor.html">
+                                <div class="tool-head"><span class="tool-emoji">🖼️</span><span class="tool-name">SVG-XML可视化</span></div>
+                                <div class="tool-desc">上传SVG，左侧预览，右侧可折叠XML树，双向高亮联动。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">可视化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://www.gaitubao.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖍️</span><span class="tool-name">改图宝</span></div>
+                                <div class="tool-desc">一站式图片压缩、裁剪、格式转换、加水印。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">压缩</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://www.min2k.com/tools/mermaid/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📊</span><span class="tool-name">Mermaid 图表生成</span></div>
+                                <div class="tool-desc">在线将Mermaid文本实时渲染为SVG图表。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">可视化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://revizepic.toolooz.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖌️</span><span class="tool-name">RevizePic 图像优化</span></div>
+                                <div class="tool-desc">AI驱动的智能图片超分/降噪/无损修复。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">优化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://snapany.com/zh/bilibili" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📥</span><span class="tool-name">B站视频下载</span></div>
+                                <div class="tool-desc">无需登录自由保存B站视频音频弹幕。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">bilibili</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://youtube.iiilab.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">▶️</span><span class="tool-name">YouTube视频下载</span></div>
+                                <div class="tool-desc">转换/下载YouTube音视频，支持多格式。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">youtube</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://dy.kukutool.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🎬</span><span class="tool-name">抖音视频下载</span></div>
+                                <div class="tool-desc">免费下载无水印抖音（TikTok）视频。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">抖音</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://huggingface.co/spaces/alibabasglab/SpeechScore" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🎤</span><span class="tool-name">语音质量评估</span></div>
+                                <div class="tool-desc">专业的语音质量评估工具，用于评估语音信号的清晰度和质量。</div>
+                                <div class="tool-meta"><span class="pill">音频</span><span class="pill">评估</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://vocalremover.org/zh/cutter" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✂️</span><span class="tool-name">音频切割器</span></div>
+                                <div class="tool-desc">在线音频切割工具，支持精确裁剪和编辑音频文件。</div>
+                                <div class="tool-meta"><span class="pill">音频</span><span class="pill">编辑</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://tool.jisuapi.com/base642pic.html" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖼️</span><span class="tool-name">Base64转图片</span></div>
+                                <div class="tool-desc">粘贴Base64字符串，直接在线生成图片。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">转换</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="code">
+                            <a href="https://jsonlint.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🔎</span><span class="tool-name">Json格式验证</span></div>
+                                <div class="tool-desc">一键查错JSON语法并高亮可视化定位问题。</div>
+                                <div class="tool-meta"><span class="pill">格式化</span><span class="pill">JSON</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="code">
+                            <a href="https://jsonformatter.org/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🛠️</span><span class="tool-name">Json一键排版</span></div>
+                                <div class="tool-desc">快速美化、折叠、压缩JSON并高亮。</div>
+                                <div class="tool-meta"><span class="pill">美化</span><span class="pill">JSON</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="nlp">
+                            <a href="https://www.alltoall.net/md_pdf/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📄</span><span class="tool-name">PDF转Word</span></div>
+                                <div class="tool-desc">支持PDF转Word、Excel、PPT等格式文档互转。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">PDF</span></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+

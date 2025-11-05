@@ -1,0 +1,35 @@
+name: Update HuggingFace Papers Data
+
+on:
+  schedule:
+    # 每天凌晨3点运行（UTC时间）
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-hf-papers:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml
+      - name: Run HuggingFace Papers scraper
+        run: |
+          python scripts/fetch_huggingface_papers.py
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add feeds/huggingface-papers-data.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update HuggingFace papers data [skip ci]"
+          git push
+
+
