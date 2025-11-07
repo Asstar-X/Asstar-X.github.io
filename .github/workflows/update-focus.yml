@@ -30,13 +30,13 @@ jobs:
 
       - name: Run focus news scraper
         run: |
-          python scripts/fetch_focus.py
+          python scripts/fetch_tophub_all.py
 
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add feeds/focus-data.json
+          git add feeds/realtime-focus.json
           # 只有当有变更时才提交
           git diff --quiet && git diff --staged --quiet || git commit -m "Update focus news data [skip ci]"
           git push
