@@ -191,6 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
     createParticles();
     loadProjects();
     
+    // 初始化访客记录
+    initVisitorTracking();
+    
     // 汉堡菜单交互
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -306,6 +309,95 @@ function createScrollProgress() {
 
 // 初始化滚动进度条
 createScrollProgress(); 
+
+// ===== 访客记录功能 =====
+// Cookie 工具函数
+function setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+// 生成唯一访客ID
+function generateVisitorId() {
+    return 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// 格式化日期
+function formatDate(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+// 计算访问间隔（天）
+function getDaysSince(firstVisit) {
+    const now = new Date();
+    const first = new Date(firstVisit);
+    const diffTime = Math.abs(now - first);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+}
+
+// 初始化访客记录
+function initVisitorTracking() {
+    const visitorInfoEl = document.getElementById('visitor-info');
+    if (!visitorInfoEl) return;
+
+    // 获取或创建访客ID
+    let visitorId = getCookie('visitor_id');
+    if (!visitorId) {
+        visitorId = generateVisitorId();
+        setCookie('visitor_id', visitorId, 365); // 保存1年
+    }
+
+    // 获取首次访问时间
+    let firstVisit = getCookie('first_visit');
+    const now = new Date().toISOString();
+    if (!firstVisit) {
+        firstVisit = now;
+        setCookie('first_visit', firstVisit, 365);
+    }
+
+    // 更新访问次数
+    let visitCount = parseInt(getCookie('visit_count') || '0');
+    visitCount += 1;
+    setCookie('visit_count', visitCount.toString(), 365);
+
+    // 更新最后访问时间
+    setCookie('last_visit', now, 365);
+
+    // 计算访问天数
+    const daysSince = getDaysSince(firstVisit);
+
+    // 显示访客信息
+    const firstVisitDate = formatDate(firstVisit);
+    const lastVisitDate = formatDate(now);
+    
+    let visitorText = '';
+    if (visitCount === 1) {
+        visitorText = `欢迎首次访问！访问时间：<strong>${firstVisitDate}</strong>`;
+    } else {
+        visitorText = `访问次数：<strong>${visitCount}</strong> 次 | 首次访问：<strong>${firstVisitDate}</strong> | 已陪伴 <strong>${daysSince}</strong> 天`;
+    }
+
+    visitorInfoEl.innerHTML = `<span class="visitor-text">${visitorText}</span>`;
+}
 
 // 通用项目加载函数
 function loadProjects(gridId, maxShow = 3) {

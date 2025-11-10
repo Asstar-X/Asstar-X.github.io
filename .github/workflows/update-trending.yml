@@ -2,8 +2,8 @@ name: Update GitHub Trending Data
 
 on:
   schedule:
-    # 每天凌晨2点运行（UTC时间）
-    - cron: '0 1 * * *'
+    - cron: '0 0 * * *'  # 北京时间08:00
+    - cron: '0 5 * * *'  # 北京时间13:00
   workflow_dispatch: # 允许手动触发
 
 jobs:
