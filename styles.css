@@ -866,24 +866,6 @@ section {
     font-size: 0.875rem;
 }
 
-.visitor-info {
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.visitor-text {
-    color: var(--text-secondary);
-    opacity: 0.8;
-}
-
-.visitor-text strong {
-    color: var(--accent-color);
-    font-weight: 600;
-}
-
 /* ===== 响应式设计 ===== */
 @media (max-width: 768px) {
     .nav-links {
@@ -964,11 +946,6 @@ section {
     .footer-content {
         flex-direction: column;
         text-align: center;
-    }
-    
-    .visitor-info {
-        font-size: 0.7rem;
-        margin-top: 0.5rem;
     }
 }
 
