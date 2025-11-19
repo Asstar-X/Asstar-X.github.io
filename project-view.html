@@ -18,10 +18,13 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
         rel="stylesheet">
-    <!-- Giscus will be loaded via script tag below -->
+    <!-- Preconnect to Utterances for faster loading -->
+    <link rel="preconnect" href="https://utteranc.es" crossorigin>
+    <link rel="dns-prefetch" href="https://utteranc.es">
+    <!-- Utterances will be loaded via script tag below -->
     <style>
-        /* Giscus 自定义样式 */
-        .giscus {
+        /* Utterances 自定义样式 */
+        .utterances {
             margin-top: 3rem;
         }
 
@@ -174,7 +177,7 @@
                     <!-- 项目内容将在这里动态加载 -->
                 </div>
 
-                <div class="giscus"></div>
+                <div class="utterances"></div>
             </div>
         </section>
     </main>
@@ -192,10 +195,8 @@
         </div>
     </footer>
 
-    <script src="https://giscus.app/client.js" data-repo="Asstar-X/Asstar-X.github.io" data-repo-id="R_kgDONbxWDg"
-        data-category="General" data-category-id="DIC_kwDONbxWDs4Clah5" data-mapping="pathname" data-strict="0"
-        data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="dark" data-lang="zh-CN"
-        data-loading="lazy" crossorigin="anonymous" async>
+    <script src="https://utteranc.es/client.js" repo="Asstar-X/Asstar-X.github.io" issue-term="title"
+        theme="photon-dark" crossorigin="anonymous" async>
         </script>
     <script src="script.js"></script>
     <script>
