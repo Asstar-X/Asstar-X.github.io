@@ -192,10 +192,12 @@ class ChatManager {
         const model = this.configManager.getAllModels()[modelKey];
         if (!model || !apiKey) return false;
         try {
-            const tempConfig = { getCurrentModelConfig: () => model, getCurrentApiKey: () => apiKey, getCurrentApiUrl: () => {
-                const overriddenUrl = this.configManager.apiUrls[this.configManager.selectedModel];
-                return (overriddenUrl && overriddenUrl.length > 0) ? overriddenUrl : (model.apiUrl || '');
-            } };
+            const tempConfig = {
+                getCurrentModelConfig: () => model, getCurrentApiKey: () => apiKey, getCurrentApiUrl: () => {
+                    const overriddenUrl = this.configManager.apiUrls[this.configManager.selectedModel];
+                    return (overriddenUrl && overriddenUrl.length > 0) ? overriddenUrl : (model.apiUrl || '');
+                }
+            };
             const testMessage = '你好';
             const response = await this.callAIAPIWithConfig(testMessage, tempConfig);
             return response && response.length > 0;
@@ -228,7 +230,17 @@ class ChatManager {
             requestBody = { model: currentModel.model, input: { messages: [{ role: 'user', content: message }] }, parameters: { temperature: currentModel.temperature, max_tokens: Math.min(currentModel.maxTokens, 100), top_p: currentModel.topP } };
         }
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(requestBody) });
-        if (!response.ok) { throw new Error(`API请求失败: ${response.status} ${response.statusText}`); }
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API错误响应:', errorText);
+            throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+        }
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('非JSON响应:', text);
+            throw new Error('API返回了非JSON格式的响应');
+        }
         const data = await response.json();
         if (data.output && data.output.text) return data.output.text;
         if (data.choices && data.choices[0] && data.choices[0].message) return data.choices[0].message.content;
@@ -352,7 +364,7 @@ class ChatManager {
             headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}`, 'Accept': 'text/event-stream' };
             requestBody = {
                 model: currentModel.model,
-                messages: [ { role: 'system', content: this.getSystemPrompt() }, ...this.messages.map(msg => ({ role: msg.role, content: msg.content })), { role: 'user', content: message } ],
+                messages: [{ role: 'system', content: this.getSystemPrompt() }, ...this.messages.map(msg => ({ role: msg.role, content: msg.content })), { role: 'user', content: message }],
                 temperature: currentModel.temperature,
                 max_tokens: currentModel.maxTokens,
                 top_p: currentModel.topP,
@@ -361,15 +373,15 @@ class ChatManager {
         } else if (currentModel.requestFormat === 'anthropic') {
             url = currentApiUrl;
             headers = { ...currentModel.headers, 'x-api-key': currentApiKey, 'Accept': 'text/event-stream' };
-            requestBody = { model: currentModel.model, max_tokens: currentModel.maxTokens, temperature: currentModel.temperature, messages: [ { role: 'user', content: `${this.getSystemPrompt()}\n\n${this.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\nuser: ${message}` } ], stream: true };
+            requestBody = { model: currentModel.model, max_tokens: currentModel.maxTokens, temperature: currentModel.temperature, messages: [{ role: 'user', content: `${this.getSystemPrompt()}\n\n${this.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\nuser: ${message}` }], stream: true };
         } else if (currentModel.requestFormat === 'baidu') {
             url = currentApiUrl;
             headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}` };
-            requestBody = { messages: [ { role: 'user', content: `${this.getSystemPrompt()}\n\n${this.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\nuser: ${message}` } ], temperature: currentModel.temperature, top_p: currentModel.topP };
+            requestBody = { messages: [{ role: 'user', content: `${this.getSystemPrompt()}\n\n${this.messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\nuser: ${message}` }], temperature: currentModel.temperature, top_p: currentModel.topP };
         } else {
             url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
             headers = { 'Authorization': `Bearer ${currentApiKey}`, 'Content-Type': 'application/json', 'X-DashScope-SSE': 'enable' };
-            requestBody = { model: currentModel.model, input: { messages: [ { role: 'system', content: this.getSystemPrompt() }, ...this.messages.map(msg => ({ role: msg.role, content: msg.content })), { role: 'user', content: message } ] }, parameters: { temperature: currentModel.temperature, max_tokens: currentModel.maxTokens, top_p: currentModel.topP } };
+            requestBody = { model: currentModel.model, input: { messages: [{ role: 'system', content: this.getSystemPrompt() }, ...this.messages.map(msg => ({ role: msg.role, content: msg.content })), { role: 'user', content: message }] }, parameters: { temperature: currentModel.temperature, max_tokens: currentModel.maxTokens, top_p: currentModel.topP } };
         }
         const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(requestBody) });
         if (!response.ok) {
@@ -379,6 +391,12 @@ class ChatManager {
         }
         const supportsStreaming = currentModel.requestFormat === 'openai' || currentModel.requestFormat === 'anthropic' || currentModel.requestFormat === 'dashscope';
         if (supportsStreaming) { return this.handleStreamResponse(response, currentModel.requestFormat); }
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('非JSON响应:', text);
+            throw new Error('API返回了非JSON格式的响应');
+        }
         const data = await response.json();
         if (data.output && data.output.text) return data.output.text;
         if (data.choices && data.choices[0] && data.choices[0].message) return data.choices[0].message.content;
@@ -562,11 +580,11 @@ function createParticle(container) {
     container.appendChild(particle);
 }
 
-const style = document.createElement('style');
-style.textContent = `
+const promptOptimizerStyle = document.createElement('style');
+promptOptimizerStyle.textContent = `
     @keyframes cursorFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0); } }
     @keyframes particleFloat { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
 `;
-document.head.appendChild(style);
+document.head.appendChild(promptOptimizerStyle);
 
 

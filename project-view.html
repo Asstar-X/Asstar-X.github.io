@@ -193,23 +193,29 @@
         }
 
         .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
             color: var(--primary-color);
             text-decoration: none;
+            font-family: var(--font-primary);
             font-weight: 500;
             margin-bottom: 2rem;
             transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
         }
 
         .back-link:hover {
-            transform: translateX(-4px);
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
         .back-link::before {
-            content: '←';
-            font-size: 1.2rem;
+            content: '← ';
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -218,31 +224,10 @@
     <!-- 宇宙背景层 -->
     <canvas id="canvas-background"></canvas>
 
-    <!-- 导航栏 -->
-    <header class="header">
-        <nav class="nav">
-            <div class="logo">
-                <div class="logo-symbol">✦</div>
-                <span class="logo-text">ASSTAR</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html#home" class="nav-link">首页</a></li>
-                <li><a href="index.html#about" class="nav-link">关于</a></li>
-                <li><a href="index.html#projects" class="nav-link">AI Lab</a></li>
-                <li><a href="index.html#contact" class="nav-link">联系</a></li>
-            </ul>
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-    </header>
-
     <main>
         <section class="project-detail">
             <div class="container">
-                <a href="javascript:history.back()" class="back-link">返回</a>
+                <a href="javascript:history.back()" class="back-link">返回首页</a>
 
                 <div class="section-header">
                     <h1 class="section-title" id="project-title">项目详情</h1>

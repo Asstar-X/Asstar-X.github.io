@@ -107,6 +107,8 @@
 
         .chat-actions {
             margin-left: auto;
+            position: relative;
+            z-index: 100;
         }
 
         .clear-button {
@@ -118,6 +120,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1rem;
+            position: relative;
+            z-index: 100;
         }
 
         .clear-button:hover {
@@ -135,6 +139,8 @@
             transition: all 0.3s ease;
             font-size: 1rem;
             margin-right: 0.5rem;
+            position: relative;
+            z-index: 100;
         }
 
         .model-select-button:hover {
@@ -152,6 +158,8 @@
             transition: all 0.3s ease;
             font-size: 1rem;
             margin-right: 0.5rem;
+            position: relative;
+            z-index: 100;
         }
 
         .template-toggle-button:hover {
@@ -332,6 +340,8 @@
             gap: 0.5rem;
             min-width: 100px;
             justify-content: center;
+            position: relative;
+            z-index: 100;
         }
 
         .send-button:hover {
@@ -844,11 +854,11 @@
             position: fixed;
             top: 2rem;
             left: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 12px;
             padding: 0.75rem 1.5rem;
-            color: var(--text-primary);
+            color: var(--primary-color);
             text-decoration: none;
             font-family: var(--font-primary);
             font-weight: 500;
@@ -858,8 +868,9 @@
         }
 
         .back-button:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(0, 212, 255, 0.2);
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -901,7 +912,7 @@
 <body>
     <canvas id="canvas-background"></canvas>
 
-    <a href="../tools.html" class="back-button">← 返回工具</a>
+    <a href="../tools.html" class="back-button">← 返回工具箱</a>
 
     <main class="prompt-container">
         <div class="prompt-header">

@@ -151,12 +151,14 @@ class AntigravityBackground {
 // 导航栏滚动效果
 window.addEventListener('scroll', () => {
     const header = document.querySelector('.header');
-    if (window.scrollY > 100) {
-        header.style.background = 'rgba(10, 10, 10, 0.95)';
-        header.style.boxShadow = '0 2px 20px rgba(0, 212, 255, 0.1)';
-    } else {
-        header.style.background = 'rgba(10, 10, 10, 0.9)';
-        header.style.boxShadow = 'none';
+    if (header) {
+        if (window.scrollY > 100) {
+            header.style.background = 'rgba(10, 10, 10, 0.95)';
+            header.style.boxShadow = '0 2px 20px rgba(0, 212, 255, 0.1)';
+        } else {
+            header.style.background = 'rgba(10, 10, 10, 0.9)';
+            header.style.boxShadow = 'none';
+        }
     }
 });
 
