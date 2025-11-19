@@ -24,22 +24,129 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // 视差滚动效果
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallax = document.querySelector('.stars');
-    const parallax2 = document.querySelector('.stars2');
-    const parallax3 = document.querySelector('.stars3');
-    
-    if (parallax) {
-        parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+// Canvas Background Implementation
+class AntigravityBackground {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) return;
+
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: null, y: null, radius: 150 };
+        this.particleCount = window.innerWidth < 768 ? 60 : 100;
+        this.connectionDistance = 150;
+
+        this.init();
+        this.animate();
+        this.handleResize();
+        this.handleMouse();
     }
-    if (parallax2) {
-        parallax2.style.transform = `translateY(${scrolled * 0.3}px)`;
+
+    init() {
+        this.resize();
+        this.createParticles();
     }
-    if (parallax3) {
-        parallax3.style.transform = `translateY(${scrolled * 0.7}px)`;
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
     }
-});
+
+    createParticles() {
+        this.particles = [];
+        for (let i = 0; i < this.particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 2 + 1,
+                color: Math.random() > 0.5 ? '#00d4ff' : '#ff6b6b'
+            });
+        }
+    }
+
+    handleResize() {
+        window.addEventListener('resize', () => {
+            this.resize();
+            this.createParticles();
+        });
+    }
+
+    handleMouse() {
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.x;
+            this.mouse.y = e.y;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            this.mouse.x = null;
+            this.mouse.y = null;
+        });
+    }
+
+    drawParticles() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        for (let i = 0; i < this.particles.length; i++) {
+            let p = this.particles[i];
+
+            // Movement
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Bounce off edges
+            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+            // Mouse interaction
+            if (this.mouse.x != null) {
+                let dx = this.mouse.x - p.x;
+                let dy = this.mouse.y - p.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < this.mouse.radius) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (this.mouse.radius - distance) / this.mouse.radius;
+                    const directionX = forceDirectionX * force * 3;
+                    const directionY = forceDirectionY * force * 3;
+
+                    p.x -= directionX;
+                    p.y -= directionY;
+                }
+            }
+
+            // Draw particle
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fill();
+
+            // Connect particles
+            for (let j = i; j < this.particles.length; j++) {
+                let p2 = this.particles[j];
+                let dx = p.x - p2.x;
+                let dy = p.y - p2.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < this.connectionDistance) {
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / this.connectionDistance})`;
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.moveTo(p.x, p.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.stroke();
+                }
+            }
+        }
+    }
+
+    animate() {
+        this.drawParticles();
+        requestAnimationFrame(this.animate.bind(this));
+    }
+}
 
 // 导航栏滚动效果
 window.addEventListener('scroll', () => {
@@ -71,7 +178,7 @@ const observer = new IntersectionObserver((entries) => {
 // 为需要动画的元素添加观察
 document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.project-card, .stat, .contact-item');
-    
+
     animatedElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -96,9 +203,9 @@ document.addEventListener('mousemove', (e) => {
         top: ${e.clientY}px;
         animation: cursorFade 0.5s ease-out forwards;
     `;
-    
+
     document.body.appendChild(cursor);
-    
+
     setTimeout(() => {
         cursor.remove();
     }, 500);
@@ -122,13 +229,13 @@ document.head.appendChild(style);
 
 // 按钮点击效果
 document.querySelectorAll('.btn').forEach(button => {
-    button.addEventListener('click', function(e) {
+    button.addEventListener('click', function (e) {
         const ripple = document.createElement('span');
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
         const x = e.clientX - rect.left - size / 2;
         const y = e.clientY - rect.top - size / 2;
-        
+
         ripple.style.cssText = `
             position: absolute;
             width: ${size}px;
@@ -141,9 +248,9 @@ document.querySelectorAll('.btn').forEach(button => {
             animation: ripple 0.6s ease-out;
             pointer-events: none;
         `;
-        
+
         this.appendChild(ripple);
-        
+
         setTimeout(() => {
             ripple.remove();
         }, 600);
@@ -166,7 +273,7 @@ document.head.appendChild(rippleStyle);
 function typeWriter(element, text, speed = 100) {
     let i = 0;
     element.innerHTML = '';
-    
+
     function type() {
         if (i < text.length) {
             element.innerHTML += text.charAt(i);
@@ -174,7 +281,7 @@ function typeWriter(element, text, speed = 100) {
             setTimeout(type, speed);
         }
     }
-    
+
     type();
 }
 
@@ -186,22 +293,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = heroTitle.textContent;
         typeWriter(heroTitle, originalText, 150);
     }
-    
+
     // 添加粒子效果
-    createParticles();
+    // Init Canvas Background
+    new AntigravityBackground('canvas-background');
     loadProjects();
-    
+
     // 汉堡菜单交互
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
-    
+
     if (navToggle && navLinks) {
         navToggle.addEventListener('click', () => {
             navLinks.classList.toggle('open');
             // 添加汉堡按钮动画效果
             navToggle.classList.toggle('active');
         });
-        
+
         // 点击导航链接后关闭菜单
         navLinks.addEventListener('click', (e) => {
             if (e.target.classList.contains('nav-link')) {
@@ -209,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 navToggle.classList.remove('active');
             }
         });
-        
+
         // 点击页面其他区域关闭菜单
         document.addEventListener('click', (e) => {
             if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
@@ -220,64 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 创建粒子效果
-function createParticles() {
-    const particleContainer = document.createElement('div');
-    particleContainer.className = 'particle-container';
-    particleContainer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
-    `;
-    
-    document.body.appendChild(particleContainer);
-    
-    for (let i = 0; i < 50; i++) {
-        createParticle(particleContainer);
-    }
-}
 
-function createParticle(container) {
-    const particle = document.createElement('div');
-    particle.style.cssText = `
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background: rgba(0, 212, 255, 0.6);
-        border-radius: 50%;
-        left: ${Math.random() * 100}%;
-        top: ${Math.random() * 100}%;
-        animation: particleFloat ${5 + Math.random() * 10}s linear infinite;
-    `;
-    
-    container.appendChild(particle);
-    
-    // 粒子动画CSS
-    const particleStyle = document.createElement('style');
-    particleStyle.textContent = `
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(100vh) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) scale(1);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(particleStyle);
-}
 
 // 添加滚动进度指示器
 function createScrollProgress() {
@@ -293,9 +344,9 @@ function createScrollProgress() {
         z-index: 1001;
         transition: width 0.1s ease;
     `;
-    
+
     document.body.appendChild(progressBar);
-    
+
     window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset;
         const docHeight = document.body.scrollHeight - window.innerHeight;
@@ -305,7 +356,7 @@ function createScrollProgress() {
 }
 
 // 初始化滚动进度条
-createScrollProgress(); 
+createScrollProgress();
 
 // 通用项目加载函数
 function loadProjects(gridId, maxShow = 3) {
@@ -324,7 +375,7 @@ function loadProjects(gridId, maxShow = 3) {
                     <h3>${fileName}</h3>
                 `;
                 card.style.cursor = 'pointer';
-                card.onclick = function() {
+                card.onclick = function () {
                     window.location.href = `project-view.html?file=projects/${encodeURIComponent(projectFiles[i])}`;
                 };
                 grid.appendChild(card);
@@ -336,7 +387,7 @@ function loadProjects(gridId, maxShow = 3) {
                     moreContainer.style.display = '';
                     const btn = document.getElementById('more-projects-btn');
                     if (btn) {
-                        btn.onclick = function() {
+                        btn.onclick = function () {
                             window.location.href = 'projects.html';
                         };
                     }

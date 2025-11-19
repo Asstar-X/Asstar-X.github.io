@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-RBTWR9QNMQ');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
     </script>
     <title>AI Lab - 全部项目 | Asstar</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- 宇宙背景层 -->
-    <div class="cosmic-background">
-        <div class="stars"></div>
-        <div class="stars2"></div>
-        <div class="stars3"></div>
-        <div class="nebula-layer"></div>
-        <div class="quantum-field"></div>
-    </div>
+    <canvas id="canvas-background"></canvas>
 
     <!-- 导航栏 -->
     <header class="header">
@@ -77,7 +75,8 @@
 
     <script src="script.js"></script>
     <script>
-      loadProjects('projects-grid', Infinity);
+        loadProjects('projects-grid', Infinity);
     </script>
 </body>
-</html> 
+
+</html>

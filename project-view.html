@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-RBTWR9QNMQ');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
     </script>
     <title>项目详情 | Asstar</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
     <style>
         /* Gitalk 自定义样式 */
@@ -25,14 +28,14 @@
             padding: 2rem;
             margin-top: 3rem;
         }
-        
+
         .gt-header {
             background: transparent;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1rem;
             margin-bottom: 2rem;
         }
-        
+
         .gt-header-textarea {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
@@ -40,12 +43,12 @@
             color: var(--text-primary);
             font-family: var(--font-primary);
         }
-        
+
         .gt-header-textarea:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
         }
-        
+
         .gt-btn {
             background: var(--gradient-primary);
             border: none;
@@ -55,12 +58,12 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        
+
         .gt-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
         }
-        
+
         .gt-comment {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
@@ -68,24 +71,24 @@
             margin-bottom: 1rem;
             padding: 1.5rem;
         }
-        
+
         .gt-comment-body {
             color: var(--text-secondary);
             font-family: var(--font-primary);
             line-height: 1.6;
         }
-        
+
         .gt-comment-header {
             color: var(--text-primary);
             font-family: var(--font-display);
             font-weight: 600;
         }
-        
+
         .gt-comment-time {
             color: var(--text-secondary);
             font-size: 0.875rem;
         }
-        
+
         /* 项目内容样式 */
         .project-content {
             background: rgba(255, 255, 255, 0.02);
@@ -95,7 +98,7 @@
             margin-bottom: 2rem;
             line-height: 1.7;
         }
-        
+
         .project-content h1,
         .project-content h2,
         .project-content h3,
@@ -107,19 +110,36 @@
             margin-top: 2rem;
             margin-bottom: 1rem;
         }
-        
-        .project-content h1 { font-size: 2rem; }
-        .project-content h2 { font-size: 1.75rem; }
-        .project-content h3 { font-size: 1.5rem; }
-        .project-content h4 { font-size: 1.25rem; }
-        .project-content h5 { font-size: 1.125rem; }
-        .project-content h6 { font-size: 1rem; }
-        
+
+        .project-content h1 {
+            font-size: 2rem;
+        }
+
+        .project-content h2 {
+            font-size: 1.75rem;
+        }
+
+        .project-content h3 {
+            font-size: 1.5rem;
+        }
+
+        .project-content h4 {
+            font-size: 1.25rem;
+        }
+
+        .project-content h5 {
+            font-size: 1.125rem;
+        }
+
+        .project-content h6 {
+            font-size: 1rem;
+        }
+
         .project-content p {
             color: var(--text-secondary);
             margin-bottom: 1rem;
         }
-        
+
         .project-content code {
             background: rgba(0, 212, 255, 0.1);
             color: var(--primary-color);
@@ -127,7 +147,7 @@
             border-radius: 4px;
             font-family: 'Courier New', monospace;
         }
-        
+
         .project-content pre {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
@@ -136,13 +156,13 @@
             overflow-x: auto;
             margin: 1rem 0;
         }
-        
+
         .project-content pre code {
             background: none;
             color: var(--text-primary);
             padding: 0;
         }
-        
+
         .project-content blockquote {
             border-left: 4px solid var(--primary-color);
             padding-left: 1rem;
@@ -150,28 +170,28 @@
             color: var(--text-secondary);
             font-style: italic;
         }
-        
+
         .project-content ul,
         .project-content ol {
             color: var(--text-secondary);
             margin: 1rem 0;
             padding-left: 2rem;
         }
-        
+
         .project-content li {
             margin-bottom: 0.5rem;
         }
-        
+
         .project-content a {
             color: var(--primary-color);
             text-decoration: none;
             transition: all 0.3s ease;
         }
-        
+
         .project-content a:hover {
             text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
         }
-        
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -182,26 +202,21 @@
             margin-bottom: 2rem;
             transition: all 0.3s ease;
         }
-        
+
         .back-link:hover {
             transform: translateX(-4px);
         }
-        
+
         .back-link::before {
             content: '←';
             font-size: 1.2rem;
         }
     </style>
 </head>
+
 <body>
     <!-- 宇宙背景层 -->
-    <div class="cosmic-background">
-        <div class="stars"></div>
-        <div class="stars2"></div>
-        <div class="stars3"></div>
-        <div class="nebula-layer"></div>
-        <div class="quantum-field"></div>
-    </div>
+    <canvas id="canvas-background"></canvas>
 
     <!-- 导航栏 -->
     <header class="header">
@@ -228,16 +243,16 @@
         <section class="project-detail">
             <div class="container">
                 <a href="javascript:history.back()" class="back-link">返回</a>
-                
+
                 <div class="section-header">
                     <h1 class="section-title" id="project-title">项目详情</h1>
                     <div class="section-line"></div>
                 </div>
-                
+
                 <div class="project-content" id="project-content">
                     <!-- 项目内容将在这里动态加载 -->
                 </div>
-                
+
                 <div id="gitalk-container"></div>
             </div>
         </section>
@@ -262,7 +277,7 @@
         // 获取URL参数
         const urlParams = new URLSearchParams(window.location.search);
         const file = urlParams.get('file');
-        
+
         if (file) {
             // 加载Markdown文件
             fetch(file)
@@ -279,16 +294,16 @@
                         .replace(/\n\n/g, '</p><p>')
                         .replace(/^\n/, '<p>')
                         .replace(/\n$/, '</p>');
-                    
+
                     if (!html.startsWith('<p>')) {
                         html = '<p>' + html;
                     }
                     if (!html.endsWith('</p>')) {
                         html = html + '</p>';
                     }
-                    
+
                     document.getElementById('project-content').innerHTML = html;
-                    
+
                     // 设置页面标题
                     const fileName = file.split('/').pop().replace('.md', '');
                     document.getElementById('project-title').textContent = fileName;
@@ -325,4 +340,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>

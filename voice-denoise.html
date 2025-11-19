@@ -1,462 +1,407 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asstar Voice Denoise</title>
+    <title>Asstar Denoise Protocol</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
+        /* Page-Specific Styles */
         :root {
-            color-scheme: dark;
-            --bg: #020312;
-            --bg-glow: radial-gradient(circle at 20% 20%, rgba(67,105,255,.25), transparent 45%),
-                       radial-gradient(circle at 80% 0%, rgba(0,255,214,.2), transparent 40%);
-            --grid: rgba(255,255,255,.06);
-            --card: rgba(13,17,44,.72);
-            --card-strong: rgba(20,26,66,.85);
-            --accent: #3dffcf;
-            --accent-2: #7a8efc;
-            --text: #e6f2ff;
-            --muted: #8da0c9;
+            --c-noise: #FF4D4D;
+            --c-noise-glow: rgba(255, 77, 77, 0.4);
+            --c-clean: #00F0FF;
+            --c-clean-glow: rgba(0, 240, 255, 0.4);
+            --glass-panel: rgba(10, 15, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
-        * {
-            box-sizing: border-box;
-        }
+
         body {
-            margin: 0;
-            font-family: 'Exo 2', 'PingFang SC', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            /* Prevent scroll for this immersive view */
         }
-        body::before {
-            content: "";
-            position: fixed;
+
+        /* Main Container */
+        .denoise-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+            /* Space for fixed header */
+        }
+
+        /* Status Indicator */
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--c-noise);
+            color: var(--c-noise);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+        }
+
+        body.active .status-badge {
+            border-color: var(--c-clean);
+            color: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        /* Visualizer Frame */
+        .visualizer-frame {
+            width: 90%;
+            max-width: 900px;
+            height: 350px;
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.active .visualizer-frame {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 20px 80px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Scanline */
+        .scanline {
+            position: absolute;
             inset: 0;
-            background: var(--bg-glow);
-            opacity: .9;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%);
+            background-size: 100% 4px;
             pointer-events: none;
-            z-index: -2;
+            z-index: 5;
+            opacity: 0.3;
         }
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image: linear-gradient(var(--grid) 1px, transparent 1px),
-                              linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-            background-size: 120px 120px;
-            opacity: .25;
-            pointer-events: none;
-            z-index: -3;
+
+        /* Waves */
+        .waves {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 200px;
+            width: 80%;
+            z-index: 2;
         }
-        header {
+
+        .bar {
+            width: 8px;
+            background: var(--c-noise);
+            border-radius: 10px;
+            height: 10%;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+            transition: background-color 0.5s, box-shadow 0.5s;
+            animation: noiseAnim 0.4s ease-in-out infinite alternate;
+        }
+
+        body.active .bar {
+            background: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            animation-name: cleanAnim;
+            animation-duration: 1.2s;
+        }
+
+        @keyframes noiseAnim {
+            0% {
+                height: 10%;
+                opacity: 0.5;
+            }
+
+            100% {
+                height: 100%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes cleanAnim {
+
+            0%,
+            100% {
+                height: 30%;
+            }
+
+            50% {
+                height: 80%;
+            }
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 50px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .switch-label {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 24px clamp(24px, 6vw, 96px);
-        }
-        .logo {
-            display: flex;
-            gap: 12px;
-            align-items: center;
+            width: 280px;
+            margin: 0 auto 15px;
             font-family: 'Orbitron', sans-serif;
-            letter-spacing: .25em;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
         }
-        .logo img {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid rgba(255,255,255,.3);
-            box-shadow: 0 0 25px rgba(61,255,207,.25);
+
+        /* Toggle Switch */
+        .toggle-container {
+            width: 280px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            margin: 0 auto;
         }
-        .chip {
-            border: 1px solid rgba(255,255,255,.25);
-            border-radius: 999px;
-            padding: 8px 18px;
-            font-size: 14px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .15em;
-        }
-        main {
-            padding: 0 clamp(24px, 6vw, 96px) 72px;
-        }
-        .hero {
-            display: grid;
-            gap: 40px;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+        .toggle-handle {
+            width: 130px;
+            height: 60px;
+            background: linear-gradient(145deg, #333, #222);
+            border-radius: 90px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
             align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #888;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), color 0.3s, background 0.3s;
+        }
+
+        .toggle-handle::before {
+            content: "RAW";
+        }
+
+        body.active .toggle-container {
+            border-color: var(--c-clean-glow);
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        body.active .toggle-handle {
+            transform: translateX(140px);
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 30px var(--c-clean-glow);
+        }
+
+        body.active .toggle-handle::before {
+            content: "PURE";
+        }
+
+        /* Metrics */
+        .metrics {
+            display: flex;
+            gap: 60px;
             margin-top: 40px;
         }
-        .hero h1 {
-            font-size: clamp(32px, 6vw, 60px);
-            margin: 0 0 16px;
-            font-weight: 600;
+
+        .metric-item {
+            text-align: center;
         }
-        .hero p {
-            color: var(--muted);
-            margin-bottom: 28px;
-            font-size: 18px;
-        }
-        .cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 26px;
-            border-radius: 999px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: .05em;
-            background: linear-gradient(120deg, #3dffcf, #7a8efc);
-            color: #030514;
-            cursor: pointer;
-            transition: transform .3s ease;
-        }
-        .cta:hover {
-            transform: translateY(-2px);
-        }
-        .waveform {
-            position: relative;
-            height: 260px;
-            border-radius: 18px;
-            padding: 30px;
-            background: linear-gradient(145deg, rgba(16,21,53,.8), rgba(8,13,40,.9));
-            overflow: hidden;
-            box-shadow: 0 20px 80px rgba(10,15,37,.65);
-        }
-        .wave-backdrop {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(61,255,207,.2), transparent 55%),
-                        radial-gradient(circle at 75% 35%, rgba(122,142,252,.2), transparent 45%);
-        }
-        .wave-bars {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-evenly;
-            mix-blend-mode: screen;
-        }
-        .wave-bars span {
-            width: 8px;
-            background: linear-gradient(180deg, rgba(61,255,207,.8), rgba(122,142,252,.8));
-            border-radius: 999px;
-            animation: rise 1.6s ease-in-out infinite;
-            animation-delay: calc(var(--i) * .08s);
-            filter: drop-shadow(0 0 10px rgba(61,255,207,.4));
-        }
-        @keyframes rise {
-            0%, 100% { height: 18%; transform: translateY(0); }
-            40% { height: 80%; transform: translateY(-8px); }
-            70% { height: 40%; }
-        }
-        .wave-label {
-            position: absolute;
-            bottom: 24px;
-            left: 30px;
-            font-size: 14px;
-            letter-spacing: .2em;
-            text-transform: uppercase;
-            color: rgba(230,242,255,.7);
-        }
-        .metrics {
-            margin-top: 60px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 18px;
-        }
-        .metric-card {
-            padding: 22px;
-            border-radius: 18px;
-            background: var(--card-strong);
-            border: 1px solid rgba(255,255,255,.1);
-            box-shadow: 0 15px 40px rgba(5,8,20,.45);
-        }
-        .metric-label {
-            font-size: 13px;
-            letter-spacing: .2em;
-            color: rgba(230,242,255,.6);
-            text-transform: uppercase;
-        }
-        .metric-value {
+
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
             display: block;
-            margin: 12px 0 6px;
-            font-size: 32px;
-            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            min-width: 120px;
         }
-        .metric-desc {
-            font-size: 14px;
-            color: var(--muted);
+
+        .metric-label {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .section-title {
-            margin: 80px 0 18px;
-            font-size: 28px;
-            letter-spacing: .08em;
-        }
-        .scene-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-        .scene-card {
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,.08);
-            border-radius: 18px;
-            padding: 24px;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            backdrop-filter: blur(16px);
-        }
-        .scene-card h3 {
-            margin: 0;
-        }
-        .scene-card p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-        .taglist {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 30px 0 10px;
-        }
-        .tag {
-            padding: 8px 14px;
-            border-radius: 12px;
-            background: rgba(61,255,207,.08);
-            border: 1px solid rgba(61,255,207,.25);
-            color: var(--accent);
-            font-size: 14px;
-        }
-        .experience {
-            margin-top: 60px;
-            padding: clamp(24px, 5vw, 48px);
-            border-radius: 26px;
-            background: radial-gradient(circle at 20% 20%, rgba(61,255,207,.15), transparent 55%),
-                        radial-gradient(circle at 80% 10%, rgba(122,142,252,.2), transparent 60%),
-                        rgba(6,10,30,.9);
-            border: 1px solid rgba(255,255,255,.12);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 30px;
-        }
-        .experience h3 {
-            margin: 0 0 12px;
-            font-size: 22px;
-        }
-        .experience p {
-            margin: 0 0 18px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-        .experience-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .experience-item {
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-        }
-        .experience-item span {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            display: grid;
-            place-items: center;
-            background: rgba(61,255,207,.12);
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .experience-diagram {
-            border-radius: 20px;
-            padding: 26px;
-            background: rgba(5,8,22,.85);
-            border: 1px solid rgba(255,255,255,.12);
-            min-height: 220px;
+
+        /* Glitch Effect */
+        .glitch-text {
             position: relative;
         }
-        .diagram-step {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,.08);
+
+        body:not(.active) .glitch-text {
+            animation: textShake 0.3s infinite;
+            color: var(--c-noise);
+            text-shadow: 2px 0 var(--c-noise-glow);
         }
-        .diagram-step:last-child {
-            border-bottom: none;
-        }
-        .diagram-step strong {
-            font-size: 16px;
-            letter-spacing: .08em;
-        }
-        .diagram-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: linear-gradient(120deg, var(--accent), var(--accent-2));
-            box-shadow: 0 0 12px rgba(61,255,207,.7);
-        }
-        .callout {
-            margin: 70px 0 30px;
-            padding: 28px 32px;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,.1);
-            background: linear-gradient(120deg, rgba(61,255,207,.18), rgba(122,142,252,.18));
-            display: flex;
-            flex-wrap: wrap;
-            gap: 18px;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .callout p {
-            margin: 0;
-            color: var(--text);
-            font-size: 18px;
+
+        @keyframes textShake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            20% {
+                transform: translate(-1px, -2px);
+            }
+
+            40% {
+                transform: translate(-2px, 0);
+            }
+
+            60% {
+                transform: translate(2px, 0);
+            }
+
+            80% {
+                transform: translate(1px, -1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="ambient-grid" aria-hidden="true"></div>
-    <header>
-        <div class="logo">
-            <img src="images/Asstar.jpg" alt="Asstar 官方标志">
-            <span>ASSTAR</span>
-        </div>
-        <div class="chip">Lightweight + AI</div>
+    <!-- Cosmic Background -->
+    <canvas id="canvas-background"></canvas>
+
+    <!-- Standard Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="images/Asstar.jpg" alt="Asstar" class="logo-img">
+                <span class="logo-text">ASSTAR</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">首页</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
     </header>
-    <main>
-        <section class="hero">
-            <div>
-                <p class="chip" style="margin: 0 0 18px; display: inline-flex;">NOISELESS x AI</p>
-                <h1>无声之境，有心之交</h1>
+
+    <div class="denoise-container">
+        <div class="status-badge" id="status-text">NOISE DETECTED</div>
+
+        <div class="visualizer-frame">
+            <div class="scanline"></div>
+            <div class="waves" id="wave-container">
+                <!-- Bars generated by JS -->
             </div>
-            <div class="waveform" aria-hidden="true">
-                <div class="wave-backdrop"></div>
-                <div class="wave-bars">
-                    <!-- 24 bars -->
-                    <span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span>
-                    <span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span>
-                    <span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span>
-                    <span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span>
-                    <span style="--i:12"></span><span style="--i:13"></span><span style="--i:14"></span>
-                    <span style="--i:15"></span><span style="--i:16"></span><span style="--i:17"></span>
-                    <span style="--i:18"></span><span style="--i:19"></span><span style="--i:20"></span>
-                    <span style="--i:21"></span><span style="--i:22"></span><span style="--i:23"></span>
-                </div>
-                <div class="wave-label">immersive silence</div>
+        </div>
+
+        <div class="controls">
+            <div class="switch-label">
+                <span>INPUT SIGNAL</span>
+                <span>PROCESSED</span>
             </div>
-        </section>
+            <div class="toggle-container" id="denoise-toggle">
+                <div class="toggle-handle"></div>
+            </div>
+        </div>
+
         <div class="metrics">
-            <div class="metric-card">
-                <span class="metric-label">实时延迟</span>
-                <span class="metric-value">12 ms</span>
-                <span class="metric-desc">端侧推理，全链路响应</span>
+            <div class="metric-item">
+                <span class="metric-val glitch-text" id="snr-val" data-text="-12 dB">-12 dB</span>
+                <span class="metric-label">SNR (Signal-to-Noise)</span>
             </div>
-            <div class="metric-card">
-                <span class="metric-label">模型体积</span>
-                <span class="metric-value">9.3 MB</span>
-                <span class="metric-desc">轻量装置即开即用</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-label">降噪余量</span>
-                <span class="metric-value">-42 dB</span>
-                <span class="metric-desc">保留语音色彩与细节</span>
-            </div>
-            <div class="metric-card">
-                <span class="metric-label">部署形态</span>
-                <span class="metric-value">Edge / Cloud</span>
-                <span class="metric-desc">多场景自适配编排</span>
+            <div class="metric-item">
+                <span class="metric-val" id="latency-val">12 ms</span>
+                <span class="metric-label">Real-time Latency</span>
             </div>
         </div>
+    </div>
 
-        <h2 class="section-title">应用场景</h2>
-        <div class="scene-grid">
-            <div class="scene-card">
-                <h3>沉浸式降噪</h3>
-                <p>为 XR、音乐与冥想空间提供动态声场隔离，实现真实世界与虚拟体验之间的无缝过渡。</p>
-            </div>
-            <div class="scene-card">
-                <h3>智能助听器</h3>
-                <p>面向助听设备的低功耗模型，精准捕捉语音主体，抑制突发噪声，让沟通更自然。</p>
-            </div>
-            <div class="scene-card">
-                <h3>工业降噪</h3>
-                <p>针对高噪生产线实时滤波，支持远程协作、智能语音质检，保证稳定性与安全性。</p>
-            </div>
-            <div class="scene-card">
-                <h3>个性化定制</h3>
-                <p>通过少量样本即可训练专属声纹，定制噪声剖面，实现千人千面的听觉体验。</p>
-            </div>
-        </div>
+    <script src="script.js"></script>
+    <script>
+        const toggle = document.getElementById('denoise-toggle');
+        const body = document.body;
+        const waveContainer = document.getElementById('wave-container');
+        const statusText = document.getElementById('status-text');
+        const snrVal = document.getElementById('snr-val');
 
-        <div class="taglist">
-            <span class="tag">毫秒级推理延迟</span>
-            <span class="tag">边缘侧部署</span>
-            <span class="tag">自适应声纹</span>
-            <span class="tag">开放式 API</span>
-        </div>
-        <section class="experience">
-            <div>
-                <h3>体验栈</h3>
-                <p>从声源捕捉到个性化呈现，每一步都为真实听感构建护城河。</p>
-                <div class="experience-list">
-                    <div class="experience-item">
-                        <span>01</span>
-                        <div>
-                            <strong>多模态采样</strong>
-                            <p>融合麦克风矩阵与环境传感器，实时描绘噪声剖面。</p>
-                        </div>
-                    </div>
-                    <div class="experience-item">
-                        <span>02</span>
-                        <div>
-                            <strong>语义守护</strong>
-                            <p>自适应声纹保持语音神态，同时压制突发、持续噪声。</p>
-                        </div>
-                    </div>
-                    <div class="experience-item">
-                        <span>03</span>
-                        <div>
-                            <strong>沉浸反馈</strong>
-                            <p>通过声景快照与个性化配置，持续校准用户偏好。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="experience-diagram">
-                <div class="diagram-step">
-                    <strong>Capture</strong>
-                    <div class="diagram-dot"></div>
-                </div>
-                <div class="diagram-step">
-                    <strong>Sense</strong>
-                    <div class="diagram-dot"></div>
-                </div>
-                <div class="diagram-step">
-                    <strong>Denoise</strong>
-                    <div class="diagram-dot"></div>
-                </div>
-                <div class="diagram-step">
-                    <strong>Render</strong>
-                    <div class="diagram-dot"></div>
-                </div>
-            </div>
-        </section>
-        <div class="callout">
-            <p>需要定制声景或 Demo？写信给 asstarx7@gmail.com 获取专属通道。</p>
-            <button class="cta" onclick="location.href='mailto:asstarx7@gmail.com'">预约体验</button>
-        </div>
-    </main>
+        // 1. Generate Bars
+        const barCount = 30;
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('bar');
+            bar.style.animationDelay = `-${Math.random()}s`;
+            bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+            waveContainer.appendChild(bar);
+        }
+
+        const bars = document.querySelectorAll('.bar');
+        let isClean = false;
+
+        // 2. Toggle Logic
+        toggle.addEventListener('click', () => {
+            isClean = !isClean;
+
+            if (isClean) {
+                // === Clean Mode ===
+                body.classList.add('active');
+                statusText.innerText = "AI PURIFIED";
+                snrVal.innerText = "+48 dB";
+                snrVal.removeAttribute('data-text');
+
+                bars.forEach((bar, index) => {
+                    const delay = index * 0.1;
+                    bar.style.animationName = 'cleanAnim';
+                    bar.style.animationDuration = '1.5s';
+                    bar.style.animationDelay = `${delay}s`;
+                    bar.style.animationTimingFunction = 'ease-in-out';
+                    bar.style.transform = 'scaleY(1)';
+                });
+
+            } else {
+                // === Noise Mode ===
+                body.classList.remove('active');
+                statusText.innerText = "NOISE DETECTED";
+                snrVal.innerText = "-12 dB";
+                snrVal.setAttribute('data-text', '-12 dB');
+
+                bars.forEach((bar) => {
+                    bar.style.animationName = 'noiseAnim';
+                    bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+                    bar.style.animationDelay = `-${Math.random()}s`;
+                    bar.style.animationTimingFunction = 'linear';
+                });
+            }
+        });
+    </script>
 </body>
-</html>
 
+</html>

@@ -8,114 +8,272 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-RBTWR9QNMQ');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
     </script>
     <title>SVG-XML可视化</title>
     <link rel="icon" type="image/jpeg" href="../images/Asstar.jpg">
     <link rel="stylesheet" href="../styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --indent-size: 20px; }
+        :root {
+            --indent-size: 20px;
+        }
+
         body {
             font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
-            margin: 0; padding: 80px 16px 16px; color: var(--text-primary, #eaeaea);
+            margin: 0;
+            padding: 80px 16px 16px;
+            color: var(--text-primary, #eaeaea);
             background: linear-gradient(135deg, var(--bg-primary, #0a0a0a) 0%, var(--bg-secondary, #1a1a2e) 50%, var(--bg-tertiary, #16213e) 100%);
         }
-        .page-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
-        header { padding-bottom: 1em; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1)); }
-        h1 { margin: 0; font-family: var(--font-display, inherit); }
-        p { color: var(--text-secondary, #b0b0b0); }
-        #main-container { display: flex; height: calc(100vh - 180px); margin-top: 1em; gap: 1em; align-items: stretch; }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            padding-bottom: 1em;
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+        }
+
+        h1 {
+            margin: 0;
+            font-family: var(--font-display, inherit);
+        }
+
+        p {
+            color: var(--text-secondary, #b0b0b0);
+        }
+
+        #main-container {
+            display: flex;
+            height: calc(100vh - 180px);
+            margin-top: 1em;
+            gap: 1em;
+            align-items: stretch;
+        }
+
         .panel {
-            flex: 1; border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px; overflow: hidden;
-            display: flex; flex-direction: column; background: rgba(255,255,255,0.04); backdrop-filter: blur(6px);
+            flex: 1;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(6px);
         }
+
         .panel-header {
-            padding: 0.75em 1em; background: rgba(255,255,255,0.06);
-            border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1)); font-weight: 600; color: var(--text-primary);
+            padding: 0.75em 1em;
+            background: rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            font-weight: 600;
+            color: var(--text-primary);
         }
+
         #svg-viewer {
-            padding: 1.5em; flex-grow: 1; overflow: hidden; /* 由auto改为hidden，防止溢出滚动条 */
-            display: flex; justify-content: center; align-items: center; cursor: default;
+            padding: 1.5em;
+            flex-grow: 1;
+            overflow: hidden;
+            /* 由auto改为hidden，防止溢出滚动条 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
             position: relative;
         }
+
         #svg-zoom-wrap {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(1);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
             will-change: transform;
             cursor: grab;
             transition: box-shadow 0.2s;
         }
+
         #svg-zoom-wrap.dragging {
             cursor: grabbing;
-            box-shadow: 0 2px 24px 0 rgba(0,212,255,0.11);
+            box-shadow: 0 2px 24px 0 rgba(0, 212, 255, 0.11);
         }
+
         /* 伪类防止两栏高度不一致（补充flex) */
-        #svg-viewer svg * { cursor: pointer; }
-        #svg-viewer svg { max-width: 100%; max-height: 100%; }
-        #code-container {
-            flex-grow: 1; overflow: auto; font-family: "SF Mono", "Fira Code", "Courier New", monospace;
-            font-size: 14px; padding: 1em; white-space: nowrap; color: var(--text-primary);
+        #svg-viewer svg * {
+            cursor: pointer;
         }
-        .code-tree, .code-tree ul { list-style: none; padding-left: var(--indent-size); margin: 0; }
-        .code-tree > li { padding-left: 0; }
-        .code-tree li { position: relative; }
-        .code-line { padding: 2px 4px; border-radius: 4px; cursor: pointer; }
-        .toggler { cursor: pointer; user-select: none; display: inline-block; width: 1em; text-align: center; color: var(--text-secondary); }
-        .toggler::before { content: '▼'; display: inline-block; transition: transform 0.1s linear; }
-        .collapsed > .code-line > .toggler::before { transform: rotate(-90deg); }
-        .collapsed > ul { display: none; }
-        .collapsed + li { display: none; }
-        .syntax-tag { color: #8bd3ff; }
-        .syntax-attr-name { color: #ffd166; }
-        .syntax-attr-value { color: #a0e7e5; }
-        .syntax-bracket { color: #9aa0a6; }
-        .highlight-svg-hover { outline: 2px solid #00d4ff; outline-offset: 2px; }
-        .highlight-code-hover { background-color: rgba(0,212,255,0.18); }
-        .highlight-svg-pinned { outline: 3px solid #ff6b6b; outline-offset: 2px; }
-        .highlight-code-pinned { background-color: rgba(255,107,107,0.22); box-shadow: 0 0 0 2px rgba(255,107,107,0.35); }
-        .back-button { position: fixed; top: 20px; left: 20px; background: rgba(30, 60, 114, 0.6); border: 1px solid rgba(135, 206, 235, 0.3); border-radius: 12px; padding: 10px 16px; color: #B0E0E6; text-decoration: none; font-family: var(--font-primary); font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); z-index: 1002; }
-        .back-button:hover { background: rgba(30, 60, 114, 0.8); transform: translateY(-2px); }
-        @media (max-width: 992px) { #main-container { height: auto; min-height: calc(100vh - 180px); flex-direction: column; } }
+
+        #svg-viewer svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #code-container {
+            flex-grow: 1;
+            overflow: auto;
+            font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+            font-size: 14px;
+            padding: 1em;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+
+        .code-tree,
+        .code-tree ul {
+            list-style: none;
+            padding-left: var(--indent-size);
+            margin: 0;
+        }
+
+        .code-tree>li {
+            padding-left: 0;
+        }
+
+        .code-tree li {
+            position: relative;
+        }
+
+        .code-line {
+            padding: 2px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toggler {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            width: 1em;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .toggler::before {
+            content: '▼';
+            display: inline-block;
+            transition: transform 0.1s linear;
+        }
+
+        .collapsed>.code-line>.toggler::before {
+            transform: rotate(-90deg);
+        }
+
+        .collapsed>ul {
+            display: none;
+        }
+
+        .collapsed+li {
+            display: none;
+        }
+
+        .syntax-tag {
+            color: #8bd3ff;
+        }
+
+        .syntax-attr-name {
+            color: #ffd166;
+        }
+
+        .syntax-attr-value {
+            color: #a0e7e5;
+        }
+
+        .syntax-bracket {
+            color: #9aa0a6;
+        }
+
+        .highlight-svg-hover {
+            outline: 2px solid #00d4ff;
+            outline-offset: 2px;
+        }
+
+        .highlight-code-hover {
+            background-color: rgba(0, 212, 255, 0.18);
+        }
+
+        .highlight-svg-pinned {
+            outline: 3px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+
+        .highlight-code-pinned {
+            background-color: rgba(255, 107, 107, 0.22);
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.35);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 60, 114, 0.6);
+            border: 1px solid rgba(135, 206, 235, 0.3);
+            border-radius: 12px;
+            padding: 10px 16px;
+            color: #B0E0E6;
+            text-decoration: none;
+            font-family: var(--font-primary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1002;
+        }
+
+        .back-button:hover {
+            background: rgba(30, 60, 114, 0.8);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 992px) {
+            #main-container {
+                height: auto;
+                min-height: calc(100vh - 180px);
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 
 <body>
     <a href="../tools.html" class="back-button">← 返回工具箱</a>
-    <div class="cosmic-background">
-        <div class="stars"></div>
-        <div class="stars2"></div>
-        <div class="stars3"></div>
-        <div class="nebula-layer"></div>
-        <div class="quantum-field"></div>
-    </div>
+    <canvas id="canvas-background"></canvas>
     <div class="page-container">
-    <header>
-        <h1>SVG-XML可视化</h1>
-        <p>右侧代码为XML，支持与左侧 SVG 元素双向联动高亮。</p>
-        <input class="btn btn-secondary" type="file" id="svg-uploader" accept="image/svg+xml">
-    </header>
-    <div id="main-container">
+        <header>
+            <h1>SVG-XML可视化</h1>
+            <p>右侧代码为XML，支持与左侧 SVG 元素双向联动高亮。</p>
+            <input class="btn btn-secondary" type="file" id="svg-uploader" accept="image/svg+xml">
+        </header>
+        <div id="main-container">
 
-        <div class="panel">
+            <div class="panel">
 
-            <div class="panel-header">图像预览</div>
+                <div class="panel-header">图像预览</div>
 
-            <div id="svg-viewer"><p>请先上传一个SVG文件</p></div>
+                <div id="svg-viewer">
+                    <p>请先上传一个SVG文件</p>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="panel-header">XML 代码 (默认折叠)</div>
+
+                <div id="code-container">
+                    <p>此处将显示可交互的SVG源代码</p>
+                </div>
+
+            </div>
 
         </div>
-
-        <div class="panel">
-
-            <div class="panel-header">XML 代码 (默认折叠)</div>
-
-            <div id="code-container"><p>此处将显示可交互的SVG源代码</p></div>
-
-        </div>
-
-    </div>
     </div>
 
 
@@ -148,7 +306,7 @@
 
                 reader.onload = (e) => {
                     const content = e.target.result;
-                    try { localStorage.setItem('svgMonitor:lastSVG', content); } catch (e) {}
+                    try { localStorage.setItem('svgMonitor:lastSVG', content); } catch (e) { }
                     processSVG(content);
                 };
 
@@ -168,7 +326,7 @@
             try {
                 const cached = localStorage.getItem('svgMonitor:lastSVG');
                 if (cached) processSVG(cached);
-            } catch (e) {}
+            } catch (e) { }
         });
 
         function processSVG(svgContent) {
@@ -227,7 +385,7 @@
             const fragment = document.createDocumentFragment();
             const id = element.getAttribute('data-highlight-id');
             const hasChildren = Array.from(element.childNodes).some(node =>
-                (node.nodeType === 1) || 
+                (node.nodeType === 1) ||
                 (node.nodeType === 3 && node.nodeValue.trim().length > 0)
             );
             // 开标签
@@ -305,7 +463,7 @@
                 window.addEventListener('mouseup', endDrag);
             }
         }
-        
+
         // ... (其余所有事件处理函数保持不变) ...
 
 
@@ -397,13 +555,13 @@
             const svgEl = svgViewer.querySelector(`[data-highlight-id="${id}"]`);
 
             // 高亮所有相关li（包含文本）
-            const codeItems = codeContainer.querySelectorAll(`li[data-highlight-id="${id}"]`); 
+            const codeItems = codeContainer.querySelectorAll(`li[data-highlight-id="${id}"]`);
 
             if (svgEl) svgEl.classList.add(`highlight-svg-${type}`);
 
             codeItems.forEach((item) => {
                 const line = item.querySelector('.code-line');
-                if(line) line.classList.add(`highlight-code-${type}`);
+                if (line) line.classList.add(`highlight-code-${type}`);
                 else if (item.classList.contains('syntax-text')) item.classList.add(`highlight-code-${type}`);
             });
 
@@ -454,10 +612,10 @@
                 if (wrap) {
                     const rect = wrap.getBoundingClientRect();
                     const viewerRect = svgViewer.getBoundingClientRect();
-                    const ox = e.clientX - viewerRect.left - viewerRect.width/2 - panX;
-                    const oy = e.clientY - viewerRect.top - viewerRect.height/2 - panY;
-                    panX -= ox * (next/prevScale - 1);
-                    panY -= oy * (next/prevScale - 1);
+                    const ox = e.clientX - viewerRect.left - viewerRect.width / 2 - panX;
+                    const oy = e.clientY - viewerRect.top - viewerRect.height / 2 - panY;
+                    panX -= ox * (next / prevScale - 1);
+                    panY -= oy * (next / prevScale - 1);
                 }
                 currentScale = next;
                 applyZoom();
@@ -467,7 +625,7 @@
         function applyZoom() {
             const wrap = document.getElementById('svg-zoom-wrap');
             if (wrap) {
-                wrap.style.transform = `translate(-50%, -50%) scale(${currentScale}) translate(${panX/currentScale}px, ${panY/currentScale}px)`;
+                wrap.style.transform = `translate(-50%, -50%) scale(${currentScale}) translate(${panX / currentScale}px, ${panY / currentScale}px)`;
             }
         }
 
@@ -477,7 +635,7 @@
             lastX = e.clientX;
             lastY = e.clientY;
             const wrap = document.getElementById('svg-zoom-wrap');
-            if(wrap) wrap.classList.add('dragging');
+            if (wrap) wrap.classList.add('dragging');
         }
         function onDrag(e) {
             if (!isDragging) return;
@@ -500,8 +658,7 @@
 
     </script>
 
+    <script src="../script.js"></script>
 </body>
 
 </html>
-
-
