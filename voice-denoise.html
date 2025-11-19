@@ -24,8 +24,8 @@
         }
 
         body {
-            overflow: hidden;
-            /* Prevent scroll for this immersive view */
+            overflow-x: hidden;
+            /* Allow vertical scroll */
         }
 
         /* Main Container */
@@ -288,6 +288,274 @@
                 transform: translate(0, 0);
             }
         }
+
+        /* Scenarios Section */
+        .scenarios-section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(145deg, rgba(10, 15, 30, 0.8), rgba(20, 25, 40, 0.6));
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated border gradient */
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(45deg,
+                    #00d4ff,
+                    #0099cc,
+                    #00a8e8,
+                    #00d4ff);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: borderRotate 4s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes borderRotate {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Inner glow effect */
+        .scenario-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4),
+                0 0 80px rgba(0, 168, 232, 0.3);
+        }
+
+        .scenario-card:hover::before {
+            opacity: 1;
+            animation: borderRotate 2s linear infinite;
+        }
+
+        .scenario-card:hover::after {
+            opacity: 1;
+        }
+
+        .scenario-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 1;
+        }
+
+        .scenario-card:hover .scenario-icon {
+            transform: scale(1.2) rotate(10deg);
+            filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.9)) drop-shadow(0 0 40px rgba(0, 153, 204, 0.6));
+        }
+
+        .scenario-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00d4ff, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-title {
+            background: linear-gradient(135deg, #00d4ff, #00a8e8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scenario-desc {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            position: relative;
+            z-index: 1;
+            padding: 80px 5% 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .contact-content {
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 50px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .contact-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-link {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .contact-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--c-clean-glow);
+        }
+
+        .contact-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--c-clean);
+            transition: width 0.3s ease;
+        }
+
+        .contact-link:hover::after {
+            width: 100%;
+        }
+
+        .contact-value {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .scenarios-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scenarios-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .contact-content {
+                padding: 40px 30px;
+            }
+        }
     </style>
 </head>
 
@@ -295,23 +563,7 @@
     <!-- Cosmic Background -->
     <canvas id="canvas-background"></canvas>
 
-    <!-- Standard Header -->
-    <header class="header">
-        <nav class="nav">
-            <div class="logo">
-                <img src="images/Asstar.jpg" alt="Asstar" class="logo-img">
-                <span class="logo-text">ASSTAR</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-link">首页</a></li>
-            </ul>
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-    </header>
+
 
     <div class="denoise-container">
         <div class="status-badge" id="status-text">NOISE DETECTED</div>
@@ -345,6 +597,51 @@
         </div>
     </div>
 
+    <!-- Scenarios Section -->
+    <section class="scenarios-section">
+        <h2 class="section-title">应用场景</h2>
+        <div class="scenarios-grid">
+            <div class="scenario-card">
+                <div class="scenario-icon">🎧</div>
+                <h3 class="scenario-title">沉浸式降噪</h3>
+                <p class="scenario-desc">为音乐、游戏和娱乐提供极致的沉浸式体验，消除环境噪音干扰</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">🏭</div>
+                <h3 class="scenario-title">工业降噪</h3>
+                <p class="scenario-desc">适用于工厂、建筑工地等高噪音环境，保护听力健康</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">👂</div>
+                <h3 class="scenario-title">助听器</h3>
+                <p class="scenario-desc">智能增强语音信号，过滤背景噪音，提升听障人士的听觉体验</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">⚙️</div>
+                <h3 class="scenario-title">定制化降噪</h3>
+                <p class="scenario-desc">根据特定场景和需求，提供个性化的降噪解决方案</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2 class="section-title">联系我们</h2>
+        <div class="contact-content">
+            <p class="contact-text">如需了解更多信息或商务合作，请联系我们</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-label">邮箱:</span>
+                    <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">微信:</span>
+                    <span class="contact-value">GitscYee</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <script src="script.js"></script>
     <script>
         const toggle = document.getElementById('denoise-toggle');
@@ -373,7 +670,7 @@
             if (isClean) {
                 // === Clean Mode ===
                 body.classList.add('active');
-                statusText.innerText = "AI PURIFIED";
+                statusText.innerText = "LIGHTWEIGHT AI DENOISE";
                 snrVal.innerText = "+48 dB";
                 snrVal.removeAttribute('data-text');
 
