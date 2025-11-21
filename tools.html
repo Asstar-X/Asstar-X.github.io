@@ -242,6 +242,291 @@
                 font-size: 14px;
             }
         }
+
+        /* Modal Styles - Ultra Premium Glassmorphism */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            /* Lighter overlay to show background */
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            /* Completely transparent background as requested */
+            background: rgba(0, 0, 0, 0.01);
+            /* Strong blur to keep content readable against background */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            /* Delicate borders */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Refined shadow */
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 0 80px rgba(0, 212, 255, 0.05);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: rotate(90deg);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 10%, #a5f3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(165, 243, 252, 0.4);
+        }
+
+        .modal-header .tools-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            height: 160px;
+            /* Very transparent input */
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.25);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+        }
+
+        .modal-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.8), rgba(0, 102, 255, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 150, 255, 0.5);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 1), rgba(0, 102, 255, 1));
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.6);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 120px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .result-box:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: var(--primary-color);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Scrollbar for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* File Drop Zone */
+        .file-drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: rgba(0, 212, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .drop-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
     </style>
     <script>
         let currentSource = 'all';
@@ -311,6 +596,32 @@
 
                 <div class="tools-section">
                     <div class="tools-grid">
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('mubao', event)">
+                                <div class="tool-head"><span class="tool-emoji">📰</span><span class="tool-name">幕报
+                                        (MuBao)</span></div>
+                                <div class="tool-desc">AI 驱动的智能简报生成器，一键生成高质量内容。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('resume', event)">
+                                <div class="tool-head"><span class="tool-emoji">📄</span><span
+                                        class="tool-name">简历助手</span>
+                                </div>
+                                <div class="tool-desc">专业简历优化建议，自我介绍生成，提升求职竞争力。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('career', event)">
+                                <div class="tool-head"><span class="tool-emoji">🚀</span><span
+                                        class="tool-name">职业规划</span>
+                                </div>
+                                <div class="tool-desc">AI 深度分析职业背景，提供发展路径与转型建议。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
                         <div class="tool-card" data-source="local" data-category="nlp">
                             <a href="lab/prompt-optimizer.html">
                                 <div class="tool-head"><span class="tool-emoji">🧩</span><span
@@ -435,6 +746,270 @@
     </main>
 
     <script src="script.js"></script>
+    <!-- Parsing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- Coze Agent Modal -->
+    <div id="coze-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCozeModal()">×</button>
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">AI 助手</h2>
+                <p id="modal-subtitle" class="tools-subtitle">AI 智能助手为您服务</p>
+            </div>
+            <div class="modal-body">
+                <div id="drop-zone" class="file-drop-zone" style="display: none;">
+                    <div class="drop-icon">📂</div>
+                    <p class="drop-text">拖拽 DOCX 简历文件到这里，或点击上传</p>
+                    <input type="file" id="file-input" accept=".docx" style="display: none;"
+                        onchange="handleFileSelect(event)">
+                </div>
+                <div class="input-group">
+                    <textarea id="user-input" class="modal-textarea" placeholder="请输入内容..."></textarea>
+                </div>
+                <button id="send-btn" class="action-btn" onclick="sendToCoze()">🚀 开始执行</button>
+                <div id="result-box" class="result-box">
+                    <span style="color: var(--text-secondary);">AI 的回复将显示在这里...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL = "https://coze-api.yxy138646.workers.dev";
+        let currentAppType = 'mubao';
+        let selectedFile = null;
+
+        const APP_CONFIG = {
+            'mubao': {
+                title: '幕报生成器',
+                subtitle: '生成小红书文案',
+                placeholder: '请粘贴长文章内容，AI 将为你生成幕报内容...'
+            },
+            'resume': {
+                title: '简历优化助手',
+                subtitle: '专业简历优化建议',
+                placeholder: '请拖入简历文件，AI 将为您分析...'
+            },
+            'career': {
+                title: '职业规划助手',
+                subtitle: 'AI 深度分析职业背景，提供发展路径与转型建议',
+                placeholder: '请输入你的职业背景和困惑，AI 将为你规划路径...'
+            }
+        };
+
+        function openCozeModal(type, e) {
+            if (e) e.preventDefault();
+            currentAppType = type || 'mubao';
+            const config = APP_CONFIG[currentAppType];
+
+            // Update UI based on type
+            document.getElementById('modal-title').innerText = config.title;
+            document.getElementById('modal-subtitle').innerText = config.subtitle;
+
+            // Toggle Drop Zone for Resume
+            const dropZone = document.getElementById('drop-zone');
+            const userInput = document.getElementById('user-input');
+
+            // Reset File
+            selectedFile = null;
+            document.querySelector('.drop-text').innerText = "拖拽 DOCX 简历文件到这里，或点击上传";
+
+            if (currentAppType === 'resume') {
+                dropZone.style.display = 'block';
+                userInput.placeholder = "请拖入简历文件，或直接在此粘贴简历内容...";
+            } else {
+                dropZone.style.display = 'none';
+                userInput.placeholder = config.placeholder;
+            }
+
+            // Always allow editing initially
+            userInput.readOnly = false;
+            userInput.value = '';
+            userInput.style.cursor = 'text';
+            userInput.style.opacity = '1';
+
+            // Reset result
+            document.getElementById('result-box').innerHTML = '<span style="color: var(--text-secondary);">AI 的回复将显示在这里...</span>';
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('send-btn').innerText = "🚀 开始执行";
+
+            const modal = document.getElementById('coze-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCozeModal() {
+            const modal = document.getElementById('coze-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('coze-modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeCozeModal();
+            }
+        });
+
+        // File Drop Logic
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        async function handleFile(file) {
+            if (!file.name.endsWith('.docx') && !file.name.endsWith('.pdf')) {
+                alert('请上传 .docx 或 .pdf 格式的简历文件。');
+                return;
+            }
+
+            selectedFile = file;
+            document.querySelector('.drop-text').innerText = `已选择: ${file.name}`;
+
+            const userInput = document.getElementById('user-input');
+            userInput.value = "正在解析文件内容，请稍候...";
+            userInput.readOnly = true;
+            userInput.style.opacity = '0.7';
+
+            try {
+                let text = "";
+                if (file.name.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    text = result.value;
+                } else if (file.name.endsWith('.pdf')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + "\n";
+                    }
+                    text = fullText;
+                }
+
+                userInput.value = text;
+                userInput.readOnly = false;
+                userInput.style.opacity = '1';
+                userInput.style.cursor = 'text';
+                userInput.placeholder = "解析完成，您可以手动修改内容...";
+
+            } catch (error) {
+                console.error("Parsing error:", error);
+                userInput.value = "";
+                userInput.placeholder = "文件解析失败，请手动粘贴内容...";
+                alert("文件解析失败: " + error.message);
+                userInput.readOnly = false;
+                userInput.style.opacity = '1';
+                userInput.style.cursor = 'text';
+            }
+        }
+
+        async function sendToCoze() {
+            const inputField = document.getElementById('user-input');
+            const resultBox = document.getElementById('result-box');
+            const btn = document.getElementById('send-btn');
+            const text = inputField.value.trim();
+
+            if (!text) {
+                alert("输入内容不能为空！请粘贴内容或上传文件。");
+                return;
+            }
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerText = "⚡ AI 正在思考中，请稍候...";
+            resultBox.innerHTML = '<div class="loading"><span>🔄 正在连接 Coze 引擎并处理任务...</span></div>';
+
+            console.log("Sending request to Coze:", { input: text, app_type: currentAppType });
+
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    referrerPolicy: "no-referrer", // Avoid sending referrer to prevent potential blocking
+                    credentials: "omit", // Don't send cookies
+                    body: JSON.stringify({
+                        input: text,
+                        app_type: currentAppType
+                    })
+                });
+
+                const data = await response.json();
+
+                // Display Result with Copy Button
+                if (data.reply) {
+                    resultBox.innerHTML = `
+                        <button class="copy-btn" onclick="copyResult()">复制结果</button>
+                        <div id="result-content">${formatOutput(data.reply)}</div>
+                    `;
+                } else {
+                    resultBox.innerHTML = `<span style="color:red;">未获取到有效回复，请重试。</span>`;
+                }
+
+            } catch (error) {
+                resultBox.innerHTML = `<span style="color:red;">❌ 出错啦: ${error.message}</span>`;
+            } finally {
+                // Restore Button State
+                btn.disabled = false;
+                btn.innerText = "🚀 开始执行";
+            }
+        }
+
+        function formatOutput(text) {
+            return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function copyResult() {
+            const content = document.getElementById('result-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "已复制!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+    </script>
 </body>
 
 </html>
