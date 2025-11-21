@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asstar Denoise Protocol</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Page-Specific Styles */
+        :root {
+            --c-noise: #FF4D4D;
+            --c-noise-glow: rgba(255, 77, 77, 0.4);
+            --c-clean: #00F0FF;
+            --c-clean-glow: rgba(0, 240, 255, 0.4);
+            --glass-panel: rgba(10, 15, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            overflow-x: hidden;
+            /* Allow vertical scroll */
+        }
+
+        /* Main Container */
+        .denoise-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+            /* Space for fixed header */
+        }
+
+        /* Status Indicator */
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--c-noise);
+            color: var(--c-noise);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+        }
+
+        body.active .status-badge {
+            border-color: var(--c-clean);
+            color: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        /* Visualizer Frame */
+        .visualizer-frame {
+            width: 90%;
+            max-width: 900px;
+            height: 350px;
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.active .visualizer-frame {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 20px 80px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Scanline */
+        .scanline {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.3;
+        }
+
+        /* Waves */
+        .waves {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 200px;
+            width: 80%;
+            z-index: 2;
+        }
+
+        .bar {
+            width: 8px;
+            background: var(--c-noise);
+            border-radius: 10px;
+            height: 10%;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+            transition: background-color 0.5s, box-shadow 0.5s;
+            animation: noiseAnim 0.4s ease-in-out infinite alternate;
+        }
+
+        body.active .bar {
+            background: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            animation-name: cleanAnim;
+            animation-duration: 1.2s;
+        }
+
+        @keyframes noiseAnim {
+            0% {
+                height: 10%;
+                opacity: 0.5;
+            }
+
+            100% {
+                height: 100%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes cleanAnim {
+
+            0%,
+            100% {
+                height: 30%;
+            }
+
+            50% {
+                height: 80%;
+            }
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 50px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .switch-label {
+            display: flex;
+            justify-content: space-between;
+            width: 280px;
+            margin: 0 auto 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            width: 280px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            margin: 0 auto;
+        }
+
+        .toggle-handle {
+            width: 130px;
+            height: 60px;
+            background: linear-gradient(145deg, #333, #222);
+            border-radius: 90px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #888;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), color 0.3s, background 0.3s;
+        }
+
+        .toggle-handle::before {
+            content: "RAW";
+        }
+
+        body.active .toggle-container {
+            border-color: var(--c-clean-glow);
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        body.active .toggle-handle {
+            transform: translateX(140px);
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 30px var(--c-clean-glow);
+        }
+
+        body.active .toggle-handle::before {
+            content: "PURE";
+        }
+
+        /* Metrics */
+        .metrics {
+            display: flex;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            min-width: 120px;
+        }
+
+        .metric-label {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Glitch Effect */
+        .glitch-text {
+            position: relative;
+        }
+
+        body:not(.active) .glitch-text {
+            animation: textShake 0.3s infinite;
+            color: var(--c-noise);
+            text-shadow: 2px 0 var(--c-noise-glow);
+        }
+
+        @keyframes textShake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            20% {
+                transform: translate(-1px, -2px);
+            }
+
+            40% {
+                transform: translate(-2px, 0);
+            }
+
+            60% {
+                transform: translate(2px, 0);
+            }
+
+            80% {
+                transform: translate(1px, -1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* Scenarios Section */
+        .scenarios-section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(145deg, rgba(10, 15, 30, 0.8), rgba(20, 25, 40, 0.6));
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated border gradient */
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(45deg,
+                    #00d4ff,
+                    #0099cc,
+                    #00a8e8,
+                    #00d4ff);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: borderRotate 4s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes borderRotate {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Inner glow effect */
+        .scenario-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4),
+                0 0 80px rgba(0, 168, 232, 0.3);
+        }
+
+        .scenario-card:hover::before {
+            opacity: 1;
+            animation: borderRotate 2s linear infinite;
+        }
+
+        .scenario-card:hover::after {
+            opacity: 1;
+        }
+
+        .scenario-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 1;
+        }
+
+        .scenario-card:hover .scenario-icon {
+            transform: scale(1.2) rotate(10deg);
+            filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.9)) drop-shadow(0 0 40px rgba(0, 153, 204, 0.6));
+        }
+
+        .scenario-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00d4ff, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-title {
+            background: linear-gradient(135deg, #00d4ff, #00a8e8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scenario-desc {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            position: relative;
+            z-index: 1;
+            padding: 80px 5% 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .contact-content {
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 50px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .contact-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-link {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .contact-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--c-clean-glow);
+        }
+
+        .contact-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--c-clean);
+            transition: width 0.3s ease;
+        }
+
+        .contact-link:hover::after {
+            width: 100%;
+        }
+
+        .contact-value {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .scenarios-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scenarios-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .contact-content {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cosmic Background -->
+    <canvas id="canvas-background"></canvas>
+
+
+
+    <div class="denoise-container">
+        <div class="status-badge" id="status-text">NOISE DETECTED</div>
+
+        <div class="visualizer-frame">
+            <div class="scanline"></div>
+            <div class="waves" id="wave-container">
+                <!-- Bars generated by JS -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="switch-label">
+                <span>INPUT SIGNAL</span>
+                <span>PROCESSED</span>
+            </div>
+            <div class="toggle-container" id="denoise-toggle">
+                <div class="toggle-handle"></div>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric-item">
+                <span class="metric-val glitch-text" id="snr-val" data-text="-12 dB">-12 dB</span>
+                <span class="metric-label">SNR (Signal-to-Noise)</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-val" id="latency-val">12 ms</span>
+                <span class="metric-label">Real-time Latency</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenarios Section -->
+    <section class="scenarios-section">
+        <h2 class="section-title">应用场景</h2>
+        <div class="scenarios-grid">
+            <div class="scenario-card">
+                <div class="scenario-icon">🎧</div>
+                <h3 class="scenario-title">沉浸式降噪</h3>
+                <p class="scenario-desc">为音乐、游戏和娱乐提供极致的沉浸式体验，消除环境噪音干扰</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">🏭</div>
+                <h3 class="scenario-title">工业降噪</h3>
+                <p class="scenario-desc">适用于工厂、建筑工地等高噪音环境，保护听力健康</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">👂</div>
+                <h3 class="scenario-title">助听器</h3>
+                <p class="scenario-desc">智能增强语音信号，过滤背景噪音，提升听障人士的听觉体验</p>
+            </div>
+            <div class="scenario-card">
+                <div class="scenario-icon">⚙️</div>
+                <h3 class="scenario-title">定制化降噪</h3>
+                <p class="scenario-desc">根据特定场景和需求，提供个性化的降噪解决方案</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2 class="section-title">联系我们</h2>
+        <div class="contact-content">
+            <p class="contact-text">如需了解更多信息或商务合作，请联系我们</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-label">邮箱:</span>
+                    <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">微信:</span>
+                    <span class="contact-value">GitscYee</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>
+        const toggle = document.getElementById('denoise-toggle');
+        const body = document.body;
+        const waveContainer = document.getElementById('wave-container');
+        const statusText = document.getElementById('status-text');
+        const snrVal = document.getElementById('snr-val');
+
+        // 1. Generate Bars
+        const barCount = 30;
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('bar');
+            bar.style.animationDelay = `-${Math.random()}s`;
+            bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+            waveContainer.appendChild(bar);
+        }
+
+        const bars = document.querySelectorAll('.bar');
+        let isClean = false;
+
+        // 2. Toggle Logic
+        toggle.addEventListener('click', () => {
+            isClean = !isClean;
+
+            if (isClean) {
+                // === Clean Mode ===
+                body.classList.add('active');
+                statusText.innerText = "LIGHTWEIGHT AI DENOISE";
+                snrVal.innerText = "+48 dB";
+                snrVal.removeAttribute('data-text');
+
+                bars.forEach((bar, index) => {
+                    const delay = index * 0.1;
+                    bar.style.animationName = 'cleanAnim';
+                    bar.style.animationDuration = '1.5s';
+                    bar.style.animationDelay = `${delay}s`;
+                    bar.style.animationTimingFunction = 'ease-in-out';
+                    bar.style.transform = 'scaleY(1)';
+                });
+
+            } else {
+                // === Noise Mode ===
+                body.classList.remove('active');
+                statusText.innerText = "NOISE DETECTED";
+                snrVal.innerText = "-12 dB";
+                snrVal.setAttribute('data-text', '-12 dB');
+
+                bars.forEach((bar) => {
+                    bar.style.animationName = 'noiseAnim';
+                    bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+                    bar.style.animationDelay = `-${Math.random()}s`;
+                    bar.style.animationTimingFunction = 'linear';
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
