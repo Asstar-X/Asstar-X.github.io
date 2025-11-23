@@ -738,6 +738,39 @@
                                 <div class="tool-meta"><span class="pill">文本</span><span class="pill">PDF</span></div>
                             </a>
                         </div>
+                        <div class="tool-card" data-source="external" data-category="nlp">
+                            <a href="https://www.ilovepdf.com/zh-cn/split_pdf" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✂️</span><span
+                                        class="tool-name">拆分PDF</span></div>
+                                <div class="tool-desc">将PDF文件拆分为多个文件或提取特定页面。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">PDF</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📐</span><span
+                                        class="tool-name">Draw.io</span></div>
+                                <div class="tool-desc">功能强大的在线流程图与图表绘制工具。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">绘图</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://excalidraw.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✏️</span><span
+                                        class="tool-name">手稿画图</span></div>
+                                <div class="tool-desc">Excalidraw - 虚拟白板，手绘风格的图表绘制工具。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">绘图</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://screen.bmcx.com/#welcome" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖥️</span><span
+                                        class="tool-name">在线屏幕检测</span></div>
+                                <div class="tool-desc">检测屏幕坏点、漏光、颜色显示等显示器问题。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">测试</span></div>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -889,7 +922,8 @@
         }
 
         async function handleFile(file) {
-            if (!file.name.endsWith('.docx') && !file.name.endsWith('.pdf')) {
+            const fileName = file.name.toLowerCase();
+            if (!fileName.endsWith('.docx') && !fileName.endsWith('.pdf')) {
                 alert('请上传 .docx 或 .pdf 格式的简历文件。');
                 return;
             }
@@ -904,11 +938,11 @@
 
             try {
                 let text = "";
-                if (file.name.endsWith('.docx')) {
+                if (fileName.endsWith('.docx')) {
                     const arrayBuffer = await file.arrayBuffer();
                     const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
                     text = result.value;
-                } else if (file.name.endsWith('.pdf')) {
+                } else if (fileName.endsWith('.pdf')) {
                     const arrayBuffer = await file.arrayBuffer();
                     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                     let fullText = "";
@@ -956,39 +990,80 @@
 
             console.log("Sending request to Coze:", { input: text, app_type: currentAppType });
 
-            try {
-                const response = await fetch(WORKER_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    referrerPolicy: "no-referrer", // Avoid sending referrer to prevent potential blocking
-                    credentials: "omit", // Don't send cookies
-                    body: JSON.stringify({
-                        input: text,
-                        app_type: currentAppType
-                    })
-                });
+            const maxRetries = 2; // Maximum number of retries
+            let attempt = 0;
+            let success = false;
 
-                const data = await response.json();
-
-                // Display Result with Copy Button
-                if (data.reply) {
-                    resultBox.innerHTML = `
-                        <button class="copy-btn" onclick="copyResult()">复制结果</button>
-                        <div id="result-content">${formatOutput(data.reply)}</div>
-                    `;
-                } else {
-                    resultBox.innerHTML = `<span style="color:red;">未获取到有效回复，请重试。</span>`;
-                }
-
-            } catch (error) {
-                resultBox.innerHTML = `<span style="color:red;">❌ 出错啦: ${error.message}</span>`;
-            } finally {
-                // Restore Button State
-                btn.disabled = false;
-                btn.innerText = "🚀 开始执行";
+            // Truncate text if too long (Coze/Worker might have limits)
+            const MAX_LENGTH = 20000;
+            let finalInput = text;
+            if (finalInput.length > MAX_LENGTH) {
+                console.warn(`Input too long (${finalInput.length} chars), truncating to ${MAX_LENGTH}...`);
+                finalInput = finalInput.substring(0, MAX_LENGTH) + "\n[...内容已截断...]";
+                alert(`提示：您的输入内容过长（${text.length}字），已自动截取前${MAX_LENGTH}字进行处理。`);
             }
+
+            while (attempt <= maxRetries && !success) {
+                try {
+                    const controller = new AbortController();
+                    // Increase timeout to 300s (5 minutes) for long workflows
+                    const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+                    const response = await fetch(WORKER_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        referrerPolicy: "no-referrer",
+                        credentials: "omit",
+                        body: JSON.stringify({
+                            input: finalInput,
+                            app_type: currentAppType
+                        }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Display Result with Copy Button
+                    if (data.reply) {
+                        resultBox.innerHTML = `
+                            <button class="copy-btn" onclick="copyResult()">复制结果</button>
+                            <div id="result-content">${formatOutput(data.reply)}</div>
+                        `;
+                        success = true;
+                    } else {
+                        throw new Error("未获取到有效回复");
+                    }
+
+                } catch (error) {
+                    attempt++;
+                    console.error(`Attempt ${attempt} failed:`, error);
+
+                    if (attempt <= maxRetries) {
+                        resultBox.innerHTML = `<div class="loading"><span>⚠️ 连接超时或失败，正在进行第 ${attempt} 次重试...<br><small>(可能是任务处理时间较长，请耐心等待)</small></span></div>`;
+                        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3s before retry
+                    } else {
+                        let errorMessage = error.message;
+                        if (error.name === 'AbortError') {
+                            errorMessage = "请求超时（超过5分钟），任务处理时间过长。";
+                        } else if (errorMessage === 'Failed to fetch') {
+                            errorMessage = "网络连接中断或服务器响应超时（Cloudflare Worker 限制）。建议缩短内容或稍后重试。";
+                        }
+                        resultBox.innerHTML = `<span style="color:red;">❌ 出错啦: ${errorMessage}</span>`;
+                    }
+                }
+            }
+
+            // Restore Button State
+            btn.disabled = false;
+            btn.innerText = "🚀 开始执行";
         }
 
         function formatOutput(text) {
