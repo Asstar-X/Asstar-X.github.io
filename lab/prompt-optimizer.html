@@ -423,6 +423,47 @@
             }
         }
 
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00f2ff;
+            text-shadow: 0 0 10px #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                top: 12px;
+                left: 12px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+
         .model-modal {
             position: fixed;
             top: 0;
@@ -850,28 +891,7 @@
             }
         }
 
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-family: var(--font-primary);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(20px);
-            z-index: 1001;
-        }
 
-        .back-button:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
 
         @media (max-width: 768px) {
             .prompt-container {
@@ -899,20 +919,14 @@
                 width: 100%;
             }
 
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
+
         }
     </style>
 </head>
 
 <body>
+    <a href="../tools.html" class="back-button glass-panel">← 返回工具箱</a>
     <canvas id="canvas-background"></canvas>
-
-    <a href="../tools.html" class="back-button">← 返回工具箱</a>
 
     <main class="prompt-container">
         <div class="prompt-header">

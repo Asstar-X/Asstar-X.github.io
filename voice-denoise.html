@@ -28,6 +28,40 @@
             /* Allow vertical scroll */
         }
 
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00f2ff;
+            text-shadow: 0 0 10px #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
         /* Main Container */
         .denoise-container {
             position: relative;
@@ -847,7 +881,7 @@
     <!-- Cosmic Background -->
     <canvas id="canvas-background"></canvas>
 
-
+    <a href="index.html" class="back-button glass-panel">← 返回首页</a>
 
     <div class="denoise-container">
         <div class="status-badge" id="status-text">NOISE DETECTED</div>
