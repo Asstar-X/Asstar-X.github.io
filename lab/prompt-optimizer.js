@@ -161,14 +161,20 @@ class ChatManager {
         const selectedModelKey = this.modelList.querySelector('.model-item.selected')?.dataset.modelKey;
         if (!selectedModelKey) { alert('请选择一个AI模型'); return; }
         this.configManager.setSelectedModel(selectedModelKey);
+        
+        const selectedModel = this.configManager.getAllModels()[selectedModelKey];
+        const useProxy = selectedModel.useProxy === true;
+        
         let apiKey = '';
         const apiUrl = (this.customApiUrl.value || '').trim();
         // 允许留空则使用默认地址
         if (apiUrl) { this.configManager.setApiUrl(selectedModelKey, apiUrl); }
         else { this.configManager.setApiUrl(selectedModelKey, ''); }
+        
         if (this.useCustomKey.checked) {
             const customKey = this.customApiKey.value.trim();
-            if (!customKey) { alert('请输入API密钥'); return; }
+            // 只有非代理模式才需要检查自定义密钥
+            if (!useProxy && !customKey) { alert('请输入API密钥'); return; }
             apiKey = customKey;
             this.configManager.setApiKey(selectedModelKey, customKey);
             this.configManager.setUseDefaultKey(false);
@@ -176,6 +182,7 @@ class ChatManager {
             apiKey = this.configManager.getCurrentModelConfig().defaultApiKey;
             this.configManager.setUseDefaultKey(true);
         }
+        
         this.showLoading('正在验证API密钥...');
         const isValid = await this.testApiKey(selectedModelKey, apiKey);
         this.hideLoading();
@@ -190,7 +197,10 @@ class ChatManager {
 
     async testApiKey(modelKey, apiKey) {
         const model = this.configManager.getAllModels()[modelKey];
-        if (!model || !apiKey) return false;
+        if (!model) return false;
+        // 如果使用代理，不需要检查 apiKey（密钥在 Worker 端）
+        const useProxy = model.useProxy === true;
+        if (!useProxy && !apiKey) return false;
         try {
             const tempConfig = {
                 getCurrentModelConfig: () => model, getCurrentApiKey: () => apiKey, getCurrentApiUrl: () => {
@@ -210,11 +220,21 @@ class ChatManager {
     async callAIAPIWithConfig(message, config) {
         const currentModel = config.getCurrentModelConfig();
         const currentApiKey = config.getCurrentApiKey();
+        const useProxy = currentModel.useProxy === true;
+        const proxyUrl = this.configManager.getProxyUrl();
+        
         let url, headers, requestBody;
         const resolvedUrl = (typeof config.getCurrentApiUrl === 'function') ? config.getCurrentApiUrl() : (currentModel.apiUrl || '');
+        
         if (currentModel.requestFormat === 'openai') {
-            url = resolvedUrl;
-            headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}` };
+            // 使用代理时，请求发送到代理URL
+            if (useProxy && proxyUrl) {
+                url = proxyUrl;
+                headers = { 'Content-Type': 'application/json' };
+            } else {
+                url = resolvedUrl;
+                headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}` };
+            }
             requestBody = { model: currentModel.model, messages: [{ role: 'user', content: message }], temperature: currentModel.temperature, max_tokens: Math.min(currentModel.maxTokens, 100), top_p: currentModel.topP };
         } else if (currentModel.requestFormat === 'anthropic') {
             url = resolvedUrl;
@@ -358,10 +378,20 @@ class ChatManager {
         const currentModel = this.configManager.getCurrentModelConfig();
         const currentApiKey = this.configManager.getCurrentApiKey();
         const currentApiUrl = this.configManager.getCurrentApiUrl();
+        const useProxy = this.configManager.shouldUseProxy();
+        const proxyUrl = this.configManager.getProxyUrl();
+        
         let url, headers, requestBody;
+        
         if (currentModel.requestFormat === 'openai') {
-            url = currentApiUrl;
-            headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}`, 'Accept': 'text/event-stream' };
+            // 如果使用代理，则请求发送到代理URL，不需要Authorization头
+            if (useProxy && proxyUrl) {
+                url = proxyUrl;
+                headers = { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' };
+            } else {
+                url = currentApiUrl;
+                headers = { ...currentModel.headers, 'Authorization': `Bearer ${currentApiKey}`, 'Accept': 'text/event-stream' };
+            }
             requestBody = {
                 model: currentModel.model,
                 messages: [{ role: 'system', content: this.getSystemPrompt() }, ...this.messages.map(msg => ({ role: msg.role, content: msg.content })), { role: 'user', content: message }],

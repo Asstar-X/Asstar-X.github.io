@@ -9,6 +9,9 @@ class ConfigManager {
             defaultKeys: 'prompt.defaultKeys'
         };
 
+        // Cloudflare Worker 代理配置（用于安全存储 API 密钥）
+        this.proxyUrl = 'https://qwen-api.yxy138646.workers.dev';
+
         // 可用模型配置（可按需扩展与调整）
         this.models = {
             qwen: {
@@ -22,7 +25,8 @@ class ConfigManager {
                 temperature: 0.7,
                 topP: 0.9,
                 maxTokens: 1024,
-                defaultApiKey: 'sk-33f1ab763eb24d10a49b513527774eab'
+                useProxy: true,  // 使用 Cloudflare Worker 代理
+                defaultApiKey: '' // 密钥已迁移到 Cloudflare Worker 环境变量
             },
             openai: {
                 name: 'OpenAI',
@@ -166,6 +170,17 @@ class ConfigManager {
             if (cfg.defaultApiKey) return cfg.defaultApiKey;
         }
         return this.apiKeys[this.selectedModel] || '';
+    }
+
+    // 检查当前模型是否使用代理
+    shouldUseProxy() {
+        const cfg = this.getCurrentModelConfig();
+        return cfg.useProxy === true;
+    }
+
+    // 获取代理 URL
+    getProxyUrl() {
+        return this.proxyUrl || '';
     }
 
     // 安全存取localStorage
