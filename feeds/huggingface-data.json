@@ -5,7 +5,7 @@
       "description": "No description available",
       "task": "text-to-image",
       "parameters": "Unknown",
-      "likes": "2,422",
+      "likes": "2,438",
       "downloads": "217,428",
       "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
       "tags": [
@@ -21,7 +21,7 @@
       "description": "No description available",
       "task": "text-to-speech",
       "parameters": "Unknown",
-      "likes": "592",
+      "likes": "603",
       "downloads": "56,958",
       "url": "https://huggingface.co/microsoft/VibeVoice-Realtime-0.5B",
       "tags": [
@@ -37,7 +37,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "841",
+      "likes": "846",
       "downloads": "33,102",
       "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
       "tags": [
@@ -49,24 +49,11 @@
       ]
     },
     {
-      "name": "alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union",
-      "description": "No description available",
-      "task": "Unknown",
-      "parameters": "Unknown",
-      "likes": "288",
-      "downloads": "0",
-      "url": "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union",
-      "tags": [
-        "license:apache-2.0",
-        "region:us"
-      ]
-    },
-    {
       "name": "zai-org/GLM-4.6V-Flash",
       "description": "No description available",
       "task": "image-text-to-text",
       "parameters": "Unknown",
-      "likes": "225",
+      "likes": "250",
       "downloads": "6,920",
       "url": "https://huggingface.co/zai-org/GLM-4.6V-Flash",
       "tags": [
@@ -78,19 +65,16 @@
       ]
     },
     {
-      "name": "deepseek-ai/DeepSeek-V3.2-Speciale",
+      "name": "alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union",
       "description": "No description available",
-      "task": "text-generation",
+      "task": "Unknown",
       "parameters": "Unknown",
-      "likes": "572",
-      "downloads": "9,310",
-      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Speciale",
+      "likes": "289",
+      "downloads": "0",
+      "url": "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union",
       "tags": [
-        "transformers",
-        "safetensors",
-        "deepseek_v32",
-        "text-generation",
-        "base_model:deepseek-ai/DeepSeek-V3.2-Exp-Base"
+        "license:apache-2.0",
+        "region:us"
       ]
     },
     {
@@ -98,7 +82,7 @@
       "description": "No description available",
       "task": "image-text-to-text",
       "parameters": "Unknown",
-      "likes": "196",
+      "likes": "214",
       "downloads": "687",
       "url": "https://huggingface.co/zai-org/GLM-4.6V",
       "tags": [
@@ -110,11 +94,27 @@
       ]
     },
     {
+      "name": "deepseek-ai/DeepSeek-V3.2-Speciale",
+      "description": "No description available",
+      "task": "text-generation",
+      "parameters": "Unknown",
+      "likes": "573",
+      "downloads": "9,310",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Speciale",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "deepseek_v32",
+        "text-generation",
+        "base_model:deepseek-ai/DeepSeek-V3.2-Exp-Base"
+      ]
+    },
+    {
       "name": "mistralai/Mistral-Large-3-675B-Instruct-2512",
       "description": "No description available",
       "task": "Unknown",
       "parameters": "Unknown",
-      "likes": "176",
+      "likes": "177",
       "downloads": "400",
       "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512",
       "tags": [
@@ -130,7 +130,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "412",
+      "likes": "413",
       "downloads": "4,106",
       "url": "https://huggingface.co/nvidia/Nemotron-Orchestrator-8B",
       "tags": [
@@ -146,7 +146,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "165",
+      "likes": "171",
       "downloads": "443,437",
       "url": "https://huggingface.co/EssentialAI/rnj-1-instruct",
       "tags": [
@@ -162,7 +162,7 @@
       "description": "No description available",
       "task": "Unknown",
       "parameters": "Unknown",
-      "likes": "164",
+      "likes": "165",
       "downloads": "237,941",
       "url": "https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512",
       "tags": [
@@ -178,7 +178,7 @@
       "description": "No description available",
       "task": "text-to-image",
       "parameters": "Unknown",
-      "likes": "164",
+      "likes": "165",
       "downloads": "303",
       "url": "https://huggingface.co/meituan-longcat/LongCat-Image",
       "tags": [
@@ -187,6 +187,22 @@
         "safetensors",
         "text-to-image",
         "en"
+      ]
+    },
+    {
+      "name": "mistralai/Devstral-Small-2-24B-Instruct-2512",
+      "description": "No description available",
+      "task": "Unknown",
+      "parameters": "Unknown",
+      "likes": "156",
+      "downloads": "57",
+      "url": "https://huggingface.co/mistralai/Devstral-Small-2-24B-Instruct-2512",
+      "tags": [
+        "vllm",
+        "safetensors",
+        "mistral3",
+        "mistral-common",
+        "arxiv:2501.19399"
       ]
     },
     {
@@ -210,7 +226,7 @@
       "description": "No description available",
       "task": "text-to-image",
       "parameters": "Unknown",
-      "likes": "140",
+      "likes": "141",
       "downloads": "347",
       "url": "https://huggingface.co/NewBie-AI/NewBie-image-Exp0.1",
       "tags": [
@@ -222,27 +238,11 @@
       ]
     },
     {
-      "name": "mistralai/Devstral-Small-2-24B-Instruct-2512",
-      "description": "No description available",
-      "task": "Unknown",
-      "parameters": "Unknown",
-      "likes": "135",
-      "downloads": "57",
-      "url": "https://huggingface.co/mistralai/Devstral-Small-2-24B-Instruct-2512",
-      "tags": [
-        "vllm",
-        "safetensors",
-        "mistral3",
-        "mistral-common",
-        "arxiv:2501.19399"
-      ]
-    },
-    {
       "name": "black-forest-labs/FLUX.2-dev",
       "description": "No description available",
       "task": "image-to-image",
       "parameters": "Unknown",
-      "likes": "949",
+      "likes": "952",
       "downloads": "211,215",
       "url": "https://huggingface.co/black-forest-labs/FLUX.2-dev",
       "tags": [
@@ -258,7 +258,7 @@
       "description": "No description available",
       "task": "Unknown",
       "parameters": "Unknown",
-      "likes": "119",
+      "likes": "120",
       "downloads": "64,226",
       "url": "https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512",
       "tags": [
@@ -270,11 +270,27 @@
       ]
     },
     {
+      "name": "ServiceNow-AI/Apriel-1.6-15b-Thinker",
+      "description": "No description available",
+      "task": "image-text-to-text",
+      "parameters": "Unknown",
+      "likes": "111",
+      "downloads": "16",
+      "url": "https://huggingface.co/ServiceNow-AI/Apriel-1.6-15b-Thinker",
+      "tags": [
+        "transformers",
+        "safetensors",
+        "llava",
+        "image-to-text",
+        "image-text-to-text"
+      ]
+    },
+    {
       "name": "ostris/Z-Image-De-Turbo",
       "description": "No description available",
       "task": "text-to-image",
       "parameters": "Unknown",
-      "likes": "108",
+      "likes": "109",
       "downloads": "147,234",
       "url": "https://huggingface.co/ostris/Z-Image-De-Turbo",
       "tags": [
@@ -302,27 +318,11 @@
       ]
     },
     {
-      "name": "ServiceNow-AI/Apriel-1.6-15b-Thinker",
-      "description": "No description available",
-      "task": "image-text-to-text",
-      "parameters": "Unknown",
-      "likes": "106",
-      "downloads": "16",
-      "url": "https://huggingface.co/ServiceNow-AI/Apriel-1.6-15b-Thinker",
-      "tags": [
-        "transformers",
-        "safetensors",
-        "llava",
-        "image-to-text",
-        "image-text-to-text"
-      ]
-    },
-    {
       "name": "facebook/sam3",
       "description": "No description available",
       "task": "mask-generation",
       "parameters": "Unknown",
-      "likes": "939",
+      "likes": "941",
       "downloads": "486,833",
       "url": "https://huggingface.co/facebook/sam3",
       "tags": [
@@ -338,7 +338,7 @@
       "description": "No description available",
       "task": "image-to-image",
       "parameters": "Unknown",
-      "likes": "99",
+      "likes": "101",
       "downloads": "351",
       "url": "https://huggingface.co/meituan-longcat/LongCat-Image-Edit",
       "tags": [
@@ -347,6 +347,22 @@
         "safetensors",
         "image-to-image",
         "en"
+      ]
+    },
+    {
+      "name": "mistralai/Devstral-2-123B-Instruct-2512",
+      "description": "No description available",
+      "task": "Unknown",
+      "parameters": "Unknown",
+      "likes": "95",
+      "downloads": "19",
+      "url": "https://huggingface.co/mistralai/Devstral-2-123B-Instruct-2512",
+      "tags": [
+        "vllm",
+        "safetensors",
+        "ministral3",
+        "mistral-common",
+        "license:other"
       ]
     },
     {
@@ -380,22 +396,6 @@
         "mistral-common",
         "en"
       ]
-    },
-    {
-      "name": "mistralai/Ministral-3-8B-Instruct-2512",
-      "description": "No description available",
-      "task": "Unknown",
-      "parameters": "Unknown",
-      "likes": "89",
-      "downloads": "12,173",
-      "url": "https://huggingface.co/mistralai/Ministral-3-8B-Instruct-2512",
-      "tags": [
-        "vllm",
-        "safetensors",
-        "mistral3",
-        "mistral-common",
-        "en"
-      ]
     }
   ],
   "likes": [
@@ -420,7 +420,7 @@
       "description": "No description available",
       "task": "text-to-image",
       "parameters": "Unknown",
-      "likes": "11,984",
+      "likes": "11,986",
       "downloads": "1,119,914",
       "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
       "tags": [
@@ -516,7 +516,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "5,103",
+      "likes": "5,104",
       "downloads": "5,361,336",
       "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
       "tags": [
@@ -644,7 +644,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "4,227",
+      "likes": "4,228",
       "downloads": "4,591,145",
       "url": "https://huggingface.co/openai/gpt-oss-120b",
       "tags": [
@@ -660,7 +660,7 @@
       "description": "No description available",
       "task": "sentence-similarity",
       "parameters": "Unknown",
-      "likes": "4,204",
+      "likes": "4,205",
       "downloads": "152,346,159",
       "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
       "tags": [
@@ -676,7 +676,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "4,036",
+      "likes": "4,037",
       "downloads": "8,180,102",
       "url": "https://huggingface.co/openai/gpt-oss-20b",
       "tags": [
@@ -800,7 +800,7 @@
       "description": "No description available",
       "task": "sentence-similarity",
       "parameters": "Unknown",
-      "likes": "4,204",
+      "likes": "4,205",
       "downloads": "152,346,159",
       "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
       "tags": [
@@ -1136,7 +1136,7 @@
       "description": "No description available",
       "task": "text-generation",
       "parameters": "Unknown",
-      "likes": "3,047",
+      "likes": "3,046",
       "downloads": "9,585,797",
       "url": "https://huggingface.co/openai-community/gpt2",
       "tags": [
@@ -1196,6 +1196,6 @@
       ]
     }
   ],
-  "lastUpdated": "2025-12-10T01:07:02.770100",
+  "lastUpdated": "2025-12-10T05:12:23.521788",
   "totalModels": 75
 }
