@@ -33,11 +33,12 @@
             font-family: var(--font-display);
             font-size: 3rem;
             font-weight: 900;
-            background: var(--gradient-primary);
+            background: #ffffff;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .tools-subtitle {
@@ -63,9 +64,9 @@
         }
 
         .tools-input:focus {
-            border-color: var(--primary-color);
-            background: rgba(0, 212, 255, 0.06);
-            box-shadow: 0 8px 24px rgba(0, 212, 255, .08);
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .tools-search-icon {
@@ -104,14 +105,15 @@
         }
 
         .tab:hover {
-            border-color: var(--primary-color);
-            color: var(--text-primary);
+            border-color: #ffffff;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .tab.active {
-            background: var(--gradient-primary);
-            color: #fff;
-            border-color: transparent;
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
         }
 
         .source-toggle {
@@ -131,8 +133,8 @@
         }
 
         .source-toggle button.active {
-            background: rgba(0, 212, 255, 0.12);
-            color: var(--text-primary);
+            background: #ffffff;
+            color: #000000;
         }
 
         .tools-section {
@@ -161,8 +163,8 @@
 
         .tool-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, .18);
-            border-color: rgba(0, 212, 255, .35);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
         }
 
         .tool-card a {
@@ -235,9 +237,9 @@
         }
         .back-button:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: #00f2ff;
-            text-shadow: 0 0 10px #00f2ff;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -340,15 +342,12 @@
         }
 
         .modal-title {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 10%, #a5f3fc 100%);
+            background: #ffffff;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
             letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(165, 243, 252, 0.4);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
 
         .modal-header .tools-subtitle {
@@ -381,8 +380,8 @@
         .modal-textarea:focus {
             outline: none;
             background: rgba(0, 0, 0, 0.25);
-            border-color: rgba(0, 212, 255, 0.5);
-            box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
         }
 
         .modal-textarea::placeholder {
@@ -391,11 +390,10 @@
 
         .action-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.8), rgba(0, 102, 255, 0.8));
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
-            color: white;
+            color: #ffffff;
             font-weight: 600;
             font-size: 1.05rem;
             letter-spacing: 1px;
@@ -403,14 +401,16 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
         }
 
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0, 150, 255, 0.5);
-            background: linear-gradient(135deg, rgba(0, 212, 255, 1), rgba(0, 102, 255, 1));
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #ffffff;
         }
 
         .action-btn:active {
@@ -445,9 +445,9 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8);
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
             padding: 6px 14px;
             border-radius: 8px;
             cursor: pointer;
@@ -457,10 +457,10 @@
         }
 
         .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         .loading {
@@ -469,7 +469,7 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            color: var(--primary-color);
+            color: #ffffff;
             font-style: italic;
             padding: 20px;
         }
@@ -478,8 +478,8 @@
             content: '';
             width: 30px;
             height: 30px;
-            border: 3px solid rgba(0, 212, 255, 0.3);
-            border-top-color: var(--primary-color);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -522,8 +522,8 @@
 
         .file-drop-zone:hover,
         .file-drop-zone.dragover {
-            border-color: var(--primary-color);
-            background: rgba(0, 212, 255, 0.05);
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
             transform: scale(1.02);
         }
 
@@ -605,6 +605,20 @@
                 </div>
 
                 <div class="tools-section">
+                    <style>
+                        .tool-card[data-source="local"] {
+                            background: #000000 !important;
+                            border: 1px solid #ffffff !important;
+                        }
+                        .tool-card[data-source="local"] .tool-name,
+                        .tool-card[data-source="local"] .tool-desc,
+                        .tool-card[data-source="local"] .pill {
+                            color: #ffffff !important;
+                        }
+                        .tool-card[data-source="local"] .pill {
+                            border-color: rgba(255, 255, 255, 0.3) !important;
+                        }
+                    </style>
                     <div class="tools-grid">
                         <div class="tool-card" data-source="local" data-category="nlp">
                             <a href="#" onclick="openCozeModal('mubao', event)">

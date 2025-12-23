@@ -61,7 +61,7 @@ class AntigravityBackground {
                 vx: (Math.random() - 0.5) * 0.5,
                 vy: (Math.random() - 0.5) * 0.5,
                 size: Math.random() * 2 + 1,
-                color: Math.random() > 0.5 ? '#00d4ff' : '#ff6b6b'
+                color: Math.random() > 0.5 ? '#ffffff' : '#ffffff'
             });
         }
     }
@@ -154,7 +154,7 @@ window.addEventListener('scroll', () => {
     if (header) {
         if (window.scrollY > 100) {
             header.style.background = 'rgba(10, 10, 10, 0.95)';
-            header.style.boxShadow = '0 2px 20px rgba(0, 212, 255, 0.1)';
+            header.style.boxShadow = '0 2px 20px rgba(255, 255, 255, 0.1)';
         } else {
             header.style.background = 'rgba(10, 10, 10, 0.9)';
             header.style.boxShadow = 'none';
@@ -197,7 +197,7 @@ document.addEventListener('mousemove', (e) => {
         position: fixed;
         width: 4px;
         height: 4px;
-        background: #00d4ff;
+        background: #ffffff;
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 点击页面其他区域关闭菜单
         document.addEventListener('click', (e) => {
-            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+            if (e.target.classList.contains('nav-link')) {
                 navLinks.classList.remove('open');
                 navToggle.classList.remove('active');
             }
@@ -342,7 +342,7 @@ function createScrollProgress() {
         left: 0;
         width: 0%;
         height: 3px;
-        background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+        background: linear-gradient(90deg, #ffffff, #000000);
         z-index: 1001;
         transition: width 0.1s ease;
     `;

@@ -6,25 +6,25 @@
 }
 
 :root {
-    --primary-color: #00d4ff;
-    --secondary-color: #ff6b6b;
-    --accent-color: #a8e6cf;
+    --primary-color: #ffffff;
+    --secondary-color: #ffffff;
+    --accent-color: #ffffff;
     --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #1a1a2e;
-    --bg-tertiary: #16213e;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow-color: rgba(0, 212, 255, 0.1);
-    --gradient-primary: linear-gradient(135deg, #00d4ff, #0099cc);
-    --gradient-secondary: linear-gradient(135deg, #ff6b6b, #ff4757);
-    --font-primary: 'Exo 2', sans-serif;
-    --font-display: 'Orbitron', monospace;
+    --text-secondary: #ffffff;
+    --bg-primary: #000000;
+    --bg-secondary: #000000;
+    --bg-tertiary: #000000;
+    --border-color: rgba(255, 255, 255, 0.4);
+    --shadow-color: rgba(255, 255, 255, 0.2);
+    --gradient-primary: linear-gradient(135deg, #ffffff, #000000);
+    --gradient-secondary: linear-gradient(135deg, #ffffff, #000000);
+    --font-primary: 'Space Grotesk', sans-serif;
+    --font-display: 'Orbitron', sans-serif;
 }
 
 body {
     font-family: var(--font-primary);
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    background: #050505; /* Fallback */
     color: var(--text-primary);
     overflow-x: hidden;
     line-height: 1.6;
@@ -98,7 +98,7 @@ body {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.2rem;
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     color: var(--text-primary);
 }
 
@@ -193,23 +193,24 @@ body {
 
 .hero-badge {
     display: inline-block;
-    background: rgba(0, 212, 255, 0.1);
-    color: var(--primary-color);
+    background: transparent;
+    color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.875rem;
     font-weight: 400;
     margin-bottom: 2rem;
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .hero-title {
     font-family: var(--font-display);
-    font-size: 3.5rem;
-    font-weight: 900;
+    font-size: 5rem;
+    font-weight: 700;
     line-height: 1.1;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
     color: var(--text-primary);
+    letter-spacing: 10px;
 }
 
 .title-word {
@@ -239,10 +240,11 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    margin-bottom: 2.5rem;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 40px;
     line-height: 1.6;
+    letter-spacing: 2px;
 }
 
 .hero-actions {
@@ -256,17 +258,26 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-primary);
-    font-weight: 500;
-    font-size: 0.875rem;
+    padding: 15px 40px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    border-radius: 0; /* Boxy sci-fi look from snippet (snippet didn't specify radius but implied void style usually is sharp, snippet had no radius) - actually snippet default is 0 for buttons usually unless user agent. Snippet didn't have border-radius. */
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: #ffffff;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+}
+
+.btn:hover {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .btn::before {
@@ -276,7 +287,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -285,25 +296,20 @@ body {
 }
 
 .btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-}
+    /* Inherits base btn styles which now match the requirement */
+} 
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    /* Inherits base hover */
 }
 
 .btn-secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    /* Inherits base btn styles */
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--primary-color);
+    border-color: #ffffff;
 }
 
 .btn-outline {
@@ -364,7 +370,8 @@ body {
     left: 50%;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 20px rgba(200, 220, 255, 0.2);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .ring-1 {
@@ -380,9 +387,9 @@ body {
 .ring-2 {
     width: 280px;
     height: 280px;
-    border: 8px solid rgba(100, 149, 237, 0.1);
-    border-left: 8px solid rgba(100, 149, 237, 0.6);
-    border-right: 8px solid rgba(100, 149, 237, 0.6);
+    border: 8px solid rgba(255, 255, 255, 0.05);
+    border-left: 8px solid rgba(255, 255, 255, 0.3);
+    border-right: 8px solid rgba(255, 255, 255, 0.3);
     filter: blur(4px);
     animation: pulseRing 6s ease-in-out infinite alternate;
 }
@@ -390,8 +397,8 @@ body {
 .ring-3 {
     width: 200px;
     height: 200px;
-    border: 1px dashed rgba(100, 200, 255, 0.6);
-    box-shadow: 0 0 10px rgba(100, 200, 255, 0.3);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     animation: spinReverse 20s linear infinite;
 }
 
@@ -446,8 +453,8 @@ body {
     border-radius: 50%;
     box-shadow:
         0 0 20px #000,
-        0 0 40px rgba(255, 255, 255, 0.2),
-        0 0 80px rgba(75, 0, 130, 0.2);
+        0 0 40px rgba(255, 255, 255, 0.1),
+        0 0 80px rgba(255, 255, 255, 0.1);
 }
 
 .photon-ring {
@@ -458,21 +465,20 @@ body {
     height: 110%;
     border-radius: 50%;
     border: 2px solid #fff;
-    box-shadow: 0 0 15px #fff, 0 0 30px rgba(100, 200, 255, 0.5);
+    box-shadow: 0 0 15px #fff, 0 0 30px rgba(255, 255, 255, 0.3);
     opacity: 0.9;
     animation: photonPulse 3s ease-in-out infinite;
 }
 
 @keyframes photonPulse {
 
-    0%,
     100% {
-        box-shadow: 0 0 15px #fff, 0 0 30px rgba(100, 200, 255, 0.5);
+        box-shadow: 0 0 15px #fff, 0 0 30px rgba(255, 255, 255, 0.3);
         opacity: 0.9;
     }
 
     50% {
-        box-shadow: 0 0 20px #fff, 0 0 40px rgba(100, 200, 255, 0.8);
+        box-shadow: 0 0 20px #fff, 0 0 40px rgba(255, 255, 255, 0.5);
         opacity: 1;
     }
 }
@@ -493,7 +499,7 @@ body {
     height: 150px;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
     filter: blur(2px);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     transform-origin: bottom center;
 }
 
@@ -637,7 +643,7 @@ section {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -648,7 +654,7 @@ section {
 .stat-card:hover {
     transform: translateY(-8px);
     border-color: var(--primary-color);
-    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15);
+    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.1);
 }
 
 .stat-icon {
@@ -658,18 +664,18 @@ section {
 }
 
 .stat-card:nth-child(1) .stat-icon {
-    color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .stat-card:nth-child(2) .stat-icon {
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .stat-card:nth-child(3) .stat-icon {
-    color: #ff6b6b;
-    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .stat-number {
@@ -714,7 +720,7 @@ section {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -726,7 +732,7 @@ section {
 .project-card:hover {
     transform: translateY(-5px);
     border-color: var(--primary-color);
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 }
 
 .project-visual {
@@ -738,10 +744,11 @@ section {
 .project-orb {
     width: 60px;
     height: 60px;
-    background: radial-gradient(circle, var(--primary-color), #0099cc);
+    background: #000000;
+    border: 1px solid #ffffff;
     border-radius: 50%;
     animation: projectPulse 2s ease-in-out infinite;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 @keyframes projectPulse {
@@ -760,7 +767,7 @@ section {
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #ffffff; /* Explicitly white */
     margin-bottom: 0.5rem;
     text-align: center;
 }
@@ -795,7 +802,7 @@ section {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -806,7 +813,7 @@ section {
 .contact-card:hover {
     transform: translateY(-5px);
     border-color: var(--primary-color);
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 }
 
 /* 去除链接下划线并继承文字颜色 */

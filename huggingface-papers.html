@@ -33,11 +33,12 @@
             font-family: var(--font-display);
             font-size: 3rem;
             font-weight: 900;
-            background: var(--gradient-primary);
+            background: #ffffff;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .trending-subtitle {
@@ -67,15 +68,15 @@
         }
 
         .category-btn:hover {
-            border-color: var(--primary-color);
-            background: rgba(0, 212, 255, 0.1);
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
         }
 
         .category-btn.active {
-            border-color: var(--primary-color);
-            background: var(--gradient-primary);
-            color: white;
+            border-color: #ffffff;
+            background: #ffffff;
+            color: #000000;
         }
 
         .trending-grid {
@@ -97,7 +98,8 @@
 
         .trending-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
         }
 
         .paper-title {
@@ -122,11 +124,11 @@
 
         .tag {
             padding: 4px 12px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             font-size: 0.8rem;
-            color: var(--primary-color);
+            color: #ffffff;
         }
 
         .model-tags {
@@ -140,15 +142,18 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--primary-color);
+            color: #ffffff;
+            background: transparent;
+            padding: 8px 0;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
         }
 
         .model-link:hover {
-            color: var(--text-primary);
+            color: #ffffff;
             transform: translateX(5px);
+            text-decoration: underline;
         }
 
         .loading {
@@ -161,9 +166,9 @@
             display: inline-block;
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(0, 212, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
+            border-top-color: #ffffff;
             animation: spin 1s ease-in-out infinite;
         }
 
@@ -219,9 +224,9 @@
 
         .back-button:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: #00f2ff;
-            text-shadow: 0 0 10px #00f2ff;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 768px) {
