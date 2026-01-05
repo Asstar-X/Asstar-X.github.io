@@ -745,8 +745,14 @@
             numEl.innerText = data.groupNumber;
             memEl.innerText = data.groupMembers;
 
-            // 保持图片占位符
-            qrEl.innerHTML = `<img src="images/WechatIMG41.jpg" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="QR Code">`;
+            // 根据星球类型选择对应的群组图片
+            let groupImage = 'images/AI_group.jpg'; // 默认使用科技群图片
+            if (data.cnName === '流光书海') {
+                groupImage = 'images/READ_group.jpg'; // 文学星球使用读书群图片
+            } else if (data.cnName === '霓虹锻界') {
+                groupImage = 'images/AI_group.jpg'; // 科技星球使用AI群图片
+            }
+            qrEl.innerHTML = `<img src="${groupImage}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="QR Code">`;
 
             modal.classList.add('active');
         }
