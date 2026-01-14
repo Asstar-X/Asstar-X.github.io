@@ -328,6 +328,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // 关于区域交互感：光晕随鼠标移动
+    const aboutSection = document.querySelector('.about');
+    const aboutAura = document.querySelector('.about-aura');
+    if (aboutSection && aboutAura) {
+        aboutSection.addEventListener('mousemove', (e) => {
+            const rect = aboutSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 计算偏移量
+            const moveX = (x / rect.width - 0.5) * 50;
+            const moveY = (y / rect.height - 0.5) * 50;
+
+            gsap.to(aboutAura, {
+                x: moveX,
+                y: moveY,
+                duration: 2,
+                ease: "power2.out"
+            });
+        });
+    }
 });
 
 
@@ -398,4 +420,147 @@ function loadProjects(gridId, maxShow = 3) {
                 }
             }
         });
-} 
+}
+
+/* ===== Cosmic Universe Background (Three.js) ===== */
+class CosmicUniverse {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        if (!this.container || typeof THREE === 'undefined') return;
+
+        this.init();
+        this.animate();
+        this.handleResize();
+    }
+
+    init() {
+        // Scene & Fog
+        this.scene = new THREE.Scene();
+        this.scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        // Camera
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.z = 5;
+
+        // Renderer
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.container.appendChild(this.renderer.domElement);
+
+        // Clock
+        this.clock = new THREE.Clock();
+
+        // Particles Layer 1
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 3000;
+        const posArray = new Float32Array(particlesCount * 3);
+        const sizesArray = new Float32Array(particlesCount);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 25;
+        }
+        for (let i = 0; i < particlesCount; i++) {
+            sizesArray[i] = Math.random();
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.03,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        this.particlesMesh = new THREE.Points(particlesGeometry, material);
+        this.scene.add(this.particlesMesh);
+
+        // Particles Layer 2 (Blue Stars)
+        const bgStarsGeometry = new THREE.BufferGeometry();
+        const bgStarsCount = 5000;
+        const bgPosArray = new Float32Array(bgStarsCount * 3);
+        for (let i = 0; i < bgStarsCount * 3; i++) {
+            bgPosArray[i] = (Math.random() - 0.5) * 80;
+        }
+        bgStarsGeometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
+
+        const starsMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x88ccff,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        this.bgStarsMesh = new THREE.Points(bgStarsGeometry, starsMaterial);
+        this.scene.add(this.bgStarsMesh);
+
+        // Mouse interaction state
+        this.mouseX = 0;
+        this.mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            this.mouseX = e.clientX - window.innerWidth / 2;
+            this.mouseY = e.clientY - window.innerHeight / 2;
+        });
+
+        // Intro Animation
+        if (typeof gsap !== 'undefined') {
+            gsap.from(this.camera.position, {
+                z: 10,
+                duration: 3,
+                ease: "power3.inOut"
+            });
+        }
+    }
+
+    handleResize() {
+        window.addEventListener('resize', () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    animate() {
+        const elapsedTime = this.clock.getElapsedTime();
+
+        // Rotation
+        this.particlesMesh.rotation.y = elapsedTime * 0.05;
+        this.particlesMesh.rotation.x = elapsedTime * 0.02;
+        this.bgStarsMesh.rotation.y = elapsedTime * 0.01;
+
+        // Parallax
+        const targetX = this.mouseX * 0.001;
+        const targetY = this.mouseY * 0.001;
+        this.particlesMesh.rotation.y += 0.5 * (targetX - this.particlesMesh.rotation.y);
+        this.particlesMesh.rotation.x += 0.05 * (targetY - this.particlesMesh.rotation.x);
+
+        this.camera.position.x += (this.mouseX * 0.005 - this.camera.position.x) * 0.05;
+        this.camera.position.y += (-this.mouseY * 0.005 - this.camera.position.y) * 0.05;
+
+        this.renderer.render(this.scene, this.camera);
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// Auto-initialize background if container exists
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('canvas-container')) {
+        new CosmicUniverse('canvas-container');
+    } else if (document.getElementById('canvas-background')) {
+        // Some pages use 'canvas-background' ID
+        const container = document.getElementById('canvas-background').parentElement;
+        // In case 'canvas-background' is a container not a canvas
+        const bgEl = document.getElementById('canvas-background');
+        if (bgEl.tagName !== 'CANVAS') {
+            new CosmicUniverse('canvas-background');
+        } else {
+            // If it IS a canvas, we might need a container or replace it.
+            // For simplicity, let's assume it's a wrapper ID in most of our pages.
+            new CosmicUniverse('canvas-background');
+        }
+    }
+});

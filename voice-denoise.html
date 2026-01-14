@@ -12,6 +12,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@300;700&family=Syncopate:wght@400;700&display=swap"
         rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
         /* Page-Specific Styles */
         :root {
@@ -596,7 +599,7 @@
             position: relative;
             width: 100%;
             height: 100vh;
-            background-color: #050505;
+            background-color: transparent;
             color: #e0e0e0;
             font-family: 'Noto Serif SC', serif;
             overflow: hidden;
@@ -657,6 +660,7 @@
             background: linear-gradient(45deg, #fff, #888);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             /* Removed glitch animation for stable display */
         }
 
@@ -790,9 +794,7 @@
             transform: translateY(0);
         }
 
-        .zone:hover h2 {
-            /* Removed letter-spacing change to prevent jitter */
-        }
+
 
         /* Custom Cursor Scoped */
         .cursor-custom {
@@ -879,7 +881,8 @@
 
 <body>
     <!-- Cosmic Background -->
-    <canvas id="canvas-background"></canvas>
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
 
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
 
@@ -917,8 +920,7 @@
 
     <!-- Scenarios Section (Optimized 3D Style) -->
     <section class="scenarios-3d-wrapper" id="scenarios-3d-wrapper">
-        <!-- Noise Overlay -->
-        <div class="noise-overlay-scoped"></div>
+        <!-- Noise Overlay removed for transparency -->
 
         <!-- Custom Cursor Elements -->
         <div class="cursor-custom" id="cursor-custom"></div>

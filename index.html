@@ -125,34 +125,14 @@
             </div>
         </section>
 
-        <!-- 关于区域 -->
+        <!-- 关于区域 (Redesigned: High-End Tech Reveal) -->
         <section id="about" class="about">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">关于 Asstar</h2>
-                    <div class="section-line"></div>
-                </div>
+                <div class="about-aura"></div>
                 <div class="about-content">
-                    <div class="about-text">
+                    <div class="about-text-wrapper">
                         <p class="about-paragraph">在这里，硅基与碳基的认知边界被折叠，范式在零维坍缩，又在高维重写。</p>
-                        <p class="about-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
-                    </div>
-                    <div class="about-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon">∞</div>
-                            <div class="stat-number">∞</div>
-                            <div class="stat-label">可能性</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">⚡</div>
-                            <div class="stat-number">100%</div>
-                            <div class="stat-label">专注</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">🚀</div>
-                            <div class="stat-number">25/7</div>
-                            <div class="stat-label">探索</div>
-                        </div>
+                        <p class="about-sub-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
                     </div>
                 </div>
             </div>
@@ -161,9 +141,12 @@
         <!-- AI Lab区域 -->
         <section id="projects" class="projects">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">AI Lab</h2>
-                    <div class="section-line"></div>
+                <div class="lab-header">
+                    <div class="lab-title-bg">AI LAB</div>
+                    <div class="lab-title-wrapper">
+                        <h2 class="lab-title">AI Lab</h2>
+                        <div class="lab-line-decoder"></div>
+                    </div>
                 </div>
                 <div class="projects-grid" id="projects-grid">
                     <!-- 动态加载的项目卡片将插入这里 -->
@@ -177,37 +160,39 @@
             </div>
         </section>
 
-        <!-- 联系区域 -->
+        <!-- 联系区域 (Redesigned: High-End Tech Reveal) -->
         <section id="contact" class="contact">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">联系我们</h2>
-                    <div class="section-line"></div>
-                </div>
-                <div class="contact-content">
-                    <div class="contact-cards">
-                        <div class="contact-card">
-                            <div class="contact-icon">📧</div>
-                            <div class="contact-info">
-                                <h3>邮箱</h3>
-                                <p>asstarx7@gmail.com</p>
-                            </div>
-                        </div>
-                        <div class="contact-card">
-                            <div class="contact-icon">👥</div>
-                            <div class="contact-info">
-                                <h3>微信</h3>
-                                <p>GitscYee</p>
-                            </div>
-                        </div>
-                        <a class="contact-card contact-card--glow" href="voice-denoise.html">
-                            <div class="contact-icon">🚀</div>
-                            <div class="contact-info">
-                                <h3>探索</h3>
-                                <p>SE</p>
-                            </div>
-                        </a>
+                <div class="lab-header">
+                    <div class="lab-title-bg">CONTACT</div>
+                    <div class="lab-title-wrapper">
+                        <h2 class="lab-title">联系我们</h2>
+                        <div class="lab-line-decoder"></div>
                     </div>
+                </div>
+
+                <div class="contact-nexus">
+                    <div class="contact-node">
+                        <div class="node-icon">📧</div>
+                        <div class="node-content">
+                            <h3>邮箱</h3>
+                            <p>asstarx7@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-node">
+                        <div class="node-icon">👥</div>
+                        <div class="node-content">
+                            <h3>微信</h3>
+                            <p>GitscYee</p>
+                        </div>
+                    </div>
+                    <a class="contact-node node--explore" href="voice-denoise.html">
+                        <div class="node-icon">🚀</div>
+                        <div class="node-content">
+                            <h3>探索</h3>
+                            <p>SE</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -229,142 +214,6 @@
     <script src="script.js"></script>
     <script>
         loadProjects('projects-grid', 3);
-
-        // --- Three.js 背景逻辑 ---
-        (function() {
-            // --- 1. Three.js 场景设置 ---
-            const scene = new THREE.Scene();
-            // 添加迷雾，创造深度感，颜色为深空蓝黑
-            scene.fog = new THREE.FogExp2(0x050505, 0.002);
-
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio); // 高清屏适配
-            
-            const container = document.getElementById('canvas-container');
-            if (container) {
-                container.appendChild(renderer.domElement);
-            }
-
-            // --- 2. 创建粒子宇宙 (The Particles) ---
-            const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 3000; // 粒子数量
-
-            const posArray = new Float32Array(particlesCount * 3);
-            const sizesArray = new Float32Array(particlesCount); // 每个粒子的大小差异
-
-            for(let i = 0; i < particlesCount * 3; i++) {
-                // 在 -10 到 10 的空间内随机分布
-                posArray[i] = (Math.random() - 0.5) * 25;
-            }
-            
-            for(let i = 0; i < particlesCount; i++) {
-                sizesArray[i] = Math.random();
-            }
-
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
-
-            // 自定义材质 (Shader Material) 以实现圆形发光粒子
-            const material = new THREE.PointsMaterial({
-                size: 0.03,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending // 光叠加效果
-            });
-
-            // 稍微带一点蓝色的粒子
-            const starsMaterial = new THREE.PointsMaterial({
-                size: 0.05,
-                color: 0x88ccff,
-                transparent: true,
-                opacity: 0.6,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particlesMesh = new THREE.Points(particlesGeometry, material);
-            scene.add(particlesMesh);
-
-            // 创建第二个粒子层（更远的背景星）
-            const bgStarsGeometry = new THREE.BufferGeometry();
-            const bgStarsCount = 5000;
-            const bgPosArray = new Float32Array(bgStarsCount * 3);
-            for(let i = 0; i < bgStarsCount * 3; i++) {
-                bgPosArray[i] = (Math.random() - 0.5) * 80; // 更大的范围
-            }
-            bgStarsGeometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
-            const bgStarsMesh = new THREE.Points(bgStarsGeometry, starsMaterial);
-            scene.add(bgStarsMesh);
-
-
-            // --- 3. 交互逻辑 (Interaction) ---
-            let mouseX = 0;
-            let mouseY = 0;
-            let targetX = 0;
-            let targetY = 0;
-
-            const windowHalfX = window.innerWidth / 2;
-            const windowHalfY = window.innerHeight / 2;
-
-            document.addEventListener('mousemove', (event) => {
-                mouseX = (event.clientX - windowHalfX);
-                mouseY = (event.clientY - windowHalfY);
-            });
-
-            // 滚动交互
-            window.addEventListener('scroll', () => {
-               // 可以在这里添加基于滚动的摄像机推拉效果
-               // 例如：camera.position.z = 5 + window.scrollY * 0.001;
-            });
-
-            // --- 4. 动画循环 (Animation Loop) ---
-            const clock = new THREE.Clock();
-
-            const tick = () => {
-                const elapsedTime = clock.getElapsedTime();
-
-                // 粒子自转
-                particlesMesh.rotation.y = elapsedTime * 0.05;
-                particlesMesh.rotation.x = elapsedTime * 0.02;
-                
-                bgStarsMesh.rotation.y = elapsedTime * 0.01; // 背景动得慢一点
-
-                // 鼠标视差效果 (平滑插值)
-                targetX = mouseX * 0.001;
-                targetY = mouseY * 0.001;
-
-                particlesMesh.rotation.y += 0.5 * (targetX - particlesMesh.rotation.y);
-                particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
-
-                // 摄像机微动，模拟呼吸感
-                camera.position.x += (mouseX * 0.005 - camera.position.x) * 0.05;
-                camera.position.y += (-mouseY * 0.005 - camera.position.y) * 0.05;
-
-                renderer.render(scene, camera);
-                window.requestAnimationFrame(tick);
-            }
-
-            tick();
-
-            // --- 5. 窗口自适应 ---
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            // --- 6. GSAP 入场动画 ---
-            // 简单的摄像机推进效果
-            gsap.from(camera.position, {
-                z: 10,
-                duration: 3,
-                ease: "power3.inOut"
-            });
-        })();
 
         // --- Hero "Voice" 3D Particle Sphere ---
         (function() {
@@ -412,6 +261,23 @@
             const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
             heroScene.add(particleSphere);
 
+            // --- Eyes Setup (Nexus) ---
+            const eyeGroup = new THREE.Group();
+            heroScene.add(eyeGroup);
+
+            const eyeGeo = new THREE.SphereGeometry(0.35, 32, 32);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+            leftEye.position.set(-1.5, 1.2, 8.2); // Shifted up slightly
+            leftEye.scale.set(0, 0, 0); 
+            eyeGroup.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+            rightEye.position.set(1.5, 1.2, 8.2); // Shifted up slightly
+            rightEye.scale.set(0, 0, 0); 
+            eyeGroup.add(rightEye);
+
             // Store original positions for wave animation
             const originalPositions = sphereGeometry.attributes.position.array.slice();
 
@@ -428,11 +294,61 @@
             let heroTime = 0;
             let amplitude = 0.9;
             let speed = 1.0;
+            let isHeroHovered = false; // Add hover state
+
+            heroContainer.addEventListener('mouseenter', () => isHeroHovered = true);
+            heroContainer.addEventListener('mouseleave', () => {
+                isHeroHovered = false;
+                heroMouseX = 0;
+                heroMouseY = 0;
+            });
 
             heroContainer.addEventListener('mousemove', (event) => {
                 const rect = heroContainer.getBoundingClientRect();
                 heroMouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
                 heroMouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+            });
+
+            // --- 点击交互：打招呼 (Click Interaction: Greet) ---
+            const greetings = ["HELLO!", "STAY CURIOUS.", "LET'S EXPLORE.", "READY?", "INITIATING...", "WELCOME TO ASSTAR."];
+            let isGreeting = false;
+
+            const greetingEl = document.createElement('div');
+            greetingEl.className = 'hero-greeting';
+            heroContainer.appendChild(greetingEl);
+
+            heroContainer.addEventListener('click', () => {
+                if (isGreeting) return;
+                isGreeting = true;
+
+                // 1. Show Text Bubble
+                const randomText = greetings[Math.floor(Math.random() * greetings.length)];
+                greetingEl.innerText = randomText;
+                greetingEl.classList.add('show');
+
+                // 2. Sphere Reaction (Blink & Pulse)
+                gsap.to(particleSphere.scale, {
+                    x: 1.2, y: 1.2, z: 1.2,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.out"
+                });
+
+                // Blink eyes
+                gsap.to([leftEye.scale, rightEye.scale], {
+                    y: 0.1,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                });
+
+                // 3. Auto Hide
+                setTimeout(() => {
+                    greetingEl.classList.remove('show');
+                    setTimeout(() => { isGreeting = false; }, 500);
+                }, 2000);
             });
 
             // 5. Animation Loop
@@ -456,12 +372,39 @@
                 }
                 sphereGeometry.attributes.position.needsUpdate = true;
 
-                // Auto rotate
-                particleSphere.rotation.y += 0.003;
+                // Interaction Logic: Magnetic Stickiness & Elasticity
+                // 1. Position Magnetism (The "Pull" feel)
+                const targetPosX = heroMouseX * 1.2;
+                const targetPosY = -heroMouseY * 1.2;
+                particleSphere.position.x += 0.08 * (targetPosX - particleSphere.position.x);
+                particleSphere.position.y += 0.08 * (targetPosY - particleSphere.position.y);
 
-                // Mouse interaction
-                particleSphere.rotation.x += 0.05 * (heroMouseY * 0.5 - particleSphere.rotation.x);
-                particleSphere.rotation.y += 0.05 * (heroMouseX * 0.5 - particleSphere.rotation.y);
+                // 2. Elastic Scale (The "Sticky" stretching feel)
+                const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
+                const targetScale = 1 + distToCenter * 0.15;
+                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+
+                // 3. Rotation (Auto + Reaching towards mouse)
+                particleSphere.rotation.y += 0.003; // Base rotation
+                particleSphere.rotation.x += 0.05 * (heroMouseY * 0.4 - particleSphere.rotation.x);
+                particleSphere.rotation.z += 0.05 * (heroMouseX * 0.2 - particleSphere.rotation.z);
+
+                // --- 眼睛互动逻辑 (Eyes Interaction) ---
+                eyeGroup.position.copy(particleSphere.position);
+                
+                // Only trigger if hovering AND mouse is actually near the sphere (dist < 0.5)
+                const eyeScaleTarget = (isHeroHovered && distToCenter < 0.5) ? 1 : 0; 
+                const eyeScaleVec = new THREE.Vector3(eyeScaleTarget, eyeScaleTarget, eyeScaleTarget);
+                
+                leftEye.scale.lerp(eyeScaleVec, 0.1);
+                rightEye.scale.lerp(eyeScaleVec, 0.1);
+
+                // 让眼睛稍微看向鼠标 (Eye pupils tracking)
+                const lookFactor = 0.4;
+                leftEye.position.x = -1.5 + heroMouseX * lookFactor;
+                leftEye.position.y = 1.2 - heroMouseY * lookFactor;
+                rightEye.position.x = 1.5 + heroMouseX * lookFactor;
+                rightEye.position.y = 1.2 - heroMouseY * lookFactor;
 
                 heroRenderer.render(heroScene, heroCamera);
             }

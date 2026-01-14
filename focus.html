@@ -18,12 +18,14 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
     rel="stylesheet">
+  <!-- 引入 Three.js 和 GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 </head>
 
 <body>
-  <!-- 宇宙背景层 -->
-  <canvas id="canvas-background"></canvas>
-
+  <div class="noise-overlay"></div>
+  <div id="canvas-container"></div>
   <a href="index.html" class="back-button glass-panel">← 返回首页</a>
 
   <style>
