@@ -212,26 +212,8 @@
       text-decoration: underline;
     }
 
-    .loading {
-      text-align: center;
-      padding: 60px 0;
-      color: var(--text-secondary);
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    .loading-container {
+      margin-top: 40px;
     }
 
     .error-message {
@@ -321,7 +303,12 @@
           </div>
           <div id="controls"></div>
         </div>
-        <div id="focus-content"></div>
+        <div id="focus-content">
+          <div class="loading-container">
+            <div class="digital-pulse"><div></div><div></div></div>
+            <p class="loading-text">正在同步量子数据...</p>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -359,12 +346,7 @@
       async function loadFocus() {
         const container = document.getElementById('focus-content');
         if (!container) return;
-        container.innerHTML = `
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              <p>正在加载实时焦点...</p>
-            </div>
-          `;
+        container.innerHTML = window.generateSkeleton(6);
         try {
           const res = await fetch('feeds/realtime-focus.json', { cache: 'no-store' });
           if (!res.ok) throw new Error('无法加载 feeds/realtime-focus.json');

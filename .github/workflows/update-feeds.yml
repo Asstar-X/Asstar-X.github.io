@@ -1,15 +1,14 @@
-name: Update Realtime Focus Data
+name: Update All Feeds Data
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 北京时间08:00
-    - cron: '0 5 * * *'  # 北京时间13:00
-  workflow_dispatch: # 允许手动触发
+    - cron: '0 0 * * *'  # UTC 00:00 (北京 08:00)
+    - cron: '30 5 * * *' # UTC 05:30 (北京 13:30)
+  workflow_dispatch:
 
 jobs:
-  update-realtime-focus:
+  update-feeds:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
@@ -24,19 +23,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml
+          pip install -r scripts/requirements.txt
 
-      - name: Run tophub aggregator
+      - name: Run all scrapers
         run: |
-          python scripts/fetch_tophub_all.py
+          python scripts/fetch_all.py all
 
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add feeds/realtime-focus.json
+          git add feeds/
           # 只有当有变更时才提交
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update realtime focus data [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update all feeds data [skip ci]"
           git push
-
-

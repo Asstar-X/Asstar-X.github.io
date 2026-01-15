@@ -287,6 +287,31 @@ function typeWriter(element, text, speed = 100) {
     type();
 }
 
+// 通用 Skeleton 加载生成器
+window.generateSkeleton = function(count = 6) {
+    let items = '';
+    for (let i = 0; i < count; i++) {
+        items += `
+            <div class="skeleton-card">
+                <div class="skeleton-shimmer"></div>
+                <div class="skeleton-item skeleton-title"></div>
+                <div class="skeleton-item skeleton-line"></div>
+                <div class="skeleton-item skeleton-line"></div>
+                <div class="skeleton-item skeleton-line short"></div>
+            </div>
+        `;
+    }
+    return `
+        <div class="loading-container">
+            <div class="digital-pulse"><div></div><div></div></div>
+            <p class="loading-text">正在同步量子数据...</p>
+        </div>
+        <div class="skeleton-grid">
+            ${items}
+        </div>
+    `;
+};
+
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', () => {
     // 为标题添加打字机效果

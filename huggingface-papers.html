@@ -159,26 +159,8 @@
             text-decoration: underline;
         }
 
-        .loading {
-            text-align: center;
-            padding: 60px 0;
-            color: var(--text-secondary);
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .loading-container {
+            margin-top: 40px;
         }
 
         .error-message {
@@ -273,9 +255,9 @@
                     </div>
                 </div>
                 <div id="papers-content">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                        <p>正在加载论文...</p>
+                    <div class="loading-container">
+                        <div class="digital-pulse"><div></div><div></div></div>
+                        <p class="loading-text">正在同步量子数据...</p>
                     </div>
                 </div>
             </div>
@@ -312,12 +294,7 @@
 
             async loadPapersData() {
                 const container = document.getElementById('papers-content');
-                container.innerHTML = `
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>正在加载论文...</p>
-                </div>
-            `;
+                container.innerHTML = window.generateSkeleton(4);
 
                 try {
                     const data = await this.fetchPapersData();

@@ -472,26 +472,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            color: #ffffff;
-            font-style: italic;
-            padding: 20px;
-        }
-
-        .loading::after {
-            content: '';
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            gap: 20px;
+            padding: 30px;
         }
 
         /* Scrollbar for modal */
@@ -1047,7 +1029,12 @@
             // UI Loading State
             btn.disabled = true;
             btn.innerText = "⚡ AI 正在思考中，请稍候...";
-            resultBox.innerHTML = '<div class="loading"><span>🔄 正在连接 Coze 引擎并处理任务...</span></div>';
+            resultBox.innerHTML = `
+                <div class="loading">
+                    <div class="digital-pulse"><div></div><div></div></div>
+                    <div class="loading-text" style="margin-top: 10px;">正在连接深度量子引擎...</div>
+                </div>
+            `;
 
             console.log("Sending request to Coze:", { input: text, app_type: currentAppType });
 
@@ -1108,7 +1095,12 @@
                     console.error(`Attempt ${attempt} failed:`, error);
 
                     if (attempt <= maxRetries) {
-                        resultBox.innerHTML = `<div class="loading"><span>⚠️ 连接超时或失败，正在进行第 ${attempt} 次重试...<br><small>(可能是任务处理时间较长，请耐心等待)</small></span></div>`;
+                        resultBox.innerHTML = `
+                            <div class="loading">
+                                <div class="digital-pulse"><div></div><div></div></div>
+                                <div class="loading-text" style="margin-top: 10px;">正在尝试重新建立量子连接 (第 ${attempt} 次)...</div>
+                            </div>
+                        `;
                         await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3s before retry
                     } else {
                         let errorMessage = error.message;

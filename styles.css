@@ -66,6 +66,105 @@ body {
     }
 }
 
+/* ===== Premium Loading System ===== */
+.loading-container {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.loading-text {
+    margin-top: 20px;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+}
+
+.digital-pulse {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    position: relative;
+    vertical-align: middle;
+}
+
+.digital-pulse div {
+    position: absolute;
+    border: 2px solid #fff;
+    opacity: 1;
+    border-radius: 50%;
+    animation: digital-pulse-ani 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.digital-pulse div:nth-child(2) {
+    animation-delay: -0.7s;
+}
+
+@keyframes digital-pulse-ani {
+    0% {
+        top: 25px;
+        left: 25px;
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        top: 0px;
+        left: 0px;
+        width: 50px;
+        height: 50px;
+        opacity: 0;
+    }
+}
+
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.skeleton-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 25px;
+    height: 240px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+    );
+    animation: skeleton-shimmer-ani 2s infinite;
+}
+
+@keyframes skeleton-shimmer-ani {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.skeleton-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.skeleton-title { width: 60%; height: 24px; margin-bottom: 18px; }
+.skeleton-line { width: 100%; height: 12px; }
+.skeleton-line.short { width: 40%; }
+
 /* ===== 导航栏 ===== */
 /* ===== 导航栏 ===== */
 .header {

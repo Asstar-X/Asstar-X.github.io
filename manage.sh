@@ -93,35 +93,12 @@ setup_automation() {
     
     local missing_files=()
     
-    if [ ! -f ".github/workflows/update-trending.yml" ]; then
-        missing_files+=(".github/workflows/update-trending.yml")
+    if [ ! -f ".github/workflows/update-feeds.yml" ]; then
+        missing_files+=(".github/workflows/update-feeds.yml")
     fi
     
-    if [ ! -f ".github/workflows/update-huggingface.yml" ]; then
-        missing_files+=(".github/workflows/update-huggingface.yml")
-    fi
-    if [ ! -f ".github/workflows/update-huggingface-papers.yml" ]; then
-        missing_files+=(".github/workflows/update-huggingface-papers.yml")
-    fi
-    
-    if [ ! -f ".github/workflows/update-realtime-focus.yml" ]; then
-        missing_files+=(".github/workflows/update-realtime-focus.yml")
-    fi
-    
-    if [ ! -f "scripts/fetch_trending.py" ]; then
-        missing_files+=("scripts/fetch_trending.py")
-    fi
-    
-    if [ ! -f "scripts/fetch_huggingface.py" ]; then
-        missing_files+=("scripts/fetch_huggingface.py")
-    fi
-    
-    if [ ! -f "scripts/fetch_huggingface_papers.py" ]; then
-        missing_files+=("scripts/fetch_huggingface_papers.py")
-    fi
-    
-    if [ ! -f "scripts/fetch_tophub_all.py" ]; then
-        missing_files+=("scripts/fetch_tophub_all.py")
+    if [ ! -f "scripts/fetch_all.py" ]; then
+        missing_files+=("scripts/fetch_all.py")
     fi
     
     if [ ${#missing_files[@]} -gt 0 ]; then
@@ -136,18 +113,11 @@ setup_automation() {
     
     # 设置文件权限
     echo -e "${CYAN}🔧 设置文件权限...${NC}"
-    chmod +x scripts/fetch_trending.py
-    chmod +x scripts/fetch_huggingface.py
-    chmod +x scripts/update_huggingface.sh 2>/dev/null || true
-    chmod +x scripts/fetch_huggingface_papers.py
-    chmod +x scripts/fetch_tophub_all.py
+    chmod +x scripts/fetch_all.py
     
     # 测试Python脚本
     echo -e "${CYAN}🧪 快速运行校验脚本（生成本地JSON）...${NC}"
-    echo -e "${YELLOW}运行 GitHub Trending...${NC}" && python3 scripts/fetch_trending.py || true
-    echo -e "${YELLOW}运行 HuggingFace Models...${NC}" && python3 scripts/fetch_huggingface.py || true
-    echo -e "${YELLOW}运行 HuggingFace Papers...${NC}" && python3 scripts/fetch_huggingface_papers.py || true
-    echo -e "${YELLOW}运行 Realtime Focus(Tophub)...${NC}" && python3 scripts/fetch_tophub_all.py || true
+    python3 scripts/fetch_all.py all || true
     
     # 提交更改
     echo -e "${CYAN}📝 提交更改到Git...${NC}"
@@ -174,40 +144,7 @@ setup_automation() {
 update_data() {
     local data_type="$1"
     
-    case "$data_type" in
-        "github")
-            echo -e "${BLUE}🔄 更新GitHub Trending数据...${NC}"
-            python3 scripts/fetch_trending.py
-            ;;
-        "huggingface")
-            echo -e "${BLUE}🔄 更新HuggingFace Model Trending数据...${NC}"
-            python3 scripts/fetch_huggingface.py
-            ;;
-        "papers")
-            echo -e "${BLUE}🔄 更新HuggingFace Papers数据...${NC}"
-            python3 scripts/fetch_huggingface_papers.py
-            ;;
-        "focus")
-            echo -e "${BLUE}🔄 更新实时焦点数据（Tophub）...${NC}"
-            python3 scripts/fetch_tophub_all.py
-            ;;
-        "all")
-            echo -e "${BLUE}🔄 更新所有数据...${NC}"
-            echo -e "${CYAN}更新GitHub Trending数据...${NC}"
-            python3 scripts/fetch_trending.py
-            echo -e "${CYAN}更新HuggingFace Model Trending数据...${NC}"
-            python3 scripts/fetch_huggingface.py
-            echo -e "${CYAN}更新HuggingFace Papers数据...${NC}"
-            python3 scripts/fetch_huggingface_papers.py
-            echo -e "${CYAN}更新实时焦点数据（Tophub）...${NC}"
-            python3 scripts/fetch_tophub_all.py
-            ;;
-        *)
-            echo -e "${RED}❌ 错误: 未知的数据类型 '$data_type'${NC}"
-            echo -e "${YELLOW}支持的类型: github, huggingface, papers, focus, all${NC}"
-            exit 1
-            ;;
-    esac
+    python3 scripts/fetch_all.py "$data_type"
     
     # 提交更新
     echo -e "${CYAN}📝 提交数据更新...${NC}"
@@ -261,14 +198,8 @@ show_status() {
     echo -e "${YELLOW}📁 关键文件检查:${NC}"
     
     local files=(
-        ".github/workflows/update-trending.yml"
-        ".github/workflows/update-huggingface.yml"
-        ".github/workflows/update-huggingface-papers.yml"
-        ".github/workflows/update-realtime-focus.yml"
-        "scripts/fetch_trending.py"
-        "scripts/fetch_huggingface.py"
-        "scripts/fetch_huggingface_papers.py"
-        "scripts/fetch_tophub_all.py"
+        ".github/workflows/update-feeds.yml"
+        "scripts/fetch_all.py"
         "feeds/trending-data.json"
         "feeds/huggingface-data.json"
         "feeds/huggingface-papers-data.json"
@@ -288,21 +219,21 @@ show_status() {
     echo -e "${YELLOW}📊 数据状态:${NC}"
     
     if [ -f "feeds/trending-data.json" ]; then
-        local last_updated=$(grep -o '"lastUpdated":"[^"]*"' feeds/trending-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
+        local last_updated=$(grep -o '"lastUpdated"[[:space:]]*:[[:space:]]*"[^"]*"' feeds/trending-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}GitHub Trending:${NC} 最后更新 $last_updated"
     fi
     
     if [ -f "feeds/huggingface-data.json" ]; then
-        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' feeds/huggingface-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+        local last_updated=$(grep -o '"lastUpdated"[[:space:]]*:[[:space:]]*"[^"]*"' feeds/huggingface-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}HuggingFace:${NC} 最后更新 $last_updated"
     fi
     if [ -f "feeds/huggingface-papers-data.json" ]; then
-        local last_updated=$(grep -e '"lastUpdated":"[^\"]*"' feeds/huggingface-papers-data.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+        local last_updated=$(grep -o '"lastUpdated"[[:space:]]*:[[:space:]]*"[^"]*"' feeds/huggingface-papers-data.json | cut -d'"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}HuggingFace Papers:${NC} 最后更新 $last_updated"
     fi
     
     if [ -f "feeds/realtime-focus.json" ]; then
-        local saved_at=$(grep -m1 -o '"savedAt": "[^"]*"' feeds/realtime-focus.json | cut -d '"' -f4 2>/dev/null || echo "未知")
+        local saved_at=$(grep -m1 -o '"savedAt"[[:space:]]*:[[:space:]]*"[^"]*"' feeds/realtime-focus.json | cut -d'"' -f4 2>/dev/null || echo "未知")
         echo -e "  ${CYAN}Realtime Focus:${NC} 最后生成 $saved_at"
     fi
     
