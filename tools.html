@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>工具 - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        .tools-container {
+            padding: 80px 0 60px;
+            min-height: 100vh;
+        }
+
+        .tools-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .tools-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            background: #ffffff;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .tools-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .tools-search {
+            margin: 30px auto 0;
+            max-width: 720px;
+            position: relative;
+        }
+
+        .tools-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            outline: none;
+            transition: all .2s ease;
+        }
+
+        .tools-input:focus {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .tools-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filters {
+            margin: 18px auto 0;
+            max-width: 960px;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .category-tabs {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all .2s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        .source-toggle {
+            display: inline-flex;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .source-toggle button {
+            padding: 8px 14px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .source-toggle button.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .tools-section {
+            margin-top: 36px;
+        }
+
+        .tools-section h2 {
+            display: none;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            transition: all .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+        }
+
+        .tool-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .tool-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .tool-emoji {
+            font-size: 1.4rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tool-desc {
+            font-size: .92rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tool-meta {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: .78rem;
+            border: 1px solid rgba(255, 255, 255, .14);
+            color: var(--text-secondary);
+        }
+
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tools-title {
+                font-size: 2rem;
+            }
+
+            .back-button {
+                top: 12px;
+                left: 12px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* Modal Styles - Ultra Premium Glassmorphism */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            /* Lighter overlay to show background */
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            /* Completely transparent background as requested */
+            background: rgba(0, 0, 0, 0.01);
+            /* Strong blur to keep content readable against background */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            /* Delicate borders */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Refined shadow */
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 0 80px rgba(0, 212, 255, 0.05);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: rotate(90deg);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-title {
+            background: #ffffff;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-header .tools-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            height: 160px;
+            /* Very transparent input */
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #ffffff;
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.6);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 120px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .result-box:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .copy-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        /* Scrollbar for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* File Drop Zone */
+        .file-drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .drop-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+    </style>
+    <script>
+        let currentSource = 'all';
+        let currentCategory = 'all';
+
+        function filterTools(value) {
+            const query = (value || '').trim().toLowerCase();
+            document.querySelectorAll('.tool-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const src = card.getAttribute('data-source') || 'external';
+                const cat = card.getAttribute('data-category') || 'other';
+                const matchSearch = query ? text.includes(query) : true;
+                const matchSrc = currentSource === 'all' ? true : (src === currentSource);
+                const matchCat = currentCategory === 'all' ? true : (cat === currentCategory);
+                card.style.display = (matchSearch && matchSrc && matchCat) ? '' : 'none';
+            });
+        }
+
+        function setCategory(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const input = document.querySelector('.tools-input');
+            filterTools(input ? input.value : '');
+        }
+
+        function setSource(src, el) {
+            currentSource = src;
+            document.querySelectorAll('.source-toggle button').forEach(b => b.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const input = document.querySelector('.tools-input');
+            filterTools(input ? input.value : '');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+    <a href="index.html" class="back-button glass-panel">← 返回首页</a>
+
+    <main>
+        <section class="tools-container">
+            <div class="container">
+                <div class="tools-header">
+                    <h1 class="tools-title">工具</h1>
+                    <p class="tools-subtitle">提效工具箱 · 自研与精选（All Free💕）</p>
+                    <div class="tools-search">
+                        <span class="tools-search-icon">🔎</span>
+                        <input class="tools-input" type="text" placeholder="搜索工具、能力或用途...（如：论文、Prompt、趋势、可视化）"
+                            oninput="filterTools(this.value)">
+                    </div>
+                    <div class="filters">
+                        <div class="category-tabs" role="tablist" aria-label="类别筛选">
+                            <button class="tab active" onclick="setCategory('all', this)">全部</button>
+                            <button class="tab" onclick="setCategory('vision', this)">图像</button>
+                            <button class="tab" onclick="setCategory('audio', this)">音频</button>
+                            <button class="tab" onclick="setCategory('nlp', this)">文本</button>
+                            <button class="tab" onclick="setCategory('code', this)">代码</button>
+                        </div>
+                        <div class="source-toggle" role="tablist" aria-label="来源筛选">
+                            <button class="active" onclick="setSource('all', this)">全部</button>
+                            <button onclick="setSource('local', this)">自研</button>
+                            <button onclick="setSource('external', this)">精选</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tools-section">
+                    <style>
+                        .tool-card[data-source="local"] {
+                            background: #000000 !important;
+                            border: 1px solid #ffffff !important;
+                        }
+                        .tool-card[data-source="local"] .tool-name,
+                        .tool-card[data-source="local"] .tool-desc,
+                        .tool-card[data-source="local"] .pill {
+                            color: #ffffff !important;
+                        }
+                        .tool-card[data-source="local"] .pill {
+                            border-color: rgba(255, 255, 255, 0.3) !important;
+                        }
+                    </style>
+                    <div class="tools-grid">
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('mubao', event)">
+                                <div class="tool-head"><span class="tool-emoji">📰</span><span class="tool-name">幕报
+                                        (MuBao)</span></div>
+                                <div class="tool-desc">AI 驱动的智能简报生成器，一键生成高质量内容。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('resume', event)">
+                                <div class="tool-head"><span class="tool-emoji">📄</span><span
+                                        class="tool-name">简历助手</span>
+                                </div>
+                                <div class="tool-desc">专业简历优化建议，自我介绍生成，提升求职竞争力。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="#" onclick="openCozeModal('career', event)">
+                                <div class="tool-head"><span class="tool-emoji">🚀</span><span
+                                        class="tool-name">职业规划</span>
+                                </div>
+                                <div class="tool-desc">AI 深度分析职业背景，提供发展路径与转型建议。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="lab/prompt-optimizer.html">
+                                <div class="tool-head"><span class="tool-emoji">🧩</span><span
+                                        class="tool-name">Prompt优化器</span></div>
+                                <div class="tool-desc">将想法转化为高质量提示词，支持模板选择与多模型调用。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="nlp">
+                            <a href="https://github.com/Asstar-X/JailPrompter" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🔓</span><span
+                                        class="tool-name">Prompt越狱</span></div>
+                                <div class="tool-desc">专注于大语言模型提示词攻防与提示词越狱研究的开源项目。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">自研</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="local" data-category="vision">
+                            <a href="lab/svg-monitor.html">
+                                <div class="tool-head"><span class="tool-emoji">🖼️</span><span
+                                        class="tool-name">SVG-XML可视化</span></div>
+                                <div class="tool-desc">上传SVG，左侧预览，右侧可折叠XML树，双向高亮联动。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">可视化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://www.gaitubao.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖍️</span><span
+                                        class="tool-name">改图宝</span></div>
+                                <div class="tool-desc">一站式图片压缩、裁剪、格式转换、加水印。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">压缩</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://www.min2k.com/tools/mermaid/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📊</span><span class="tool-name">Mermaid
+                                        图表生成</span></div>
+                                <div class="tool-desc">在线将Mermaid文本实时渲染为SVG图表。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">可视化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://revizepic.toolooz.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖌️</span><span
+                                        class="tool-name">RevizePic 图像优化</span></div>
+                                <div class="tool-desc">AI驱动的智能图片超分/降噪/无损修复。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">优化</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://snapany.com/zh/bilibili" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📥</span><span
+                                        class="tool-name">B站视频下载</span></div>
+                                <div class="tool-desc">无需登录自由保存B站视频音频弹幕。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">bilibili</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://youtube.iiilab.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">▶️</span><span
+                                        class="tool-name">YouTube视频下载</span></div>
+                                <div class="tool-desc">转换/下载YouTube音视频，支持多格式。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">youtube</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://dy.kukutool.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🎬</span><span
+                                        class="tool-name">抖音视频下载</span></div>
+                                <div class="tool-desc">免费下载无水印抖音（TikTok）视频。</div>
+                                <div class="tool-meta"><span class="pill">视频</span><span class="pill">抖音</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://huggingface.co/spaces/alibabasglab/SpeechScore" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🎤</span><span
+                                        class="tool-name">语音质量评估</span></div>
+                                <div class="tool-desc">专业的语音质量评估工具，用于评估语音信号的清晰度和质量。</div>
+                                <div class="tool-meta"><span class="pill">音频</span><span class="pill">评估</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="audio">
+                            <a href="https://vocalremover.org/zh/cutter" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✂️</span><span
+                                        class="tool-name">音频切割器</span></div>
+                                <div class="tool-desc">在线音频切割工具，支持精确裁剪和编辑音频文件。</div>
+                                <div class="tool-meta"><span class="pill">音频</span><span class="pill">编辑</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://tool.jisuapi.com/base642pic.html" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖼️</span><span
+                                        class="tool-name">Base64转图片</span></div>
+                                <div class="tool-desc">粘贴Base64字符串，直接在线生成图片。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">转换</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="code">
+                            <a href="https://jsonlint.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🔎</span><span
+                                        class="tool-name">Json格式验证</span></div>
+                                <div class="tool-desc">一键查错JSON语法并高亮可视化定位问题。</div>
+                                <div class="tool-meta"><span class="pill">格式化</span><span class="pill">JSON</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="code">
+                            <a href="https://jsonformatter.org/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🛠️</span><span
+                                        class="tool-name">Json一键排版</span></div>
+                                <div class="tool-desc">快速美化、折叠、压缩JSON并高亮。</div>
+                                <div class="tool-meta"><span class="pill">美化</span><span class="pill">JSON</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="nlp">
+                            <a href="https://www.alltoall.net/md_pdf/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📄</span><span
+                                        class="tool-name">PDF转Word</span></div>
+                                <div class="tool-desc">支持PDF转Word、Excel、PPT等格式文档互转。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">PDF</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="nlp">
+                            <a href="https://www.ilovepdf.com/zh-cn/split_pdf" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✂️</span><span
+                                        class="tool-name">拆分PDF</span></div>
+                                <div class="tool-desc">将PDF文件拆分为多个文件或提取特定页面。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">PDF</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">📐</span><span
+                                        class="tool-name">Draw.io</span></div>
+                                <div class="tool-desc">功能强大的在线流程图与图表绘制工具。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">绘图</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://excalidraw.com/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">✏️</span><span
+                                        class="tool-name">手稿画图</span></div>
+                                <div class="tool-desc">Excalidraw - 虚拟白板，手绘风格的图表绘制工具。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">绘图</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://screen.bmcx.com/#welcome" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🖥️</span><span
+                                        class="tool-name">在线屏幕检测</span></div>
+                                <div class="tool-desc">检测屏幕坏点、漏光、颜色显示等显示器问题。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">测试</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="nlp">
+                            <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🔢</span><span
+                                        class="tool-name">Token计算</span></div>
+                                <div class="tool-desc">OpenAI官方Token计算工具，精确计算文本的Token数量。</div>
+                                <div class="tool-meta"><span class="pill">文本</span><span class="pill">计算</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="vision">
+                            <a href="https://next-ai-drawio.jiang.jp/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🎨</span><span
+                                        class="tool-name">Draw.io AI流程图</span></div>
+                                <div class="tool-desc">AI驱动的智能绘图工具，支持多种绘图风格和模式。</div>
+                                <div class="tool-meta"><span class="pill">图像</span><span class="pill">绘图</span></div>
+                            </a>
+                        </div>
+                        <div class="tool-card" data-source="external" data-category="code">
+                            <a href="https://ipleak.net/" target="_blank" rel="noopener noreferrer">
+                                <div class="tool-head"><span class="tool-emoji">🌐</span><span
+                                        class="tool-name">在线IP地址检测</span></div>
+                                <div class="tool-desc">检测IP地址、DNS泄露、WebRTC泄露等网络隐私信息。</div>
+                                <div class="tool-meta"><span class="pill">网络</span><span class="pill">检测</span></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <!-- Parsing Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- Coze Agent Modal -->
+    <div id="coze-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCozeModal()">×</button>
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title">AI 助手</h2>
+                <p id="modal-subtitle" class="tools-subtitle">AI 智能助手为您服务</p>
+            </div>
+            <div class="modal-body">
+                <div id="drop-zone" class="file-drop-zone" style="display: none;">
+                    <div class="drop-icon">📂</div>
+                    <p class="drop-text">拖拽 DOCX 简历文件到这里，或点击上传</p>
+                    <input type="file" id="file-input" accept=".docx" style="display: none;"
+                        onchange="handleFileSelect(event)">
+                </div>
+                <div class="input-group">
+                    <textarea id="user-input" class="modal-textarea" placeholder="请输入内容..."></textarea>
+                </div>
+                <button id="send-btn" class="action-btn" onclick="sendToCoze()">🚀 开始执行</button>
+                <div id="result-box" class="result-box">
+                    <span style="color: var(--text-secondary);">AI 的回复将显示在这里...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL = "https://coze-api.yxy138646.workers.dev";
+        let currentAppType = 'mubao';
+        let selectedFile = null;
+
+        const APP_CONFIG = {
+            'mubao': {
+                title: '幕报生成器',
+                subtitle: '生成小红书文案',
+                placeholder: '请粘贴长文章内容，AI 将为你生成幕报内容...'
+            },
+            'resume': {
+                title: '简历优化助手',
+                subtitle: '专业简历优化建议',
+                placeholder: '请拖入简历文件，AI 将为您分析...'
+            },
+            'career': {
+                title: '职业规划助手',
+                subtitle: 'AI 深度分析职业背景，提供发展路径与转型建议',
+                placeholder: '请输入你的职业背景和困惑，AI 将为你规划路径...'
+            }
+        };
+
+        function openCozeModal(type, e) {
+            if (e) e.preventDefault();
+            currentAppType = type || 'mubao';
+            const config = APP_CONFIG[currentAppType];
+
+            // Update UI based on type
+            document.getElementById('modal-title').innerText = config.title;
+            document.getElementById('modal-subtitle').innerText = config.subtitle;
+
+            // Toggle Drop Zone for Resume
+            const dropZone = document.getElementById('drop-zone');
+            const userInput = document.getElementById('user-input');
+
+            // Reset File
+            selectedFile = null;
+            document.querySelector('.drop-text').innerText = "拖拽 DOCX 简历文件到这里，或点击上传";
+
+            if (currentAppType === 'resume') {
+                dropZone.style.display = 'block';
+                userInput.placeholder = "请拖入简历文件，或直接在此粘贴简历内容...";
+            } else {
+                dropZone.style.display = 'none';
+                userInput.placeholder = config.placeholder;
+            }
+
+            // Always allow editing initially
+            userInput.readOnly = false;
+            userInput.value = '';
+            userInput.style.cursor = 'text';
+            userInput.style.opacity = '1';
+
+            // Reset result
+            document.getElementById('result-box').innerHTML = '<span style="color: var(--text-secondary);">AI 的回复将显示在这里...</span>';
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('send-btn').innerText = "🚀 开始执行";
+
+            const modal = document.getElementById('coze-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCozeModal() {
+            const modal = document.getElementById('coze-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('coze-modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeCozeModal();
+            }
+        });
+
+        // File Drop Logic
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        async function handleFile(file) {
+            const fileName = file.name.toLowerCase();
+            if (!fileName.endsWith('.docx') && !fileName.endsWith('.pdf')) {
+                alert('请上传 .docx 或 .pdf 格式的简历文件。');
+                return;
+            }
+
+            selectedFile = file;
+            document.querySelector('.drop-text').innerText = `已选择: ${file.name}`;
+
+            const userInput = document.getElementById('user-input');
+            userInput.value = "正在解析文件内容，请稍候...";
+            userInput.readOnly = true;
+            userInput.style.opacity = '0.7';
+
+            try {
+                let text = "";
+                if (fileName.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    text = result.value;
+                } else if (fileName.endsWith('.pdf')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + "\n";
+                    }
+                    text = fullText;
+                }
+
+                userInput.value = text;
+                userInput.readOnly = false;
+                userInput.style.opacity = '1';
+                userInput.style.cursor = 'text';
+                userInput.placeholder = "解析完成，您可以手动修改内容...";
+
+            } catch (error) {
+                console.error("Parsing error:", error);
+                userInput.value = "";
+                userInput.placeholder = "文件解析失败，请手动粘贴内容...";
+                alert("文件解析失败: " + error.message);
+                userInput.readOnly = false;
+                userInput.style.opacity = '1';
+                userInput.style.cursor = 'text';
+            }
+        }
+
+        async function sendToCoze() {
+            const inputField = document.getElementById('user-input');
+            const resultBox = document.getElementById('result-box');
+            const btn = document.getElementById('send-btn');
+            const text = inputField.value.trim();
+
+            if (!text) {
+                alert("输入内容不能为空！请粘贴内容或上传文件。");
+                return;
+            }
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.innerText = "⚡ AI 正在思考中，请稍候...";
+            resultBox.innerHTML = `
+                <div class="loading">
+                    <div class="digital-pulse"><div></div><div></div></div>
+                    <div class="loading-text" style="margin-top: 10px;">正在连接深度量子引擎...</div>
+                </div>
+            `;
+
+            console.log("Sending request to Coze:", { input: text, app_type: currentAppType });
+
+            const maxRetries = 2; // Maximum number of retries
+            let attempt = 0;
+            let success = false;
+
+            // Truncate text if too long (Coze/Worker might have limits)
+            const MAX_LENGTH = 20000;
+            let finalInput = text;
+            if (finalInput.length > MAX_LENGTH) {
+                console.warn(`Input too long (${finalInput.length} chars), truncating to ${MAX_LENGTH}...`);
+                finalInput = finalInput.substring(0, MAX_LENGTH) + "\n[...内容已截断...]";
+                alert(`提示：您的输入内容过长（${text.length}字），已自动截取前${MAX_LENGTH}字进行处理。`);
+            }
+
+            while (attempt <= maxRetries && !success) {
+                try {
+                    const controller = new AbortController();
+                    // Increase timeout to 300s (5 minutes) for long workflows
+                    const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+                    const response = await fetch(WORKER_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        referrerPolicy: "no-referrer",
+                        credentials: "omit",
+                        body: JSON.stringify({
+                            input: finalInput,
+                            app_type: currentAppType
+                        }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Display Result with Copy Button
+                    if (data.reply) {
+                        resultBox.innerHTML = `
+                            <button class="copy-btn" onclick="copyResult()">复制结果</button>
+                            <div id="result-content">${formatOutput(data.reply)}</div>
+                        `;
+                        success = true;
+                    } else {
+                        throw new Error("未获取到有效回复");
+                    }
+
+                } catch (error) {
+                    attempt++;
+                    console.error(`Attempt ${attempt} failed:`, error);
+
+                    if (attempt <= maxRetries) {
+                        resultBox.innerHTML = `
+                            <div class="loading">
+                                <div class="digital-pulse"><div></div><div></div></div>
+                                <div class="loading-text" style="margin-top: 10px;">正在尝试重新建立量子连接 (第 ${attempt} 次)...</div>
+                            </div>
+                        `;
+                        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3s before retry
+                    } else {
+                        let errorMessage = error.message;
+                        if (error.name === 'AbortError') {
+                            errorMessage = "请求超时（超过5分钟），任务处理时间过长。";
+                        } else if (errorMessage === 'Failed to fetch') {
+                            errorMessage = "网络连接中断或服务器响应超时（Cloudflare Worker 限制）。建议缩短内容或稍后重试。";
+                        }
+                        resultBox.innerHTML = `<span style="color:red;">❌ 出错啦: ${errorMessage}</span>`;
+                    }
+                }
+            }
+
+            // Restore Button State
+            btn.disabled = false;
+            btn.innerText = "🚀 开始执行";
+        }
+
+        function formatOutput(text) {
+            return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function copyResult() {
+            const content = document.getElementById('result-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "已复制!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+    </script>
+</body>
+
+</html>
