@@ -148,19 +148,8 @@ class AntigravityBackground {
     }
 }
 
-// 导航栏滚动效果
-window.addEventListener('scroll', () => {
-    const header = document.querySelector('.header');
-    if (header) {
-        if (window.scrollY > 100) {
-            header.style.background = 'rgba(10, 10, 10, 0.95)';
-            header.style.boxShadow = '0 2px 20px rgba(255, 255, 255, 0.1)';
-        } else {
-            header.style.background = 'rgba(10, 10, 10, 0.9)';
-            header.style.boxShadow = 'none';
-        }
-    }
-});
+// 移除旧的导航栏滚动背景逻辑，以保持透明垂直导航栏的一致性
+// window.addEventListener('scroll', () => { ... });
 
 // 元素进入视口时的动画
 const observerOptions = {

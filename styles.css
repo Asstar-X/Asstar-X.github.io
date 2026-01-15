@@ -166,154 +166,168 @@ body {
 .skeleton-line.short { width: 40%; }
 
 /* ===== 导航栏 ===== */
-/* ===== 导航栏 ===== */
+/* ===== 导航栏 (Silicon Valley Designer Style) ===== */
 .header {
     position: fixed;
-    top: 2rem;
+    top: 50%;
     right: 2rem;
     left: auto;
     width: auto;
     z-index: 1000;
-    transition: all 0.3s ease;
+    transform: translateY(-50%);
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    background: transparent !important;
 }
 
-/* 导航容器 - 垂直HUD玻璃态 */
 .nav {
     display: flex;
-    flex-direction: column; /* Vertical Stack */
-    align-items: center;    /* Center content */
-    background: rgba(5, 5, 5, 0.6);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px; /* Smooth corners */
-    padding: 0.5rem;
-    transition: 
-        width 0.4s cubic-bezier(0.19, 1, 0.22, 1),
-        height 0.4s cubic-bezier(0.19, 1, 0.22, 1),
-        background 0.4s ease,
-        box-shadow 0.4s ease;
-    width: 60px;  /* Initial Width */
-    height: 60px; /* Initial Height (Circle) */
-    overflow: hidden;
-    box-shadow: 
-        0 4px 30px rgba(0, 0, 0, 0.5),
-        inset 0 0 20px rgba(255, 255, 255, 0.02);
+    flex-direction: column;
+    align-items: flex-end; /* Align items to the right */
+    background: transparent;
+    padding: 0;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
-/* 鼠标悬停时的展开状态 - 向下展开 */
+/* Disable hover expansion logic */
 .nav:hover {
-    width: 160px; /* Expand Width for text */
-    height: auto; /* Allow natural height expansion */
-    max-height: 80vh; /* Increased from 500px to viewport height to prevent clipping */
-    padding: 1.5rem 1rem;
-    background: rgba(10, 10, 10, 0.9);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 
-        0 15px 50px rgba(0, 0, 0, 0.7),
-        0 0 30px rgba(255, 255, 255, 0.08);
+    width: auto;
+    height: auto;
+    background: transparent;
+    box-shadow: none;
+    border: none;
 }
 
 .logo {
     display: flex;
-    flex-direction: column; /* Stack logo elements */
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.8rem;
+    margin-bottom: 3rem;
     cursor: pointer;
-    margin-bottom: 0.5rem; /* Space between logo and links */
-    width: 100%;
+    transition: all 0.3s ease;
+    text-decoration: none; /* Ensure no underline for link */
 }
 
 .logo-img {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    object-fit: cover;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+    filter: grayscale(1);
     transition: all 0.5s ease;
 }
 
-.nav:hover .logo-img {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+.logo:hover .logo-img {
+    filter: grayscale(0);
+    transform: rotate(90deg) scale(1.1);
     border-color: #fff;
 }
 
 .logo-text {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0;
-    letter-spacing: 2px;
-    color: var(--text-primary);
-    opacity: 0;
-    height: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    color: rgba(255, 255, 255, 0.3);
+    opacity: 1;
+    height: auto;
+    transform: none;
+    transition: all 0.4s ease;
     white-space: nowrap;
 }
 
-/* Show Logo Text on Hover */
-.nav:hover .logo-text {
-    font-size: 0.9rem;
+.logo:hover .logo-text {
+    color: #fff;
     opacity: 1;
-    height: auto;
-    transform: translateY(0);
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    letter-spacing: 6px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
-/* 导航链接区域 - 垂直列表 */
 .nav-links {
     display: flex;
-    flex-direction: column; /* Vertical Stack */
+    flex-direction: column;
     list-style: none;
-    gap: 0.8rem;
+    gap: 1.5rem;
     width: 100%;
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.4s ease;
-    align-items: center; /* Center links */
+    opacity: 1;
+    transform: none;
+    align-items: flex-end;
 }
 
-/* 展开时显示链接 */
 .nav:hover .nav-links {
     opacity: 1;
-    transform: translateY(0);
-    transition-delay: 0.1s;
+    transform: none;
 }
 
 .nav-link {
-    font-family: var(--font-display);
-    color: rgba(255, 255, 255, 0.6);
+    font-family: var(--font-display); /* Using Orbitron for tech feel */
+    color: rgba(255, 255, 255, 0.2);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
-    padding: 0.2rem 0;
-    letter-spacing: 1px;
-    width: 100%;
-    text-align: center;
+    padding: 0.4rem 0;
+    text-align: right;
     display: block;
+    /* Glitch-like digital shadow */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0);
 }
 
 .nav-link:hover {
     color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.05); /* Subtle background highlight */
-    border-radius: 4px;
+    letter-spacing: 6px;
+    padding-right: 20px;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(255, 255, 255, 0.2);
 }
 
+/* Digital Scanline Effect on hover */
 .nav-link::after {
-    display: none; /* Remove underline for vertical layout */
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #fff);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px #fff;
 }
 
-/* 移动端汉堡菜单逻辑覆盖 */
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    width: 0;
+    height: 1px;
+    background: #fff;
+    transition: all 0.4s ease;
+    opacity: 0;
+}
+
+.nav-link:hover::before {
+    width: 12px;
+    opacity: 1;
+}
+
+/* Mobile Toggle - Hidden on desktop */
 .nav-toggle {
-    display: none; 
+    display: none;
 }
 
 /* ===== 英雄区域 ===== */
