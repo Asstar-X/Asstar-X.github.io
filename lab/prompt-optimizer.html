@@ -14,15 +14,43 @@
     </script>
     <title>Prompt优化器</title>
     <link rel="icon" type="image/jpeg" href="../images/Asstar.jpg">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap"
         rel="stylesheet">
     <!-- 引入 Three.js 和 GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
+        /* 宇宙背景样式 */
+        body { 
+            background: #050505 !important; 
+        }
+
+        /* 画布容器 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 设为1，主内容设为 >= 2 */
+        }
+
+        /* 噪点遮罩 */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
         .prompt-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -38,20 +66,23 @@
 
         .prompt-title {
             font-family: var(--font-display);
-            font-size: 3rem;
-            font-weight: 700;
-            background: #ffffff;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ffffff;
             margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 12px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            text-align: center;
         }
 
         .prompt-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
+            font-family: var(--font-primary);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1rem;
+            margin-bottom: 3rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
 
         .chat-container {
@@ -1131,7 +1162,7 @@
         </div>
     </div>
 
-    <script src="../script.js"></script>
+    <script src="../js/script.js"></script>
     <script src="./config.js"></script>
     <script src="./prompt-optimizer.js"></script>
 </body>

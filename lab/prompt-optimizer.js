@@ -80,7 +80,8 @@ class ChatManager {
 
     checkApiKey() {
         const currentApiKey = this.configManager.getCurrentApiKey();
-        if (!currentApiKey) {
+        const shouldUseProxy = this.configManager.shouldUseProxy();
+        if (!currentApiKey && !shouldUseProxy) {
             this.showApiKeyPrompt();
         }
     }
@@ -356,7 +357,8 @@ class ChatManager {
         const message = this.chatInput.value.trim();
         if (!message || this.isTyping) return;
         const currentApiKey = this.configManager.getCurrentApiKey();
-        if (!currentApiKey) { this.addMessage('assistant', '请先设置API密钥才能开始对话。'); return; }
+        const shouldUseProxy = this.configManager.shouldUseProxy();
+        if (!currentApiKey && !shouldUseProxy) { this.addMessage('assistant', '请先设置API密钥才能开始对话。'); return; }
         this.addMessage('user', message);
         this.chatInput.value = '';
         this.adjustTextareaHeight();
@@ -583,38 +585,7 @@ class ChatManager {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', () => { window.chatManager = new ChatManager(); });
-
-document.addEventListener('DOMContentLoaded', () => {
-    createParticles();
-    document.addEventListener('mousemove', (e) => {
-        const cursor = document.createElement('div');
-        cursor.className = 'cursor-trail';
-        cursor.style.cssText = `position: fixed; width: 4px; height: 4px; background: #00d4ff; border-radius: 50%; pointer-events: none; z-index: 9999; left: ${e.clientX}px; top: ${e.clientY}px; animation: cursorFade 0.5s ease-out forwards;`;
-        document.body.appendChild(cursor);
-        setTimeout(() => { cursor.remove(); }, 500);
-    });
-});
-
-function createParticles() {
-    const particleContainer = document.createElement('div');
-    particleContainer.className = 'particle-container';
-    particleContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;';
-    document.body.appendChild(particleContainer);
-    for (let i = 0; i < 30; i++) { createParticle(particleContainer); }
-}
-
-function createParticle(container) {
-    const particle = document.createElement('div');
-    particle.style.cssText = `position: absolute; width: 2px; height: 2px; background: rgba(0, 212, 255, 0.6); border-radius: 50%; left: ${Math.random() * 100}%; top: ${Math.random() * 100}%; animation: particleFloat ${5 + Math.random() * 10}s linear infinite;`;
-    container.appendChild(particle);
-}
-
-const promptOptimizerStyle = document.createElement('style');
-promptOptimizerStyle.textContent = `
-    @keyframes cursorFade { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0); } }
-    @keyframes particleFloat { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
-`;
-document.head.appendChild(promptOptimizerStyle);
 
 
