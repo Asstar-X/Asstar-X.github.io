@@ -14,13 +14,15 @@
     </script>
     <title>工具 - Asstar</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
         rel="stylesheet">
     <!-- 引入 Three.js 和 GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- 引入共享的小精灵和聊天功能样式 -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
     <style>
         .tools-container {
             padding: 80px 0 60px;
@@ -606,6 +608,39 @@
     <div id="canvas-container"></div>
     <div id="sprite-container"></div>
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
+    
+    <!-- Chat Dialog -->
+    <div class="chat-dialog" id="chat-dialog">
+        <div class="chat-dialog-header">
+            <div class="chat-dialog-title">
+                <span>✨</span>
+                <span>小精灵助手</span>
+            </div>
+            <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
+        </div>
+        <div class="chat-dialog-messages" id="chat-dialog-messages">
+            <div class="chat-message assistant">
+                <div class="chat-message-avatar">✨</div>
+                <div class="chat-message-content">
+                    你好！我是小精灵助手，可以帮你了解这些提效工具的信息。有什么想知道的吗？
+                </div>
+            </div>
+        </div>
+        <div class="chat-dialog-input-container">
+            <div class="chat-dialog-input-wrapper">
+                <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
+                <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
+            </div>
+            <div class="typing-indicator" id="chat-typing-indicator">
+                <span>小精灵正在思考</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main>
         <section class="tools-container">
@@ -1081,7 +1116,7 @@
         })();
     </script>
 
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
     <!-- Parsing Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -1397,6 +1432,20 @@
                 alert('复制失败，请手动复制');
             });
         }
+    </script>
+    <script src="js/script.js"></script>
+    <script src="lab/config.js"></script>
+    <script src="js/sprite-chat.js"></script>
+    <script>
+        // Initialize sprite chat with custom options for tools page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager({
+                    systemPrompt: '你是一个友好的AI助手，名字叫小精灵。你帮助用户了解各种提效工具的功能和使用方法。请用简洁、友好的方式回答问题。',
+                    initialMessage: '你好！我是小精灵助手，可以帮你了解这些提效工具的信息。有什么想知道的吗？'
+                });
+            }
+        });
     </script>
 </body>
 

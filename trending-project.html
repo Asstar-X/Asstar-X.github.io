@@ -14,7 +14,7 @@
     </script>
     <title>Trending Project - Asstar</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
         rel="stylesheet">
@@ -160,7 +160,7 @@
             z-index: 2;
         }
 
-        /* GitHub 卡片细节，保持与 trending.html 一致 */
+        /* GitHub 卡片细节 */
         .repo-header {
             display: flex;
             align-items: center;
@@ -251,7 +251,7 @@
             text-decoration: underline;
         }
 
-        /* HuggingFace 卡片细节，保持与 huggingface-trending.html 一致 */
+        /* HuggingFace 卡片细节 */
         .model-header {
             display: flex;
             align-items: center;
@@ -350,12 +350,7 @@
             transition: all 0.3s ease;
         }
 
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        /* 玻璃拟态返回按钮样式 */
         .glass-panel {
             background: rgba(10, 15, 30, 0.65);
             backdrop-filter: blur(20px);
@@ -405,49 +400,9 @@
                 font-size: 12px;
             }
         }
-
-        /* Sprite Sprite (小精灵) Styles */
-        #sprite-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 180px;
-            height: 180px;
-            z-index: 10000;
-            pointer-events: auto;
-            cursor: pointer;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
-        }
-
-        .sprite-greeting {
-            position: absolute;
-            top: 0;
-            right: 110%; /* Place it to the left of the sprite */
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: #ffffff;
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            pointer-events: none;
-            opacity: 0;
-            transform: scale(0.8) translateX(20px);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 101;
-            white-space: nowrap;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .sprite-greeting.show {
-            opacity: 1;
-            transform: scale(1) translateX(0);
-        }
     </style>
+    <!-- 引入共享的小精灵和聊天功能样式 -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body>
@@ -455,6 +410,39 @@
     <div id="canvas-container"></div>
     <div id="sprite-container"></div>
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
+    
+    <!-- Chat Dialog -->
+    <div class="chat-dialog" id="chat-dialog">
+        <div class="chat-dialog-header">
+            <div class="chat-dialog-title">
+                <span>✨</span>
+                <span>小精灵助手</span>
+            </div>
+            <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
+        </div>
+        <div class="chat-dialog-messages" id="chat-dialog-messages">
+            <div class="chat-message assistant">
+                <div class="chat-message-avatar">✨</div>
+                <div class="chat-message-content">
+                    你好！我是小精灵助手，可以帮你了解这些热门项目的信息。有什么想知道的吗？
+                </div>
+            </div>
+        </div>
+        <div class="chat-dialog-input-container">
+            <div class="chat-dialog-input-wrapper">
+                <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
+                <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
+            </div>
+            <div class="typing-indicator" id="chat-typing-indicator">
+                <span>小精灵正在思考</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <main>
         <section class="trending-container">
             <div class="container">
@@ -476,7 +464,20 @@
             </div>
         </section>
     </main>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
+    <script src="lab/config.js"></script>
+    <script src="js/sprite-chat.js"></script>
+    <script>
+        // Initialize sprite chat with custom options for trending projects page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager({
+                    systemPrompt: '你是一个友好的AI助手，名字叫小精灵。你帮助用户了解GitHub和HuggingFace上的热门项目信息。请用简洁、友好的方式回答问题。',
+                    initialMessage: '你好！我是小精灵助手，可以帮你了解这些热门项目的信息。有什么想知道的吗？'
+                });
+            }
+        });
+    </script>
     <script>
         (function () {
             class TrendingProject {
@@ -575,7 +576,7 @@
                             if (json[this.period] && Array.isArray(json[this.period])) return json[this.period];
                         }
                     } catch (e) { /* ignore, fall back */ }
-                    // fallback to simple mock subset (reuse logic from trending.js)
+                    // fallback to simple mock subset
                     const mock = {
                         daily: [
                             { name: 'dyad-sh/dyad', description: 'Free, local, open-source AI app builder', language: 'TypeScript', stars: '5,513', forks: '630', starsToday: '751', url: 'https://github.com/dyad-sh/dyad', builtBy: ['@wwwillchen', '@graphite-app', '@cubic-dev-ai'] }
@@ -615,7 +616,7 @@
                 renderGithub() {
                     const container = document.getElementById('trending-content');
                     if (!this.githubData || this.githubData.length === 0) {
-                        container.innerHTML = this.emptyHtml('trendingApp');
+                        container.innerHTML = this.emptyHtml();
                         return;
                     }
                     const grid = document.createElement('div');
@@ -629,7 +630,7 @@
                 renderHuggingface() {
                     const container = document.getElementById('trending-content');
                     if (!this.hfData || this.hfData.length === 0) {
-                        container.innerHTML = this.emptyHtml('huggingfaceTrendingApp');
+                        container.innerHTML = this.emptyHtml();
                         return;
                     }
                     const grid = document.createElement('div');
@@ -717,7 +718,7 @@
                     if (btn) btn.addEventListener('click', () => this.loadData());
                 }
 
-                emptyHtml(handler) {
+                emptyHtml() {
                     return `
                     <div class="error-message">
                         <p>暂无数据</p>
@@ -727,7 +728,6 @@
                 }
 
                 addExtras() {
-                    // Hover scaling like other pages
                     document.addEventListener('mouseover', (e) => {
                         const target = e.target.closest('.trending-card');
                         if (target) target.style.transform = 'translateY(-5px) scale(1.02)';
@@ -736,7 +736,6 @@
                         const target = e.target.closest('.trending-card');
                         if (target) target.style.transform = 'translateY(0) scale(1)';
                     });
-                    // Keyboard nav within controls
                     document.addEventListener('keydown', (e) => {
                         if (this.source === 'github') {
                             const btns = Array.from(document.querySelectorAll('.time-btn'));
@@ -761,255 +760,6 @@
             } else {
                 initTrendingProject();
             }
-        })();
-    </script>
-
-    <!-- Sprite Sprite Logic -->
-    <script>
-        (function() {
-            const container = document.getElementById('sprite-container');
-            if (!container || typeof THREE === 'undefined') return;
-
-            // Initialize scene with smaller size for the sprite
-            const width = 180;
-            const height = 180;
-
-            // 1. Scene Setup
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-            camera.position.z = 20;
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            // Clear existing canvas if any
-            container.innerHTML = '';
-            container.appendChild(renderer.domElement);
-
-            // 2. The Sprite Particle Sphere (Smaller and more detailed)
-            const sphereGeometry = new THREE.SphereGeometry(7, 128, 128);
-            const sphereMaterial = new THREE.PointsMaterial({
-                size: 0.12,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.85,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
-            });
-
-            const count = sphereGeometry.attributes.position.count;
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push(1, 1, 1);
-            }
-            sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-            const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
-            scene.add(particleSphere);
-
-            // 3. Face / Eyes (The "Sprite" character feel)
-            const eyeGroup = new THREE.Group();
-            scene.add(eyeGroup);
-
-            const eyeGeo = new THREE.SphereGeometry(0.5, 32, 32);
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            
-            // Arched eye geometry for happy/shy expressions
-            const archedEyeGeo = new THREE.TorusGeometry(0.6, 0.15, 16, 32, Math.PI);
-            
-            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-            leftEye.position.set(-1.8, 1, 6.5);
-            eyeGroup.add(leftEye);
-
-            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-            rightEye.position.set(1.8, 1, 6.5);
-            eyeGroup.add(rightEye);
-
-            // Floating "Water Drop" Ears
-            const earGeo = new THREE.SphereGeometry(1.2, 32, 32);
-            // Stretching the sphere into a drop shape via scale
-            const earMat = new THREE.MeshBasicMaterial({ 
-                color: 0xffffff, 
-                transparent: true, 
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending 
-            });
-            
-            const leftEar = new THREE.Mesh(earGeo, earMat);
-            leftEar.scale.set(0.8, 1.5, 0.8);
-            leftEar.position.set(-8, 5, 0);
-            scene.add(leftEar);
-            
-            const rightEar = new THREE.Mesh(earGeo, earMat);
-            rightEar.scale.set(0.8, 1.5, 0.8);
-            rightEar.position.set(8, 5, 0);
-            scene.add(rightEar);
-
-            // 4. Animation Variables
-            let time = 0;
-            let mouseX = 0;
-            let mouseY = 0;
-            let isHovered = false;
-
-            container.addEventListener('mouseenter', () => isHovered = true);
-            container.addEventListener('mouseleave', () => {
-                isHovered = false;
-                mouseX = 0;
-                mouseY = 0;
-            });
-            window.addEventListener('mousemove', (e) => {
-                const rect = container.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                // Map screen mouse position to -1 to 1 range relative to the sprite
-                mouseX = ((e.clientX - centerX) / window.innerWidth) * 4; 
-                mouseY = ((e.clientY - centerY) / window.innerHeight) * 4;
-
-                // Clamp values to keep eyes within a reasonable range
-                mouseX = Math.max(-1.5, Math.min(1.5, mouseX));
-                mouseY = Math.max(-1.5, Math.min(1.5, mouseY));
-            });
-
-            // 5. Greeting Interaction
-            const greetingEl = document.createElement('div');
-            greetingEl.className = 'sprite-greeting';
-            container.appendChild(greetingEl);
-
-            const greetings = ["EXPLORE!", "STAY CURIOUS", "HELLO!", "GITHUB TRENDS", "AI AGENT!", "NEED HELP?"];
-            let isGreeting = false;
-
-            container.addEventListener('click', () => {
-                if (isGreeting || typeof gsap === 'undefined') return;
-                isGreeting = true;
-
-                // Define reaction pairs: { Message, EyeScale, BlushColor, Shape, Rotation }
-                const reactions = [
-                    { msg: "(>////<)", eyeScale: { x: 1, y: 0.15 }, color: { r: 1, g: 0.5, b: 0.6 }, shape: 'sphere' },
-                    { msg: "😳", eyeScale: { x: 1.8, y: 1.8 }, color: { r: 1, g: 0.4, b: 0.4 }, shape: 'sphere' },
-                    { msg: "(〃∀〃)", eyeScale: { x: 1.2, y: 1.2 }, color: { r: 1, g: 0.6, b: 0.8 }, shape: 'arc', rot: Math.PI }, // Happy ^
-                    { msg: "✨", eyeScale: { x: 1.5, y: 1.5 }, color: { r: 1, g: 1, b: 0.4 }, shape: 'sphere' },
-                    { msg: "(/▽＼)", eyeScale: { x: 1, y: 0.1 }, color: { r: 1, g: 0.5, b: 0.7 }, shape: 'arc', rot: 0 }    // Shy U
-                ];
-
-                const r = reactions[Math.floor(Math.random() * reactions.length)];
-                
-                // 1. Show Emoji
-                greetingEl.innerText = r.msg;
-                greetingEl.classList.add('show');
-
-                // 2. Change Shape & Rotation
-                if (r.shape === 'arc') {
-                    leftEye.geometry = archedEyeGeo;
-                    rightEye.geometry = archedEyeGeo;
-                    leftEye.rotation.x = r.rot;
-                    rightEye.rotation.x = r.rot;
-                } else {
-                    leftEye.geometry = eyeGeo;
-                    rightEye.geometry = eyeGeo;
-                    leftEye.rotation.x = 0;
-                    rightEye.rotation.x = 0;
-                }
-
-                // 3. Blush Color Transition
-                gsap.to([leftEar.material.color, rightEar.material.color], {
-                    r: r.color.r, g: r.color.g, b: r.color.b,
-                    duration: 0.3
-                });
-
-                // 4. Eye Expression Animation
-                gsap.to([leftEye.scale, rightEye.scale], {
-                    x: r.eyeScale.x,
-                    y: r.eyeScale.y,
-                    duration: 0.3,
-                    onComplete: () => {
-                        // Reset after a delay
-                        setTimeout(() => {
-                            gsap.to([leftEar.material.color, rightEar.material.color], {
-                                r: 1, g: 1, b: 1, 
-                                duration: 1
-                            });
-                            // Reset eyes scale & shape
-                            gsap.to([leftEye.scale, rightEye.scale], {
-                                x: 1, y: 1, z: 1,
-                                duration: 0.5,
-                                onComplete: () => {
-                                    leftEye.geometry = eyeGeo;
-                                    rightEye.geometry = eyeGeo;
-                                    leftEye.rotation.x = 0;
-                                    rightEye.rotation.x = 0;
-                                }
-                            });
-                            greetingEl.classList.remove('show');
-                            isGreeting = false;
-                        }, 2000);
-                    }
-                });
-
-                // Bounce in place
-                gsap.to(particleSphere.position, {
-                    y: particleSphere.position.y + 2,
-                    duration: 0.1,
-                    yoyo: true,
-                    repeat: 1
-                });
-            });
-
-            // 6. Loop
-            const originalPositions = sphereGeometry.attributes.position.array.slice();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                time += 0.015;
-
-                // Sphere Wave Simulation
-                const positions = sphereGeometry.attributes.position.array;
-                for (let i = 0; i < count; i++) {
-                    const px = originalPositions[i * 3];
-                    const py = originalPositions[i * 3 + 1];
-                    const pz = originalPositions[i * 3 + 2];
-                    const noise = Math.sin(px * 0.4 + time) * Math.cos(py * 0.4 + time) * Math.sin(pz * 0.4 + time);
-                    const displacement = 1 + noise * 0.15;
-                    positions[i * 3] = px * displacement;
-                    positions[i * 3 + 1] = py * displacement;
-                    positions[i * 3 + 2] = pz * displacement;
-                }
-                sphereGeometry.attributes.position.needsUpdate = true;
-
-                // Floating & Hovering motion
-                container.style.transform = `translateY(${Math.sin(time * 0.8) * 15}px)`;
-
-                // Floating Water Drop Ears Animation
-                leftEar.position.y = 5 + Math.sin(time * 1.5) * 1.5;
-                rightEar.position.y = 5 + Math.cos(time * 1.5) * 1.5;
-                leftEar.rotation.z = Math.sin(time) * 0.2;
-                rightEar.rotation.z = -Math.sin(time) * 0.2;
-
-                // Mouse Tracking & Interaction
-                particleSphere.rotation.y += 0.005; // Base rotation
-                
-                const targetRotX = mouseY * 0.4;
-                const targetRotY = mouseX * 0.4;
-                particleSphere.rotation.x += (targetRotX - particleSphere.rotation.x) * 0.05;
-                particleSphere.rotation.y += (targetRotY - particleSphere.rotation.y) * 0.05;
-
-                // Face follows sphere & mouse
-                eyeGroup.position.copy(particleSphere.position);
-                const lookFactorX = 1.2;
-                const lookFactorY = 0.8;
-                
-                // Track positions
-                leftEye.position.x = -1.8 + mouseX * lookFactorX;
-                leftEye.position.y = 1 - mouseY * lookFactorY;
-                rightEye.position.x = 1.8 + mouseX * lookFactorX;
-                rightEye.position.y = 1 - mouseY * lookFactorY;
-                
-                // Important: Ensure eyes scale is accounted for during tracking if needed, 
-                // but usually scale is independent of position in local space.
-
-                renderer.render(scene, camera);
-            }
-            animate();
         })();
     </script>
 </body>

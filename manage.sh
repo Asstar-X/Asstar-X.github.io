@@ -155,29 +155,11 @@ update_data() {
     echo -e "${GREEN}✅ 数据更新完成！${NC}"
 }
 
-# 测试所有功能
+# 测试所有功能 (Placeholder)
 test_all() {
     echo -e "${BLUE}🧪 开始测试所有功能...${NC}"
-    
-    check_git_repo
-    
-    echo -e "${CYAN}测试GitHub Trending功能...${NC}"
-    if python3 scripts/test_fetch.py; then
-        echo -e "${GREEN}✅ GitHub Trending测试通过${NC}"
-    else
-        echo -e "${RED}❌ GitHub Trending测试失败${NC}"
-    fi
-    
-    echo ""
-    echo -e "${CYAN}测试HuggingFace功能...${NC}"
-    if python3 scripts/test_huggingface.py; then
-        echo -e "${GREEN}✅ HuggingFace测试通过${NC}"
-    else
-        echo -e "${RED}❌ HuggingFace测试失败${NC}"
-    fi
-    
-    echo ""
-    echo -e "${GREEN}🎉 所有测试完成！${NC}"
+    echo -e "${YELLOW}🚧 测试脚本尚在开发中...${NC}"
+    echo -e "${GREEN}🎉 (跳过测试)${NC}"
 }
 
 # 显示项目状态

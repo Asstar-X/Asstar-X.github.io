@@ -14,7 +14,7 @@
     </script>
     <title>项目详情 | Asstar</title>
     <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
         rel="stylesheet">
@@ -174,49 +174,9 @@
                 font-size: 14px;
             }
         }
-
-        /* Sprite Sprite (小精灵) Styles - 与前沿项目保持一致 */
-        #sprite-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 180px;
-            height: 180px;
-            z-index: 10000;
-            pointer-events: auto;
-            cursor: pointer;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
-        }
-
-        .sprite-greeting {
-            position: absolute;
-            top: 0;
-            right: 110%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: #ffffff;
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            pointer-events: none;
-            opacity: 0;
-            transform: scale(0.8) translateX(20px);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 101;
-            white-space: nowrap;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .sprite-greeting.show {
-            opacity: 1;
-            transform: scale(1) translateX(0);
-        }
     </style>
+    <!-- 引入共享的小精灵和聊天功能样式 -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body>
@@ -224,6 +184,39 @@
     <div class="noise-overlay"></div>
     <div id="canvas-container"></div>
     <div id="sprite-container"></div>
+
+    <!-- Chat Dialog -->
+    <div class="chat-dialog" id="chat-dialog">
+        <div class="chat-dialog-header">
+            <div class="chat-dialog-title">
+                <span>✨</span>
+                <span>小精灵助手</span>
+            </div>
+            <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
+        </div>
+        <div class="chat-dialog-messages" id="chat-dialog-messages">
+            <div class="chat-message assistant">
+                <div class="chat-message-avatar">✨</div>
+                <div class="chat-message-content" id="initial-chat-message">
+                    你好！我是小精灵助手，正在陪你看这个项目的详情。有什么我可以帮你的吗？
+                </div>
+            </div>
+        </div>
+        <div class="chat-dialog-input-container">
+            <div class="chat-dialog-input-wrapper">
+                <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
+                <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
+            </div>
+            <div class="typing-indicator" id="chat-typing-indicator">
+                <span>小精灵正在思考</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main>
         <section class="project-detail">
@@ -253,7 +246,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="images/Asstar.jpg" alt="Asstar" class="logo-img">
+                    <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img">
                     <span class="logo-text">ASSTAR</span>
                 </div>
                 <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
@@ -261,19 +254,18 @@
         </div>
     </footer>
 
-
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
+    <script src="lab/config.js"></script>
+    <script src="js/sprite-chat.js"></script>
     <script>
-        // 获取URL参数
+        // 获取URL参数并加载内容
         const urlParams = new URLSearchParams(window.location.search);
-        const file = urlParams.get('file');
+        const fileParam = urlParams.get('file');
 
-        if (file) {
-            // 加载Markdown文件
-            fetch(file)
+        if (fileParam) {
+            fetch(fileParam)
                 .then(response => response.text())
                 .then(md => {
-                    // 简单的Markdown到HTML转换
                     let html = md
                         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                         .replace(/^## (.*$)/gim, '<h2>$1</h2>')
@@ -285,245 +277,41 @@
                         .replace(/^\n/, '<p>')
                         .replace(/\n$/, '</p>');
 
-                    if (!html.startsWith('<p>')) {
-                        html = '<p>' + html;
-                    }
-                    if (!html.endsWith('</p>')) {
-                        html = html + '</p>';
-                    }
+                    if (!html.startsWith('<p>')) html = '<p>' + html;
+                    if (!html.endsWith('</p>')) html = html + '</p>';
 
                     document.getElementById('project-content').innerHTML = html;
 
-                    // 设置页面标题
-                    const fileName = file.split('/').pop().replace('.md', '');
+                    const fileName = fileParam.split('/').pop().replace('.md', '');
                     document.getElementById('project-title').textContent = fileName;
                     document.title = `${fileName} | Asstar`;
+                    
+                    // 初始化小精灵
+                    initSpriteChat(fileName);
                 })
                 .catch(error => {
                     console.error('Error loading file:', error);
                     document.getElementById('project-content').innerHTML = '<p>无法加载项目内容。</p>';
+                    initSpriteChat('项目');
                 });
         } else {
             document.getElementById('project-content').innerHTML = '<p>未指定项目文件。</p>';
+            initSpriteChat('项目');
+        }
+
+        function initSpriteChat(projectName) {
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager({
+                    systemPrompt: `你是一个友好的AI助手，名字叫小精灵。你正在陪同用户阅读一个名为"${projectName}"的项目详情。请基于你对该项目的理解（如果用户提及相关内容）用简洁、友好的方式回答用户的问题。`,
+                    initialMessage: `你好！我是小精灵助手，正在陪你看"${projectName}"项目的详情。有什么想知道的吗？`
+                });
+
+                const initialMsgEl = document.getElementById('initial-chat-message');
+                if (initialMsgEl) {
+                    initialMsgEl.textContent = `你好！我是小精灵助手，正在陪你看"${projectName}"项目的详情。有什么想知道的吗？`;
+                }
+            }
         }
     </script>
-
-    <!-- Sprite Sprite Logic - 同前沿项目的小精灵 -->
-    <script>
-        (function() {
-            const container = document.getElementById('sprite-container');
-            if (!container || typeof THREE === 'undefined') return;
-
-            const width = 180;
-            const height = 180;
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-            camera.position.z = 20;
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.innerHTML = '';
-            container.appendChild(renderer.domElement);
-
-            const sphereGeometry = new THREE.SphereGeometry(7, 128, 128);
-            const sphereMaterial = new THREE.PointsMaterial({
-                size: 0.12,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.85,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
-            });
-
-            const count = sphereGeometry.attributes.position.count;
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push(1, 1, 1);
-            }
-            sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-            const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
-            scene.add(particleSphere);
-
-            const eyeGroup = new THREE.Group();
-            scene.add(eyeGroup);
-
-            const eyeGeo = new THREE.SphereGeometry(0.5, 32, 32);
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const archedEyeGeo = new THREE.TorusGeometry(0.6, 0.15, 16, 32, Math.PI);
-
-            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-            leftEye.position.set(-1.8, 1, 6.5);
-            eyeGroup.add(leftEye);
-
-            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-            rightEye.position.set(1.8, 1, 6.5);
-            eyeGroup.add(rightEye);
-
-            const earGeo = new THREE.SphereGeometry(1.2, 32, 32);
-            const earMat = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending
-            });
-
-            const leftEar = new THREE.Mesh(earGeo, earMat);
-            leftEar.scale.set(0.8, 1.5, 0.8);
-            leftEar.position.set(-8, 5, 0);
-            scene.add(leftEar);
-
-            const rightEar = new THREE.Mesh(earGeo, earMat);
-            rightEar.scale.set(0.8, 1.5, 0.8);
-            rightEar.position.set(8, 5, 0);
-            scene.add(rightEar);
-
-            let time = 0;
-            let mouseX = 0;
-            let mouseY = 0;
-            let isHovered = false;
-
-            container.addEventListener('mouseenter', () => isHovered = true);
-            container.addEventListener('mouseleave', () => {
-                isHovered = false;
-                mouseX = 0;
-                mouseY = 0;
-            });
-            window.addEventListener('mousemove', (e) => {
-                const rect = container.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-
-                mouseX = ((e.clientX - centerX) / window.innerWidth) * 4;
-                mouseY = ((e.clientY - centerY) / window.innerHeight) * 4;
-                mouseX = Math.max(-1.5, Math.min(1.5, mouseX));
-                mouseY = Math.max(-1.5, Math.min(1.5, mouseY));
-            });
-
-            const greetingEl = document.createElement('div');
-            greetingEl.className = 'sprite-greeting';
-            container.appendChild(greetingEl);
-
-            const greetings = ["EXPLORE!", "STAY CURIOUS", "HELLO!", "GITHUB TRENDS", "AI AGENT!", "NEED HELP?"];
-            let isGreeting = false;
-
-            container.addEventListener('click', () => {
-                if (isGreeting || typeof gsap === 'undefined') return;
-                isGreeting = true;
-
-                const reactions = [
-                    { msg: "(>////<)", eyeScale: { x: 1, y: 0.15 }, color: { r: 1, g: 0.5, b: 0.6 }, shape: 'sphere' },
-                    { msg: "😳", eyeScale: { x: 1.8, y: 1.8 }, color: { r: 1, g: 0.4, b: 0.4 }, shape: 'sphere' },
-                    { msg: "(〃∀〃)", eyeScale: { x: 1.2, y: 1.2 }, color: { r: 1, g: 0.6, b: 0.8 }, shape: 'arc', rot: Math.PI },
-                    { msg: "✨", eyeScale: { x: 1.5, y: 1.5 }, color: { r: 1, g: 1, b: 0.4 }, shape: 'sphere' },
-                    { msg: "(/▽＼)", eyeScale: { x: 1, y: 0.1 }, color: { r: 1, g: 0.5, b: 0.7 }, shape: 'arc', rot: 0 }
-                ];
-
-                const r = reactions[Math.floor(Math.random() * reactions.length)];
-
-                greetingEl.innerText = r.msg;
-                greetingEl.classList.add('show');
-
-                if (r.shape === 'arc') {
-                    leftEye.geometry = archedEyeGeo;
-                    rightEye.geometry = archedEyeGeo;
-                    leftEye.rotation.x = r.rot;
-                    rightEye.rotation.x = r.rot;
-                } else {
-                    leftEye.geometry = eyeGeo;
-                    rightEye.geometry = eyeGeo;
-                    leftEye.rotation.x = 0;
-                    rightEye.rotation.x = 0;
-                }
-
-                gsap.to([leftEar.material.color, rightEar.material.color], {
-                    r: r.color.r, g: r.color.g, b: r.color.b,
-                    duration: 0.3
-                });
-
-                gsap.to([leftEye.scale, rightEye.scale], {
-                    x: r.eyeScale.x,
-                    y: r.eyeScale.y,
-                    duration: 0.3,
-                    onComplete: () => {
-                        setTimeout(() => {
-                            gsap.to([leftEar.material.color, rightEar.material.color], {
-                                r: 1, g: 1, b: 1,
-                                duration: 1
-                            });
-                            gsap.to([leftEye.scale, rightEye.scale], {
-                                x: 1, y: 1, z: 1,
-                                duration: 0.5,
-                                onComplete: () => {
-                                    leftEye.geometry = eyeGeo;
-                                    rightEye.geometry = eyeGeo;
-                                    leftEye.rotation.x = 0;
-                                    rightEye.rotation.x = 0;
-                                }
-                            });
-                            greetingEl.classList.remove('show');
-                            isGreeting = false;
-                        }, 2000);
-                    }
-                });
-
-                gsap.to(particleSphere.position, {
-                    y: particleSphere.position.y + 2,
-                    duration: 0.1,
-                    yoyo: true,
-                    repeat: 1
-                });
-            });
-
-            const originalPositions = sphereGeometry.attributes.position.array.slice();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                time += 0.015;
-
-                const positions = sphereGeometry.attributes.position.array;
-                for (let i = 0; i < count; i++) {
-                    const px = originalPositions[i * 3];
-                    const py = originalPositions[i * 3 + 1];
-                    const pz = originalPositions[i * 3 + 2];
-                    const noise = Math.sin(px * 0.4 + time) * Math.cos(py * 0.4 + time) * Math.sin(pz * 0.4 + time);
-                    const displacement = 1 + noise * 0.15;
-                    positions[i * 3] = px * displacement;
-                    positions[i * 3 + 1] = py * displacement;
-                    positions[i * 3 + 2] = pz * displacement;
-                }
-                sphereGeometry.attributes.position.needsUpdate = true;
-
-                container.style.transform = `translateY(${Math.sin(time * 0.8) * 15}px)`;
-
-                leftEar.position.y = 5 + Math.sin(time * 1.5) * 1.5;
-                rightEar.position.y = 5 + Math.cos(time * 1.5) * 1.5;
-                leftEar.rotation.z = Math.sin(time) * 0.2;
-                rightEar.rotation.z = -Math.sin(time) * 0.2;
-
-                particleSphere.rotation.y += 0.005;
-
-                const targetRotX = mouseY * 0.4;
-                const targetRotY = mouseX * 0.4;
-                particleSphere.rotation.x += (targetRotX - particleSphere.rotation.x) * 0.05;
-                particleSphere.rotation.y += (targetRotY - particleSphere.rotation.y) * 0.05;
-
-                eyeGroup.position.copy(particleSphere.position);
-                const lookFactorX = 1.2;
-                const lookFactorY = 0.8;
-
-                leftEye.position.x = -1.8 + mouseX * lookFactorX;
-                leftEye.position.y = 1 - mouseY * lookFactorY;
-                rightEye.position.x = 1.8 + mouseX * lookFactorX;
-                rightEye.position.y = 1 - mouseY * lookFactorY;
-
-                renderer.render(scene, camera);
-            }
-            animate();
-        })();
-    </script>
 </body>
-
 </html>
