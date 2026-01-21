@@ -614,7 +614,7 @@
         <div class="chat-dialog-header">
             <div class="chat-dialog-title">
                 <span>✨</span>
-                <span>小精灵助手</span>
+                <span>As</span>
             </div>
             <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
         </div>
@@ -622,7 +622,7 @@
             <div class="chat-message assistant">
                 <div class="chat-message-avatar">✨</div>
                 <div class="chat-message-content">
-                    你好！我是小精灵助手，可以帮你了解这些提效工具的信息。有什么想知道的吗？
+                    你好！我是As，可以帮你了解这些提效工具的信息。有什么想知道的吗？
                 </div>
             </div>
         </div>
@@ -632,7 +632,7 @@
                 <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
             </div>
             <div class="typing-indicator" id="chat-typing-indicator">
-                <span>小精灵正在思考</span>
+                <span>As 正在思考</span>
                 <div class="typing-dots">
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
@@ -1440,10 +1440,7 @@
         // Initialize sprite chat with custom options for tools page
         document.addEventListener('DOMContentLoaded', () => {
             if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager({
-                    systemPrompt: '你是一个友好的AI助手，名字叫小精灵。你帮助用户了解各种提效工具的功能和使用方法。请用简洁、友好的方式回答问题。',
-                    initialMessage: '你好！我是小精灵助手，可以帮你了解这些提效工具的信息。有什么想知道的吗？'
-                });
+                window.spriteChatManager = new window.SpriteChatManager();
             }
         });
     </script>

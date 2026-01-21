@@ -1,14 +1,5 @@
 # Asstar - 探索未知的边界
 
-<div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-  <img src="./images/Asstar.jpg" alt="Asstar Logo" style="width: 300px; height: 300px; flex: 0 0 auto;">
-  <div style="flex: 1; min-width: 300px;">
-    Asstar是一个为创作者、开发者与创新者打造的智能平台。我们聚合并解析全球前沿动态，将海量信息转化为您的清晰行动指南，助您高效探索、激发灵感并保持技术领先。
-  </div>
-</div>
-
----
-
 ## 🌟 关于 Asstar
 
 Asstar 是一个以探索为核心的网站，通过前沿技术、沉浸式体验和多样化内容，带你发现科学、艺术、技术等领域的无限魅力。我们希望每位用户都能在这里找到灵感，点燃好奇心，开启属于自己的探索之旅。
@@ -33,7 +24,7 @@ Asstar 是一个以探索为核心的网站，通过前沿技术、沉浸式体�
 
 ## 📸 网站预览
 
-![网站截图](./images/website_photo.jpg) <!-- 替换为你的网站截图链接 -->
+![网站截图](./assets/images/website_photo.jpg) <!-- 替换为你的网站截图链接 -->
 
 > **立即体验**: 访问 [Asstar 官网](https://asstar-x.github.io/) 开启你的探索之旅！ <!-- 替换为你的网站链接 -->
 
@@ -77,8 +68,8 @@ Asstar 是一个以探索为核心的网站，通过前沿技术、沉浸式体�
 - **官网**: [Asstar](https://asstar-x.github.io/)
 - **邮箱**: yxy138646@gmail.com
 - **社区**: WX：GitscYee
-![社区群](./images/AI_group.jpg) 
-![作者](./images/Author.jpg) 
+![社区群](./assets/images/AI_group.jpg) 
+![作者](./assets/images/Author.jpg) 
 - **反馈**: 在 GitHub Issues 中提交建议或想法
 
 ---

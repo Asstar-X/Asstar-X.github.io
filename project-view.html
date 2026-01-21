@@ -175,48 +175,12 @@
             }
         }
     </style>
-    <!-- 引入共享的小精灵和聊天功能样式 -->
-    <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body>
     <!-- 宇宙背景层，与前沿项目保持结构一致 -->
     <div class="noise-overlay"></div>
     <div id="canvas-container"></div>
-    <div id="sprite-container"></div>
-
-    <!-- Chat Dialog -->
-    <div class="chat-dialog" id="chat-dialog">
-        <div class="chat-dialog-header">
-            <div class="chat-dialog-title">
-                <span>✨</span>
-                <span>小精灵助手</span>
-            </div>
-            <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
-        </div>
-        <div class="chat-dialog-messages" id="chat-dialog-messages">
-            <div class="chat-message assistant">
-                <div class="chat-message-avatar">✨</div>
-                <div class="chat-message-content" id="initial-chat-message">
-                    你好！我是小精灵助手，正在陪你看这个项目的详情。有什么我可以帮你的吗？
-                </div>
-            </div>
-        </div>
-        <div class="chat-dialog-input-container">
-            <div class="chat-dialog-input-wrapper">
-                <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
-                <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
-            </div>
-            <div class="typing-indicator" id="chat-typing-indicator">
-                <span>小精灵正在思考</span>
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <main>
         <section class="project-detail">
@@ -255,8 +219,6 @@
     </footer>
 
     <script src="js/script.js"></script>
-    <script src="lab/config.js"></script>
-    <script src="js/sprite-chat.js"></script>
     <script>
         // 获取URL参数并加载内容
         const urlParams = new URLSearchParams(window.location.search);
@@ -285,32 +247,13 @@
                     const fileName = fileParam.split('/').pop().replace('.md', '');
                     document.getElementById('project-title').textContent = fileName;
                     document.title = `${fileName} | Asstar`;
-                    
-                    // 初始化小精灵
-                    initSpriteChat(fileName);
                 })
                 .catch(error => {
                     console.error('Error loading file:', error);
                     document.getElementById('project-content').innerHTML = '<p>无法加载项目内容。</p>';
-                    initSpriteChat('项目');
                 });
         } else {
             document.getElementById('project-content').innerHTML = '<p>未指定项目文件。</p>';
-            initSpriteChat('项目');
-        }
-
-        function initSpriteChat(projectName) {
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager({
-                    systemPrompt: `你是一个友好的AI助手，名字叫小精灵。你正在陪同用户阅读一个名为"${projectName}"的项目详情。请基于你对该项目的理解（如果用户提及相关内容）用简洁、友好的方式回答用户的问题。`,
-                    initialMessage: `你好！我是小精灵助手，正在陪你看"${projectName}"项目的详情。有什么想知道的吗？`
-                });
-
-                const initialMsgEl = document.getElementById('initial-chat-message');
-                if (initialMsgEl) {
-                    initialMsgEl.textContent = `你好！我是小精灵助手，正在陪你看"${projectName}"项目的详情。有什么想知道的吗？`;
-                }
-            }
         }
     </script>
 </body>

@@ -21,8 +21,6 @@
     <!-- 引入 Three.js 和 GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <!-- 引入共享的小精灵和聊天功能样式 -->
-    <link rel="stylesheet" href="css/sprite-chat.css">
     <style>
         /* 与 space.html 一致的玻璃拟态返回按钮样式 */
         .glass-panel {
@@ -64,41 +62,7 @@
     <div class="noise-overlay"></div>
     <!-- 宇宙背景层 -->
     <canvas id="canvas-background"></canvas>
-    <div id="sprite-container"></div>
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
-    
-    <!-- Chat Dialog -->
-    <div class="chat-dialog" id="chat-dialog">
-        <div class="chat-dialog-header">
-            <div class="chat-dialog-title">
-                <span>✨</span>
-                <span>小精灵助手</span>
-            </div>
-            <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
-        </div>
-        <div class="chat-dialog-messages" id="chat-dialog-messages">
-            <div class="chat-message assistant">
-                <div class="chat-message-avatar">✨</div>
-                <div class="chat-message-content">
-                    你好！我是小精灵助手，可以帮你了解这些项目的信息。有什么想知道的吗？
-                </div>
-            </div>
-        </div>
-        <div class="chat-dialog-input-container">
-            <div class="chat-dialog-input-wrapper">
-                <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
-                <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
-            </div>
-            <div class="typing-indicator" id="chat-typing-indicator">
-                <span>小精灵正在思考</span>
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- 导航栏 -->
     <header class="header">
@@ -146,19 +110,8 @@
     </footer>
 
     <script src="js/script.js"></script>
-    <script src="lab/config.js"></script>
-    <script src="js/sprite-chat.js"></script>
     <script>
         loadProjects('projects-grid', Infinity);
-        // Initialize sprite chat with custom options for projects page
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager({
-                    systemPrompt: '你是一个友好的AI助手，名字叫小精灵。你帮助用户了解AI Lab项目和相关信息。请用简洁、友好的方式回答问题。',
-                    initialMessage: '你好！我是小精灵助手，可以帮你了解这些项目的信息。有什么想知道的吗？'
-                });
-            }
-        });
     </script>
 </body>
 

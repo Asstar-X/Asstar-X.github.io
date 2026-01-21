@@ -473,19 +473,44 @@
     opacity: 0.8;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .chat-dialog {
-        width: calc(100% - 40px);
-        right: 20px;
-        max-height: 80vh;
-        border-radius: 28px 16px 28px 24px;
+        width: 100%;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        transform: translateY(100%);
+        border-radius: 32px 32px 0 0;
     }
+    
+    .chat-dialog.show {
+        transform: translateY(0);
+    }
+}
 
-    .chat-dialog-header {
-        border-radius: 28px 16px 0 0;
-    }
+/* As's Inner Thoughts (Status Block) */
+.chat-message-status {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dotted rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    display: block;
+}
 
-    .chat-dialog-input-container {
-        border-radius: 0 0 28px 24px;
-    }
+.chat-message-status::before {
+    content: '💭 As的心声: ';
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: normal;
+}
+
+/* Paragraph spacing in messages */
+.chat-message-content p {
+    margin-bottom: 0.8em;
+}
+
+.chat-message-content p:last-child {
+    margin-bottom: 0;
 }
