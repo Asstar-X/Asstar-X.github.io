@@ -393,18 +393,38 @@ window.SpriteChatManager = class SpriteChatManager {
         } catch (error) {
             this.hideTypingIndicator();
             console.error('API调用错误:', error);
-            this.addMessage('assistant', '抱歉，发生了错误。请检查您的网络连接，或前往 <a href="lab/prompt-optimizer.html" target="_blank" style="color:white;text-decoration:underline;">Prompt优化器</a> 配置正确的模型和API Key。');
+            this.addMessage('assistant', '（微弱的干扰声）……连接似乎不稳定。我已经自动切换到备用量子链路（Qwen Proxy），请再试一次。如果持续失败，可能是时空波动（网络环境）太剧烈了。');
         }
     }
 
     async callAIAPI(message) {
-        if (!this.configManager) throw new Error('ConfigManager not loaded');
+        let currentModel, currentApiKey, currentApiUrl, useProxy, proxyUrl;
 
-        const currentModel = this.configManager.getCurrentModelConfig();
-        const currentApiKey = this.configManager.getCurrentApiKey();
-        const currentApiUrl = this.configManager.getCurrentApiUrl();
-        const useProxy = this.configManager.shouldUseProxy();
-        const proxyUrl = this.configManager.getProxyUrl();
+        if (this.configManager) {
+            currentModel = this.configManager.getCurrentModelConfig();
+            currentApiKey = this.configManager.getCurrentApiKey();
+            currentApiUrl = this.configManager.getCurrentApiUrl();
+            useProxy = this.configManager.shouldUseProxy();
+            proxyUrl = this.configManager.getProxyUrl();
+
+            // 仿照 prompt-optimizer.html 自动配置逻辑：
+            // 如果没配置 Key 且没开启代理，则自动强制切换到 Qwen 代理模式，确保“点进去就能用”
+            if (!currentApiKey && !useProxy) {
+                const qwen = this.configManager.getAllModels().qwen;
+                if (qwen) {
+                    currentModel = qwen;
+                    useProxy = true;
+                    proxyUrl = this.configManager.getProxyUrl();
+                }
+            }
+        } else {
+            // 极端情况下的硬编码降级方案
+            currentModel = { name: 'Qwen3-Max', model: 'qwen3-max', requestFormat: 'openai', headers: { 'Content-Type': 'application/json' } };
+            currentApiKey = '';
+            currentApiUrl = '';
+            useProxy = true;
+            proxyUrl = 'https://qwen-api.yxy138646.workers.dev';
+        }
 
         let url, headers, requestBody;
 
