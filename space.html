@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts: 使用更有现代感和科技感的字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>Asstar Space | Deep Universe</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <style>
+        :root {
+            --primary-color: #00f2ff; /* 赛博青 */
+            --secondary-color: #7000ff; /* 深邃紫 */
+            --glass-bg: rgba(10, 15, 30, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #a0a0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 防止文本被意外选中影响体验 */
+        }
+
+        body {
+            font-family: 'Exo 2', 'Montserrat', sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: var(--text-main);
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 电影感暗角遮罩 */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 200px rgba(0,0,0,0.9) inset;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* UI 通用玻璃拟态 */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* 返回按钮 */
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 操作提示 - 极简风 */
+        .operation-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 100;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        /* 行星详情模态框 - 高端设计 */
+        .planet-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 380px;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            border-radius: 20px;
+            padding: 40px;
+            z-index: 1000;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .planet-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-header h3 {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .planet-type {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .planet-description {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-dim);
+            text-align: justify;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .group-section {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .data-label {
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 5px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .data-value {
+            color: #fff;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .qrcode {
+            width: 140px;
+            height: 140px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .qrcode:hover {
+            transform: scale(1.05);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(112, 0, 255, 0.1));
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            font-weight: 600;
+            color: #000;
+        }
+
+        /* Toast 提示 */
+        .info-toast {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-left: 3px solid var(--primary-color);
+            padding: 15px 30px;
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 2000;
+        }
+
+        .info-toast.show {
+            transform: translateX(0);
+        }
+
+        /* Loading */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s ease;
+        }
+        
+        .loader-text {
+            margin-top: 20px;
+            font-size: 10px;
+            letter-spacing: 5px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .planet-modal { width: 90%; padding: 25px; }
+            .modal-header h3 { font-size: 24px; }
+            .back-button { padding: 10px 18px; top: 20px; left: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="vignette"></div>
+
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader-text">Initializing Universe...</div>
+    </div>
+
+    <a href="index.html" class="back-button glass-panel">
+        &larr; 返回首页
+    </a>
+
+    <div id="canvas-container"></div>
+    
+    <div class="operation-hint">
+        Explore: Drag &bull; Scroll &bull; Click Planets
+    </div>
+    
+    <!-- 详情弹窗 -->
+    <div class="planet-modal glass-panel" id="planet-modal">
+        <button class="close-btn" id="close-modal">&times;</button>
+        <div class="modal-header">
+            <h3 id="modal-planet-name">Planet</h3>
+            <div class="planet-type" id="modal-planet-type">Type</div>
+        </div>
+        
+        <div class="modal-content">
+            <div class="planet-description" id="modal-planet-description"></div>
+            
+            <div class="group-section">
+                <div class="data-row">
+                    <div class="data-item">
+                        <span class="data-label">GROUP ID</span>
+                        <span class="data-value" id="modal-group-number">--</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">MEMBERS</span>
+                        <span class="data-value" id="modal-group-members">--</span>
+                    </div>
+                </div>
+
+                <div class="qrcode" id="modal-qrcode">
+                    <!-- 二维码图片将通过JS插入 -->
+                </div>
+                <button class="action-btn" onclick="copyGroupNumber()">Join Frequency</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="info-toast" id="info-toast">System Message</div>
+
+    <!-- Three.js Dependencies (Include Post-Processing) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Post Processing Scripts for Bloom Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+    <script>
+        // --- Configuration ---
+        const CONFIG = {
+            bloomStrength: 1.8,  // 辉光强度
+            bloomRadius: 0.5,    // 辉光半径
+            bloomThreshold: 0.2, // 辉光阈值
+            ambientLight: 0.05,  // 极暗的环境光，增强对比度
+            starCount: 6000,
+            autoRotateSpeed: 0.3
+        };
+
+        // --- Global Variables ---
+        let scene, camera, renderer, controls, composer;
+        let planets = [];
+        let sunMesh;
+        let time = 0;
+        let raycaster, mouse;
+        
+        // --- Data ---
+        const planetData = [
+            {
+                name: 'MUSE AURORA',
+                cnName: '缪斯极光',
+                color: 0x4169E1,
+                atmosphereColor: 0x00ffff,
+                type: 'Terrestrial',
+                orbitRadius: 55,
+                size: 4.5,
+                speed: 0.003,
+                description: '汇聚宇宙间的灵感碎片，这里是艺术家与梦想家的终极归宿。大气层中流淌着液态的灵感，每一次呼吸都是一次思维的觉醒。',
+                groupNumber: 'GitscYee',
+                groupMembers: 23
+            },
+            {
+                name: 'LUMINARIA',
+                cnName: '流光书海',
+                color: 0xD3D3D3,
+                atmosphereColor: 0xffffff,
+                type: 'Satellite',
+                orbitRadius: 75,
+                size: 2.2,
+                speed: 0.005,
+                description: '漂浮在静谧虚空中的智慧结晶，表面刻满了宇宙真理的符文。这里没有喧嚣，只有对未知的永恒探索与沉思，每一道光都是一部未完的史诗。',
+                groupNumber: 'GitscYee',
+                groupMembers: 56
+            },
+            {
+                name: 'NEON FORGE',
+                cnName: '霓虹锻界',
+                color: 0xFF4500,
+                atmosphereColor: 0xff3300,
+                type: 'Industrial',
+                orbitRadius: 100,
+                size: 4,
+                speed: 0.002,
+                description: '闪耀着赛博朋克光芒的未来世界。硅基生命与碳基生命的完美融合，每一个代码脉冲都在重塑现实的边界，废墟与霓虹在此共同孕育新文明。',
+                groupNumber: 'GitscYee',
+                groupMembers: 72
+            },
+            {
+                name: 'WHISPER RING',
+                cnName: '风语环廊',
+                color: 0xDAA520,
+                atmosphereColor: 0xffcc00,
+                type: 'Gas Giant',
+                orbitRadius: 140,
+                size: 9,
+                speed: 0.001,
+                description: '巨大的气态行星，表面风暴涌动着全宇宙的信息流。它是星际网络的中枢，在这里，真相与流言在环廊间回响，像风一样穿梭于万千文明。',
+                groupNumber: 'GitscYee',
+                groupMembers: 70
+            }
+        ];
+
+        // --- Initialization ---
+        function init() {
+            // 1. Scene Setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.0015); // 黑色雾气增加深邃感
+
+            // 2. Camera Setup
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 40, 180);
+
+            // 3. Renderer Setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ReinhardToneMapping; // 电影感色调映射
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // 4. Post-Processing (Bloom Effect) - 关键步骤
+            const renderScene = new THREE.RenderPass(scene, camera);
+            const bloomPass = new THREE.UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                1.5, 0.4, 0.85
+            );
+            bloomPass.threshold = CONFIG.bloomThreshold;
+            bloomPass.strength = CONFIG.bloomStrength;
+            bloomPass.radius = CONFIG.bloomRadius;
+
+            composer = new THREE.EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            // 5. Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 50;
+            controls.maxDistance = 400;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = CONFIG.autoRotateSpeed;
+
+            // 6. Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, CONFIG.ambientLight);
+            scene.add(ambientLight);
+            
+            // 太阳点光源
+            const sunLight = new THREE.PointLight(0xffffff, 1.5, 400);
+            scene.add(sunLight);
+
+            // 7. Create Objects
+            createStarfield();
+            createSun();
+            createPlanets();
+
+            // 8. Events
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            window.addEventListener('resize', onWindowResize, false);
+            renderer.domElement.addEventListener('click', onMouseClick, false);
+            
+            // UI interaction
+            setupUI();
+
+            // Remove loading screen
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = 0;
+                setTimeout(() => loader.remove(), 1000);
+            }, 1500);
+
+            animate();
+        }
+
+        // --- Object Creation Functions ---
+
+        // 创建多层级星空
+        function createStarfield() {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            
+            for (let i = 0; i < CONFIG.starCount; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = (Math.random() - 0.5) * 2000;
+                const z = (Math.random() - 0.5) * 2000;
+                positions.push(x, y, z);
+
+                // 星星颜色微调，偏蓝/白
+                const colorType = Math.random();
+                let color;
+                if (colorType > 0.9) color = new THREE.Color(0xadd8e6); // 浅蓝
+                else if (colorType > 0.7) color = new THREE.Color(0xffd700); // 微金
+                else color = new THREE.Color(0xffffff); // 白
+                
+                colors.push(color.r, color.g, color.b);
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 1.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+            
+            const starField = new THREE.Points(geometry, material);
+            scene.add(starField);
+        }
+
+        // 高级太阳着色器
+        function createSun() {
+            const geometry = new THREE.SphereGeometry(12, 64, 64);
+            
+            // 使用自定义Shader模拟太阳表面湍流
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    color1: { value: new THREE.Color(0xffaa00) }, // 深橙
+                    color2: { value: new THREE.Color(0xffddaa) }  // 亮黄
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    varying vec3 vNormal;
+                    void main() {
+                        vUv = uv;
+                        vNormal = normalize(normalMatrix * normal);
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    uniform vec3 color1;
+                    uniform vec3 color2;
+                    varying vec2 vUv;
+                    
+                    // 简化的噪声函数
+                    float noise(vec2 p) {
+                        return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+                    }
+                    
+                    void main() {
+                        vec2 p = vUv * 8.0; 
+                        float n = noise(p + time * 0.2); 
+                        
+                        // 混合颜色模拟耀斑
+                        vec3 finalColor = mix(color1, color2, n + 0.2);
+                        
+                        // 边缘发光增强 (Bloom会处理大部分，这里做基础)
+                        gl_FragColor = vec4(finalColor, 1.0);
+                    }
+                `,
+                side: THREE.DoubleSide
+            });
+
+            sunMesh = new THREE.Mesh(geometry, material);
+            
+            // 太阳外层辉光 (Bloom会放大这个效果)
+            const glowGeo = new THREE.SphereGeometry(13.5, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xff4500,
+                transparent: true,
+                opacity: 0.15
+            });
+            const sunGlow = new THREE.Mesh(glowGeo, glowMat);
+            sunMesh.add(sunGlow);
+
+            scene.add(sunMesh);
+        }
+
+        // 菲涅尔大气层Shader (让行星看起来有体积感)
+        function getAtmosphereMaterial(color) {
+            return new THREE.ShaderMaterial({
+                uniforms: {
+                    c: { type: "f", value: 0.7 },
+                    p: { type: "f", value: 3.0 },
+                    glowColor: { type: "c", value: new THREE.Color(color) },
+                    viewVector: { type: "v3", value: camera.position }
+                },
+                vertexShader: `
+                    uniform vec3 viewVector;
+                    varying float intensity;
+                    void main() {
+                        vec3 vNormal = normalize(normalMatrix * normal);
+                        vec3 vNormel = normalize(normalMatrix * viewVector);
+                        intensity = pow(c - dot(vNormal, vNormel), p);
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 glowColor;
+                    varying float intensity;
+                    void main() {
+                        vec3 glow = glowColor * intensity;
+                        gl_FragColor = vec4(glow, 1.0);
+                    }
+                `,
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+        }
+
+        function createPlanets() {
+            planetData.forEach(data => {
+                const planetGroup = new THREE.Group();
+                data.angle = Math.random() * Math.PI * 2;
+
+                // 1. 行星本体 (程序化纹理，避免加载外部图片)
+                const geometry = new THREE.SphereGeometry(data.size, 64, 64);
+                // 使用 MeshPhysicalMaterial 获得更好的光照反应
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: data.color,
+                    roughness: 0.6,
+                    metalness: 0.1,
+                    reflectivity: 0.2,
+                    flatShading: false
+                });
+                
+                const planet = new THREE.Mesh(geometry, material);
+                planetGroup.add(planet);
+
+                // 2. 大气层辉光 (Fresnel)
+                const atmoGeo = new THREE.SphereGeometry(data.size * 1.2, 64, 64);
+                const atmoMat = getAtmosphereMaterial(data.atmosphereColor);
+                const atmosphere = new THREE.Mesh(atmoGeo, atmoMat);
+                planet.add(atmosphere); // Add to planet so it rotates with it
+                planetGroup.atmosphere = atmosphere;
+
+                // 3. 极简轨道线
+                const orbitCurve = new THREE.EllipseCurve(
+                    0, 0,
+                    data.orbitRadius, data.orbitRadius,
+                    0, 2 * Math.PI,
+                    false, 0
+                );
+                const points = orbitCurve.getPoints(128);
+                const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
+                const orbitMat = new THREE.LineBasicMaterial({ 
+                    color: 0xffffff, 
+                    transparent: true, 
+                    opacity: 0.08 
+                });
+                const orbit = new THREE.Line(orbitGeo, orbitMat);
+                orbit.rotation.x = Math.PI / 2;
+                scene.add(orbit);
+
+                // 4. 数据绑定
+                planetGroup.userData = data;
+                planet.userData = { parentGroup: planetGroup, ...data }; // Raycast hit uses this
+                
+                scene.add(planetGroup);
+                planets.push(planetGroup);
+            });
+        }
+
+        // --- Interaction ---
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseClick(event) {
+            // 当点击时暂停自动旋转
+            controls.autoRotate = false;
+            setTimeout(() => { controls.autoRotate = true; }, 5000);
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // 获取所有行星 Mesh
+            const planetMeshes = planets.map(g => g.children[0]);
+            const intersects = raycaster.intersectObjects(planetMeshes);
+
+            if (intersects.length > 0) {
+                const target = intersects[0].object.userData;
+                showModal(target);
+            }
+        }
+
+        function showModal(data) {
+            const modal = document.getElementById('planet-modal');
+            const nameEl = document.getElementById('modal-planet-name');
+            const typeEl = document.getElementById('modal-planet-type');
+            const descEl = document.getElementById('modal-planet-description');
+            const numEl = document.getElementById('modal-group-number');
+            const memEl = document.getElementById('modal-group-members');
+            const qrEl = document.getElementById('modal-qrcode');
+
+            nameEl.innerText = data.cnName + ' / ' + data.name;
+            typeEl.innerText = `CLASS: ${data.type} PLANET`;
+            descEl.innerText = data.description;
+            numEl.innerText = data.groupNumber;
+            memEl.innerText = data.groupMembers;
+
+            // 根据星球类型选择对应的群组图片
+            let groupImage = 'images/AI_group.jpg'; // 默认使用科技群图片
+            if (data.cnName === '流光书海') {
+                groupImage = 'images/READ_group.jpg'; // 文学星球使用读书群图片
+            } else if (data.cnName === '霓虹锻界') {
+                groupImage = 'images/AI_group.jpg'; // 科技星球使用AI群图片
+            }
+            qrEl.innerHTML = `<img src="${groupImage}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="QR Code">`;
+
+            modal.classList.add('active');
+        }
+
+        function setupUI() {
+            document.getElementById('close-modal').addEventListener('click', () => {
+                document.getElementById('planet-modal').classList.remove('active');
+            });
+            
+            // 点击外部关闭
+            document.addEventListener('click', (e) => {
+                const modal = document.getElementById('planet-modal');
+                if (!modal.contains(e.target) && e.target.tagName !== 'CANVAS' && !e.target.closest('.planet-modal')) {
+                    // 逻辑略微复杂，这里简化：如果是点击Canvas以外的地方才处理，或者Canvas点击没点到行星时
+                    // 简单处理：只通过关闭按钮关闭，避免误触
+                }
+            });
+        }
+
+        // --- Animation ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += 0.005;
+
+            // 1. Sun Animation
+            if (sunMesh) {
+                sunMesh.material.uniforms.time.value = time;
+                sunMesh.rotation.y += 0.002;
+            }
+
+            // 2. Planet Animation
+            planets.forEach(p => {
+                const data = p.userData;
+                
+                // 公转
+                data.angle += data.speed;
+                p.position.x = Math.cos(data.angle) * data.orbitRadius;
+                p.position.z = Math.sin(data.angle) * data.orbitRadius;
+                
+                // 自转
+                p.children[0].rotation.y += 0.01;
+                
+                // 更新大气层Shader视角向量
+                if (p.atmosphere) {
+                    p.atmosphere.material.uniforms.viewVector.value = new THREE.Vector3().subVectors(camera.position, p.position);
+                }
+            });
+
+            controls.update();
+            
+            // 使用 composer 替代 renderer.render
+            composer.render();
+        }
+
+        // --- Utilities ---
+        window.copyGroupNumber = function() {
+            const num = document.getElementById('modal-group-number').innerText;
+            navigator.clipboard.writeText(num).then(() => {
+                showToast('FREQUENCY COPIED: ' + num);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('info-toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+</html>
