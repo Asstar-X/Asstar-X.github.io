@@ -13,15 +13,19 @@
         gtag('config', 'G-RBTWR9QNMQ');
     </script>
     <title>AI Lab - 全部项目 | Asstar</title>
-    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
     <link rel="stylesheet" href="css/styles.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap"
         rel="stylesheet">
     <!-- 引入 Three.js 和 GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <style>
+        body { 
+            background: #050505 !important; 
+        }
+
         /* 与 space.html 一致的玻璃拟态返回按钮样式 */
         .glass-panel {
             background: rgba(10, 15, 30, 0.65);
@@ -55,39 +59,53 @@
             text-shadow: 0 0 10px #ffffff;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
+
+        /* 修复背景层级 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .noise-overlay {
+            z-index: 1;
+        }
+
+        main {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            z-index: 1000;
+        }
+
+        .footer {
+            z-index: 2;
+        }
     </style>
 </head>
 
 <body>
     <div class="noise-overlay"></div>
     <!-- 宇宙背景层 -->
-    <canvas id="canvas-background"></canvas>
+    <div id="canvas-container"></div>
+    
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
-
-    <!-- 导航栏 -->
-    <header class="header">
-        <nav class="nav">
-            <a href="space.html" class="logo">
-                <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img" title="点击进入探索">
-                <span class="logo-text">ASSTAR</span>
-            </a>
-            <ul class="nav-links">
-            </ul>
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-    </header>
 
     <main>
         <!-- AI Lab区域 -->
         <section class="projects">
             <div class="container">
-                <div class="section-header">
-                    <h1 class="section-title">AI Lab - 全部项目</h1>
-                    <div class="section-line"></div>
+                <div class="lab-header">
+                    <div class="lab-title-bg">AI LAB</div>
+                    <div class="lab-title-wrapper">
+                        <h1 class="lab-title">AI Lab</h1>
+                        <div class="lab-line-decoder"></div>
+                    </div>
                 </div>
                 <div class="projects-grid" id="projects-grid">
                     <!-- 动态加载的项目卡片将插入这里 -->
@@ -101,7 +119,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <div class="logo-symbol">✦</div>
+                    <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img">
                     <span class="logo-text">ASSTAR</span>
                 </div>
                 <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
