@@ -314,6 +314,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Init Canvas Background
     new AntigravityBackground('canvas-background');
     loadProjects();
+    
+    // 监听窗口大小变化以适配星系布局
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const galacticTimeline = document.getElementById('galactic-timeline');
+            if (galacticTimeline) {
+                loadProjects('galactic-timeline');
+            }
+        }, 250);
+    });
 
     // 汉堡菜单交互
     const navToggle = document.querySelector('.nav-toggle');
@@ -397,43 +409,157 @@ function createScrollProgress() {
 createScrollProgress();
 
 // 通用项目加载函数
-function loadProjects(gridId, maxShow = 3) {
+function loadProjects(containerId = 'galactic-timeline') {
     fetch('projects/list.json')
         .then(res => res.json())
         .then(projectFiles => {
-            const grid = document.getElementById(gridId);
-            if (!grid) return;
-            grid.innerHTML = '';
-            for (let i = 0; i < Math.min(maxShow, projectFiles.length); i++) {
-                const card = document.createElement('div');
-                card.className = 'project-card';
-                const fileName = projectFiles[i].replace(/\.md$/, '');
-                card.innerHTML = `
-                    <div class="project-visual"><div class="project-orb"></div></div>
-                    <h3>${fileName}</h3>
-                `;
-                card.style.cursor = 'pointer';
-                card.onclick = function () {
-                    window.location.href = `project-view.html?file=projects/${encodeURIComponent(projectFiles[i])}`;
-                };
-                grid.appendChild(card);
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // 现在的逻辑默认全量展示在星系时间轴中
+            renderGalacticTimeline(container, projectFiles);
+        })
+        .catch(err => console.error('Error loading projects:', err));
+}
+
+// 渲染星系时间轴布局 (海量数据优化版)
+function renderGalacticTimeline(container, projects) {
+    const nodesContainer = container.querySelector('.galactic-nodes') || (function() {
+        const div = document.createElement('div');
+        div.className = 'galactic-nodes';
+        container.appendChild(div);
+        return div;
+    })();
+    
+    let svg = container.querySelector('.galactic-svg') || (function() {
+        const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        s.setAttribute("class", "galactic-svg");
+        container.insertBefore(s, nodesContainer);
+        return s;
+    })();
+    
+    nodesContainer.innerHTML = '';
+    svg.innerHTML = '';
+    
+    const count = projects.length;
+    if (count === 0) return;
+
+    const parentContainer = container.parentElement; // galactic-timeline-container
+    const viewportWidth = parentContainer.offsetWidth;
+    const containerHeight = 400;
+    
+    // 智能间距压缩逻辑
+    let spacing = viewportWidth / (count + 1);
+    const minSpacing = 180; // 节点极多时压缩到 180px
+    const maxSpacing = 400; 
+    spacing = Math.min(Math.max(spacing, minSpacing), maxSpacing);
+    
+    const totalContentWidth = spacing * (count + 1);
+    const startX = (totalContentWidth < viewportWidth) ? (viewportWidth - totalContentWidth) / 2 : 150;
+    
+    container.style.width = `${Math.max(totalContentWidth, viewportWidth + 300)}px`;
+    
+    // --- 新增：边缘感应自动滑动 (Magnetic Edge Scrolling) ---
+    if (!parentContainer.dataset.magneticInit) {
+        let scrollSpeed = 0;
+        let animationFrame;
+        
+        const updateScroll = () => {
+            if (scrollSpeed !== 0) {
+                parentContainer.scrollLeft += scrollSpeed;
             }
-            // 显示或隐藏查看更多内容按钮
-            const moreContainer = document.getElementById('more-projects-container');
-            if (moreContainer) {
-                if (projectFiles.length > maxShow) {
-                    moreContainer.style.display = '';
-                    const btn = document.getElementById('more-projects-btn');
-                    if (btn) {
-                        btn.onclick = function () {
-                            window.location.href = 'projects.html';
-                        };
-                    }
-                } else {
-                    moreContainer.style.display = 'none';
-                }
+            animationFrame = requestAnimationFrame(updateScroll);
+        };
+        
+        parentContainer.addEventListener('mousemove', (e) => {
+            const rect = parentContainer.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const threshold = 200; // 扩大感应区域宽度
+            
+            if (mouseX < threshold) {
+                // 靠近左边缘：产生向左的动力
+                scrollSpeed = -((threshold - mouseX) / threshold) * 20; // 提高最大速度
+            } else if (mouseX > rect.width - threshold) {
+                // 靠近右边缘：产生向右的动力
+                const dist = mouseX - (rect.width - threshold);
+                scrollSpeed = (dist / threshold) * 20; // 提高最大速度
+            } else {
+                scrollSpeed = 0;
             }
         });
+        
+        parentContainer.addEventListener('mouseleave', () => {
+            scrollSpeed = 0;
+        });
+        
+        animationFrame = requestAnimationFrame(updateScroll);
+        parentContainer.dataset.magneticInit = "true";
+    }
+    
+
+    
+    const points = [];
+    
+    projects.forEach((file, i) => {
+        const x = startX + spacing * (i + 0.5); 
+        
+        // 动态起伏高度：波浪会随节点顺序平滑波动
+        const y = containerHeight / 2 + Math.sin(i * 1.2) * 90;
+        
+        points.push({x, y});
+        
+        const node = document.createElement('div');
+        // 随机分配大小等级：增加视觉丰富度
+        const sizeClass = ['planet-sm', 'planet-md', 'planet-lg'][i % 3]; 
+        node.className = `planet-node ${sizeClass}`;
+        node.style.left = `${x}px`;
+        node.style.top = `${y}px`;
+        
+        const labelPosClass = (y > containerHeight / 2) ? 'label-top' : 'label-bottom';
+        const fileName = file.replace(/\.md$/, '');
+        
+        node.innerHTML = `
+            <div class="planet-visual">
+                <div class="planet-ring"></div>
+                <div class="planet-body"></div>
+                <div class="planet-glow"></div>
+            </div>
+            <div class="planet-label ${labelPosClass}" title="${fileName}">${fileName}</div>
+        `;
+        
+        node.onclick = () => {
+            window.location.href = `project-view.html?file=projects/${encodeURIComponent(file)}`;
+        };
+        
+        nodesContainer.appendChild(node);
+    });
+    
+    // 连接线绘制
+    if (points.length > 1) {
+        let pathD = `M ${points[0].x} ${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i];
+            const p1 = points[i + 1];
+            const cp1x = p0.x + (p1.x - p0.x) / 2;
+            pathD += ` C ${cp1x} ${p0.y}, ${cp1x} ${p1.y}, ${p1.x} ${p1.y}`;
+        }
+        
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathD);
+        path.setAttribute("class", "galactic-path");
+        svg.appendChild(path);
+        
+        // 添加装饰性繁星（点多时背景更亮眼）
+        const starsCount = Math.min(count * 5, 100);
+        for (let i = 0; i < starsCount; i++) {
+            const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            star.setAttribute("cx", Math.random() * totalContentWidth);
+            star.setAttribute("cy", Math.random() * containerHeight);
+            star.setAttribute("r", Math.random() * 1.2);
+            star.setAttribute("class", "galactic-dust");
+            svg.appendChild(star);
+        }
+    }
 }
 
 /* ===== Cosmic Universe Background (Three.js) ===== */

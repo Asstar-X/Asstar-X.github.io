@@ -792,7 +792,7 @@ section {
 
 /* ===== 关于区域 (Redesigned: High-End HUD Style) ===== */
 .about {
-    padding: 10rem 0;
+    padding: 7rem 0;
     overflow: hidden;
 }
 
@@ -800,7 +800,7 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6rem;
+    gap: 4rem;
     position: relative;
 }
 
@@ -880,8 +880,8 @@ section {
 .about-stats {
     display: flex;
     justify-content: center;
-    gap: 10rem;
-    padding-top: 4rem;
+    gap: 6rem;
+    padding-top: 3rem;
     width: 100%;
     position: relative;
 }
@@ -953,14 +953,14 @@ section {
 
 /* ===== AI Lab (Redesigned: Floating HUD Style) ===== */
 .projects {
-    padding: 10rem 0;
+    padding: 7rem 0;
 }
 
 /* ===== AI Lab Header (HUD Redesign) ===== */
 .lab-header {
     position: relative;
     text-align: center;
-    margin-bottom: 8rem;
+    margin-bottom: 4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1062,28 +1062,9 @@ section {
     100% { left: 100%; }
 }
 
-.projects-grid {
-    display: flex;
-    justify-content: center;
-    gap: 8rem;
-    margin-bottom: 5rem;
-    flex-wrap: wrap;
-}
 
-.project-card {
-    position: relative;
-    width: 280px;
-    height: 380px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-    background: none; /* Remove Box */
-    border: none;
-    border-radius: 0;
-}
+
+
 
 /* 核心视觉：悬浮球 */
 .project-visual {
@@ -1177,13 +1158,13 @@ section {
 
 /* ===== 联系区域 (Redesigned: Nexus Style) ===== */
 .contact {
-    padding: 10rem 0;
+    padding: 7rem 0;
 }
 
 .contact-nexus {
     display: flex;
     justify-content: center;
-    gap: 8rem;
+    gap: 5rem;
     flex-wrap: wrap;
     position: relative;
     z-index: 1;
@@ -1501,16 +1482,7 @@ section {
         text-align: center;
     }
 
-    /* Projects Grid Mobile Tweak */
-    .projects-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-        padding: 0 1rem;
-    }
 
-    .project-card {
-        padding: 1.5rem;
-    }
 
     /* Hero Greeting Mobile Position */
     .hero-greeting.show {
@@ -1537,4 +1509,194 @@ section {
     .section-title {
         font-size: 2rem;
     }
+}
+/* ===== Galactic Horizontal Timeline (Improved Centering & Wave) ===== */
+.galactic-timeline-container {
+    width: 100%;
+    margin: 2rem 0;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 60px 0; /* Reduced vertical padding for wave */
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    position: relative;
+    /* Edge mask for premium scrolling feel */
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.galactic-timeline-container::-webkit-scrollbar {
+    display: none;
+}
+
+.galactic-timeline {
+    position: relative;
+    height: 400px;
+    margin: 0 auto; /* Essential for centering */
+}
+
+.galactic-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.galactic-path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1;
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+    animation: galacticPathReveal 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Decoration Dust */
+.galactic-dust {
+    fill: #fff;
+    opacity: 0;
+    animation: dustTwinkle 2s infinite alternate;
+}
+
+@keyframes dustTwinkle {
+    from { opacity: 0.1; transform: scale(0.8); }
+    to { opacity: 0.4; transform: scale(1.2); }
+}
+
+@keyframes galacticPathReveal {
+    to { stroke-dashoffset: 0; }
+}
+
+.galactic-nodes {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.planet-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.planet-visual {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.planet-body {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #fff;
+    z-index: 3;
+    transition: all 0.4s ease;
+}
+
+.planet-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 1;
+    animation: glowPulse 4s infinite alternate;
+}
+
+@keyframes glowPulse {
+    from { transform: scale(0.8); opacity: 0.3; }
+    to { transform: scale(1.4); opacity: 0.7; }
+}
+
+.planet-ring {
+    position: absolute;
+    width: 140%;
+    height: 40%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    transform: rotateX(75deg) rotateZ(-15deg);
+    transition: all 0.6s ease;
+    z-index: 2;
+}
+
+.planet-node:hover {
+    transform: translate(-50%, -60%) scale(1.1); /* Slight vertical lift on hover */
+}
+
+.planet-node:hover .planet-body {
+    transform: scale(1.5);
+    box-shadow: 0 0 30px #fff, 0 0 60px rgba(255,255,255,0.4);
+}
+
+.planet-node:hover .planet-ring {
+    width: 220%;
+    height: 60%;
+    border-color: rgba(255,255,255,0.5);
+    transform: rotateX(65deg) rotateZ(25deg);
+}
+
+.planet-label {
+    position: absolute;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.25);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: all 0.5s ease;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Adaptive Label Positioning */
+.label-top {
+    bottom: 50px;
+}
+
+.label-bottom {
+    top: 50px;
+}
+
+.planet-node:hover .planet-label {
+    color: #fff;
+    letter-spacing: 5px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* Planet Size Variations */
+.planet-sm .planet-body { width: 8px; height: 8px; }
+.planet-sm .planet-visual { width: 40px; height: 40px; }
+
+.planet-md .planet-body { width: 12px; height: 12px; }
+.planet-md .planet-visual { width: 60px; height: 60px; }
+
+.planet-lg .planet-body { width: 18px; height: 18px; }
+.planet-lg .planet-visual { width: 80px; height: 80px; }
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .galactic-timeline-container {
+        mask-image: none;
+        -webkit-mask-image: none;
+        padding: 60px 0;
+    }
+    .planet-label {
+        letter-spacing: 1px;
+        font-size: 0.6rem;
+    }
+    /* Scale down large planets on mobile */
+    .planet-lg .planet-body { width: 14px; height: 14px; }
 }

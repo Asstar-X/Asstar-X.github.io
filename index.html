@@ -132,26 +132,16 @@
             </div>
         </section>
 
-        <!-- AI Lab区域 -->
         <section id="projects" class="projects">
-            <div class="container">
-                <div class="lab-header">
-                    <div class="lab-title-bg">AI LAB</div>
-                    <div class="lab-title-wrapper">
-                        <h2 class="lab-title">AI Lab</h2>
-                        <div class="lab-line-decoder"></div>
-                    </div>
-                </div>
-                <div class="projects-grid" id="projects-grid">
-                    <!-- 动态加载的项目卡片将插入这里 -->
-                </div>
-                <div id="more-projects-container" class="more-projects">
-                    <button id="more-projects-btn" class="btn btn-outline">
-                        <span class="btn-text">查看更多内容</span>
-                        <span class="btn-icon">→</span>
-                    </button>
+
+
+            <div class="galactic-timeline-container">
+                <div id="galactic-timeline" class="galactic-timeline">
+                    <svg id="galactic-svg" class="galactic-svg"></svg>
+                    <div id="galactic-nodes" class="galactic-nodes"></div>
                 </div>
             </div>
+
         </section>
 
         <!-- 联系区域 (Redesigned: High-End Tech Reveal) -->
@@ -207,7 +197,7 @@
 
     <script src="js/script.js"></script>
     <script>
-        loadProjects('projects-grid', 3);
+        loadProjects('galactic-timeline');
 
         // --- Hero "Voice" 3D Particle Sphere ---
         (function() {
