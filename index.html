@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <style>
+        /* 新增背景样式 */
+        body { 
+            background: #050505 !important; 
+            /* 注意：不添加 overflow: hidden 以保持原有滚动功能 */
+        }
+
+        /* 画布容器 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 保持在内容之下 (内容 z-index >= 2) */
+        }
+
+        /* 噪点遮罩 - 增加电影质感 */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Hero 3D Container Styles */
+        #hero-3d-container {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #hero-3d-container canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 宇宙背景层 -->
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <!-- 导航栏 -->
+    <header class="header">
+        <nav class="nav">
+            <a href="space.html" class="logo">
+                <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img" title="点击进入探索">
+                <span class="logo-text">ASSTAR</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="trending-project.html" class="nav-link">前沿项目</a></li>
+                <li><a href="huggingface-papers.html" class="nav-link">前沿论文</a></li>
+                <li><a href="focus.html" class="nav-link">焦点新闻</a></li>
+                <li><a href="tools.html" class="nav-link">提效工具</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 英雄区域 -->
+        <section id="home" class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">探索 • 专注 • 未来</div>
+                    <h1 class="hero-title">
+                        <span class="title-word">探索未知的边界</span>
+                    </h1>
+                    <p class="hero-subtitle">欢迎来到Asstar，让意识，先于光速抵达未知。</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="scrollToSection('about')">
+                            <span class="btn-text">开始探索</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
+                            <span class="btn-text">了解更多</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div id="hero-3d-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于区域 (Redesigned: High-End Tech Reveal) -->
+        <section id="about" class="about">
+            <div class="container">
+                <div class="about-aura"></div>
+                <div class="about-content">
+                    <div class="about-text-wrapper">
+                        <p class="about-paragraph">在这里，硅基与碳基的认知边界被折叠，范式在零维坍缩，又在高维重写。</p>
+                        <p class="about-sub-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="projects">
+
+
+            <div class="galactic-timeline-container">
+                <div id="galactic-timeline" class="galactic-timeline">
+                    <svg id="galactic-svg" class="galactic-svg"></svg>
+                    <div id="galactic-nodes" class="galactic-nodes"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 联系区域 (Redesigned: High-End Tech Reveal) -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <div class="lab-header">
+                    <div class="lab-title-bg">CONTACT</div>
+                    <div class="lab-title-wrapper">
+                        <h2 class="lab-title">联系我们</h2>
+                        <div class="lab-line-decoder"></div>
+                    </div>
+                </div>
+
+                <div class="contact-nexus">
+                    <div class="contact-node">
+                        <div class="node-icon">📧</div>
+                        <div class="node-content">
+                            <h3>邮箱</h3>
+                            <p>asstarx7@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-node">
+                        <div class="node-icon">👥</div>
+                        <div class="node-content">
+                            <h3>微信</h3>
+                            <p>GitscYee</p>
+                        </div>
+                    </div>
+                    <a class="contact-node node--explore" href="voice-denoise.html">
+                        <div class="node-icon">🚀</div>
+                        <div class="node-content">
+                            <h3>探索</h3>
+                            <p>SE</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img">
+                    <span class="logo-text">ASSTAR</span>
+                </div>
+                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        loadProjects('galactic-timeline');
+
+        // --- Hero "Voice" 3D Particle Sphere ---
+        (function() {
+            const heroContainer = document.getElementById('hero-3d-container');
+            if (!heroContainer) return;
+
+            const containerWidth = heroContainer.offsetWidth || 500;
+            const containerHeight = heroContainer.offsetHeight || 500;
+
+            // 1. Setup Scene
+            const heroScene = new THREE.Scene();
+            heroScene.fog = new THREE.FogExp2(0x050505, 0.015);
+
+            const heroCamera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+            heroCamera.position.z = 25;
+
+            const heroRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            heroRenderer.setSize(containerWidth, containerHeight);
+            heroRenderer.setPixelRatio(window.devicePixelRatio);
+            heroContainer.appendChild(heroRenderer.domElement);
+
+            // 2. The "Voice" Particle Sphere
+            const sphereGeometry = new THREE.SphereGeometry(8, 128, 128);
+            const sphereMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.85,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            // Add colors (Cyan to Magenta gradient)
+            const count = sphereGeometry.attributes.position.count;
+            const colors = [];
+            const color1 = new THREE.Color(0xffffff); // White
+            const color2 = new THREE.Color(0xaaaaaa); // Light Gray
+
+            for (let i = 0; i < count; i++) {
+                const mixedColor = color1.clone().lerp(color2, Math.random());
+                colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
+            }
+            sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
+            heroScene.add(particleSphere);
+
+            // --- Eyes Setup (Nexus) ---
+            const eyeGroup = new THREE.Group();
+            heroScene.add(eyeGroup);
+
+            const eyeGeo = new THREE.SphereGeometry(0.35, 32, 32);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+            leftEye.position.set(-1.5, 1.2, 8.2); // Shifted up slightly
+            leftEye.scale.set(0, 0, 0); 
+            eyeGroup.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+            rightEye.position.set(1.5, 1.2, 8.2); // Shifted up slightly
+            rightEye.scale.set(0, 0, 0); 
+            eyeGroup.add(rightEye);
+
+            // Store original positions for wave animation
+            const originalPositions = sphereGeometry.attributes.position.array.slice();
+
+            // 3. Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            heroScene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            heroScene.add(pointLight);
+
+            // 4. Interaction Variables
+            let heroMouseX = 0;
+            let heroMouseY = 0;
+            let heroTime = 0;
+            let amplitude = 0.9;
+            let speed = 1.0;
+            let isHeroHovered = false; // Add hover state
+
+            heroContainer.addEventListener('mouseenter', () => isHeroHovered = true);
+            heroContainer.addEventListener('mouseleave', () => {
+                isHeroHovered = false;
+                heroMouseX = 0;
+                heroMouseY = 0;
+            });
+
+            heroContainer.addEventListener('mousemove', (event) => {
+                const rect = heroContainer.getBoundingClientRect();
+                heroMouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+                heroMouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+            });
+
+            // --- 点击交互：打招呼 (Click Interaction: Greet) ---
+            const greetings = ["WELCOME TO ASSTAR !"];
+            let isGreeting = false;
+
+            const greetingEl = document.createElement('div');
+            greetingEl.className = 'hero-greeting';
+            heroContainer.appendChild(greetingEl);
+
+            heroContainer.addEventListener('click', () => {
+                if (isGreeting) return;
+                isGreeting = true;
+
+                // 1. Show Text Bubble
+                const randomText = greetings[Math.floor(Math.random() * greetings.length)];
+                greetingEl.innerText = randomText;
+                greetingEl.classList.add('show');
+
+                // 2. Sphere Reaction (Blink & Pulse)
+                gsap.to(particleSphere.scale, {
+                    x: 1.2, y: 1.2, z: 1.2,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.out"
+                });
+
+                // Blink eyes
+                gsap.to([leftEye.scale, rightEye.scale], {
+                    y: 0.1,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                });
+
+                // 3. Auto Hide
+                setTimeout(() => {
+                    greetingEl.classList.remove('show');
+                    setTimeout(() => { isGreeting = false; }, 500);
+                }, 2000);
+            });
+
+            // 5. Animation Loop
+            function animateHeroSphere() {
+                requestAnimationFrame(animateHeroSphere);
+                heroTime += 0.01 * speed;
+
+                // Wave Simulation
+                const positions = sphereGeometry.attributes.position.array;
+                for (let i = 0; i < count; i++) {
+                    const px = originalPositions[i * 3];
+                    const py = originalPositions[i * 3 + 1];
+                    const pz = originalPositions[i * 3 + 2];
+
+                    const noise = Math.sin(px * 0.5 + heroTime) * Math.cos(py * 0.3 + heroTime) * Math.sin(pz * 0.5 + heroTime);
+                    const displacement = 1 + (noise * 0.18 * amplitude);
+
+                    positions[i * 3] = px * displacement;
+                    positions[i * 3 + 1] = py * displacement;
+                    positions[i * 3 + 2] = pz * displacement;
+                }
+                sphereGeometry.attributes.position.needsUpdate = true;
+
+                // Interaction Logic: Magnetic Stickiness & Elasticity
+                // 1. Position Magnetism (The "Pull" feel)
+                const targetPosX = heroMouseX * 1.2;
+                const targetPosY = -heroMouseY * 1.2;
+                particleSphere.position.x += 0.08 * (targetPosX - particleSphere.position.x);
+                particleSphere.position.y += 0.08 * (targetPosY - particleSphere.position.y);
+
+                // 2. Elastic Scale (The "Sticky" stretching feel)
+                const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
+                const targetScale = 1 + distToCenter * 0.15;
+                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+
+                // 3. Rotation (Auto + Reaching towards mouse)
+                particleSphere.rotation.y += 0.003; // Base rotation
+                particleSphere.rotation.x += 0.05 * (heroMouseY * 0.4 - particleSphere.rotation.x);
+                particleSphere.rotation.z += 0.05 * (heroMouseX * 0.2 - particleSphere.rotation.z);
+
+                // --- 眼睛互动逻辑 (Eyes Interaction) ---
+                eyeGroup.position.copy(particleSphere.position);
+                
+                // Only trigger if hovering AND mouse is actually near the sphere (dist < 0.5)
+                const eyeScaleTarget = (isHeroHovered && distToCenter < 0.5) ? 1 : 0; 
+                const eyeScaleVec = new THREE.Vector3(eyeScaleTarget, eyeScaleTarget, eyeScaleTarget);
+                
+                leftEye.scale.lerp(eyeScaleVec, 0.1);
+                rightEye.scale.lerp(eyeScaleVec, 0.1);
+
+                // 让眼睛稍微看向鼠标 (Eye pupils tracking)
+                const lookFactor = 0.4;
+                leftEye.position.x = -1.5 + heroMouseX * lookFactor;
+                leftEye.position.y = 1.2 - heroMouseY * lookFactor;
+                rightEye.position.x = 1.5 + heroMouseX * lookFactor;
+                rightEye.position.y = 1.2 - heroMouseY * lookFactor;
+
+                heroRenderer.render(heroScene, heroCamera);
+            }
+
+            animateHeroSphere();
+
+            // 6. Resize Handler
+            const resizeObserver = new ResizeObserver(() => {
+                const newWidth = heroContainer.offsetWidth;
+                const newHeight = heroContainer.offsetHeight;
+                heroCamera.aspect = newWidth / newHeight;
+                heroCamera.updateProjectionMatrix();
+                heroRenderer.setSize(newWidth, newHeight);
+            });
+            resizeObserver.observe(heroContainer);
+        })();
+    </script>
+</body>
+
+</html>
