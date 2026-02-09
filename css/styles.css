@@ -1547,27 +1547,54 @@ section {
 
 .galactic-path {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.1);
-    stroke-width: 1;
-    stroke-dasharray: 2000;
-    stroke-dashoffset: 2000;
-    animation: galacticPathReveal 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    stroke: url(#pathGradient);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.path-core {
+    stroke-width: 0.8;
+    opacity: 0.4;
+}
+
+.path-aura-1, .path-aura-2 {
+    stroke-width: 0.4;
+    opacity: 0.15;
+    filter: blur(1px);
+}
+
+/* 光子微粒流 */
+.galactic-photon {
+    fill: #fff;
+    filter: blur(0.5px) drop-shadow(0 0 5px #fff);
+    opacity: 0;
+    animation: photonFade 4s infinite linear;
+}
+
+@keyframes photonFade {
+    0% { opacity: 0; transform: scale(0.3); }
+    15% { opacity: 0.8; transform: scale(1); }
+    85% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.3); }
 }
 
 /* Decoration Dust */
 .galactic-dust {
     fill: #fff;
     opacity: 0;
-    animation: dustTwinkle 2s infinite alternate;
+    animation: dustTwinkle 4s infinite alternate ease-in-out;
 }
 
 @keyframes dustTwinkle {
-    from { opacity: 0.1; transform: scale(0.8); }
-    to { opacity: 0.4; transform: scale(1.2); }
+    0% { opacity: 0.05; transform: scale(0.8); }
+    100% { opacity: 0.3; transform: scale(1.2); }
 }
 
 @keyframes galacticPathReveal {
-    to { stroke-dashoffset: 0; }
+    from { stroke-dasharray: 0, 2000; opacity: 0; }
+    to { stroke-dasharray: 2000, 0; opacity: 0.4; }
 }
 
 .galactic-nodes {

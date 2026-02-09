@@ -441,6 +441,19 @@ function renderGalacticTimeline(container, projects) {
     nodesContainer.innerHTML = '';
     svg.innerHTML = '';
     
+    // 注入梯度定义 (Linear Gradient for the path)
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = `
+        <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="white" stop-opacity="0" />
+            <stop offset="20%" stop-color="white" stop-opacity="0.1" />
+            <stop offset="50%" stop-color="white" stop-opacity="0.3" />
+            <stop offset="80%" stop-color="white" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="white" stop-opacity="0" />
+        </linearGradient>
+    `;
+    svg.appendChild(defs);
+    
     const count = projects.length;
     if (count === 0) return;
 
@@ -454,10 +467,12 @@ function renderGalacticTimeline(container, projects) {
     const maxSpacing = 400; 
     spacing = Math.min(Math.max(spacing, minSpacing), maxSpacing);
     
-    const totalContentWidth = spacing * (count + 1);
-    const startX = (totalContentWidth < viewportWidth) ? (viewportWidth - totalContentWidth) / 2 : 150;
+    const sideMargin = 150; // 左右留白
+    const totalContentWidth = spacing * count + sideMargin * 2;
+    const startX = (totalContentWidth < viewportWidth) ? (viewportWidth - totalContentWidth) / 2 : sideMargin;
     
-    container.style.width = `${Math.max(totalContentWidth, viewportWidth + 300)}px`;
+    // 设置容器宽度：使其刚好容纳所有节点及留白，严禁滑出界限
+    container.style.width = `${Math.max(totalContentWidth, viewportWidth)}px`;
     
     // --- 新增：边缘感应自动滑动 (Magnetic Edge Scrolling) ---
     if (!parentContainer.dataset.magneticInit) {
@@ -534,31 +549,103 @@ function renderGalacticTimeline(container, projects) {
         nodesContainer.appendChild(node);
     });
     
-    // 连接线绘制
+    // --- 核心重构：以太纤波轨道 (Nebula Threads) ---
     if (points.length > 1) {
-        let pathD = `M ${points[0].x} ${points[0].y}`;
-        for (let i = 0; i < points.length - 1; i++) {
-            const p0 = points[i];
-            const p1 = points[i + 1];
-            const cp1x = p0.x + (p1.x - p0.x) / 2;
-            pathD += ` C ${cp1x} ${p0.y}, ${cp1x} ${p1.y}, ${p1.x} ${p1.y}`;
+        // 定义三种不同扰动的路径
+        const createPathD = (offsetY = 0, tension = 0.6) => {
+            let d = `M ${points[0].x} ${points[0].y + offsetY}`;
+            for (let i = 0; i < points.length - 1; i++) {
+                const p0 = points[i];
+                const p1 = points[i + 1];
+                const cp1x = p0.x + (p1.x - p0.x) * tension;
+                const cp2x = p1.x - (p1.x - p0.x) * (tension + 0.05); // 稍微不对称
+                d += ` C ${cp1x} ${p0.y + offsetY}, ${cp2x} ${p1.y + offsetY}, ${p1.x} ${p1.y + offsetY}`;
+            }
+            return d;
+        };
+
+        // 1. 渲染三层极细丝线
+        const pathConfigs = [
+            { class: 'path-core', offset: 0, tension: 0.6 },
+            { class: 'path-aura-1', offset: 2, tension: 0.62 },
+            { class: 'path-aura-2', offset: -2, tension: 0.58 }
+        ];
+
+        pathConfigs.forEach(cfg => {
+            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.setAttribute("d", createPathD(cfg.offset, cfg.tension));
+            p.setAttribute("class", `galactic-path ${cfg.class}`);
+            svg.appendChild(p);
+        });
+
+        // 2. 渲染光子微粒流 (取代刻板的流光段)
+        for (let i = 0; i < 5; i++) {
+            const photon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            photon.setAttribute("r", 2);
+            photon.setAttribute("class", "galactic-photon");
+            // 给每个光子分配不同的动画延迟和速度
+            photon.style.animationDelay = `${i * 1.5}s`;
+            photon.style.animationDuration = `${5 + Math.random() * 3}s`;
+            
+            // 为光子创建一个独立的路径引用（隐藏）
+            const animatePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            animatePath.setAttribute("d", createPathD(0, 0.6));
+            animatePath.setAttribute("id", `photon-path-${i}`);
+            animatePath.style.fill = "none";
+            svg.appendChild(animatePath);
+
+            // 使用 mpath 让光子沿路径移动
+            const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+            anim.setAttribute("dur", `${6 + Math.random() * 4}s`);
+            anim.setAttribute("repeatCount", "indefinite");
+            const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+            mpath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#photon-path-${i}`);
+            anim.appendChild(mpath);
+            photon.appendChild(anim);
+            
+            svg.appendChild(photon);
         }
         
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", pathD);
-        path.setAttribute("class", "galactic-path");
-        svg.appendChild(path);
-        
-        // 添加装饰性繁星（点多时背景更亮眼）
-        const starsCount = Math.min(count * 5, 100);
+        // 3. 繁星背景（调淡并增加景深感）
+        const starsCount = Math.min(count * 10, 200);
         for (let i = 0; i < starsCount; i++) {
             const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             star.setAttribute("cx", Math.random() * totalContentWidth);
             star.setAttribute("cy", Math.random() * containerHeight);
             star.setAttribute("r", Math.random() * 1.2);
             star.setAttribute("class", "galactic-dust");
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            star.style.opacity = Math.random() * 0.3;
             svg.appendChild(star);
         }
+    }
+
+    // --- 新增：GSAP 入场动画与动态漂浮 ---
+    const nodes = container.querySelectorAll('.planet-node');
+    if (typeof gsap !== 'undefined') {
+        gsap.from(nodes, {
+            y: "+=50",
+            opacity: 0,
+            scale: 0.5,
+            duration: 1,
+            stagger: 0.15,
+            ease: "back.out(1.7)",
+            onComplete: () => {
+                // 入场后开启各自的微小漂浮动画
+                nodes.forEach((node, i) => {
+                    const driftY = 5 + Math.random() * 10;
+                    const duration = 3 + Math.random() * 3;
+                    gsap.to(node, {
+                        y: `+=${driftY}`,
+                        duration: duration,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut",
+                        delay: i * 0.2
+                    });
+                });
+            }
+        });
     }
 }
 
