@@ -419,7 +419,7 @@ window.SpriteChatManager = class SpriteChatManager {
             }
         } else {
             // 极端情况下的硬编码降级方案
-            currentModel = { name: 'Qwen3-Max', model: 'qwen3-max', requestFormat: 'openai', headers: { 'Content-Type': 'application/json' } };
+            currentModel = { name: 'Qwen 3.5 Flash', model: 'qwen3.5-flash', requestFormat: 'openai', headers: { 'Content-Type': 'application/json' } };
             currentApiKey = '';
             currentApiUrl = '';
             useProxy = true;
@@ -444,7 +444,7 @@ window.SpriteChatManager = class SpriteChatManager {
                 };
             }
             requestBody = {
-                model: currentModel.model || 'qwen-max',
+                model: currentModel.model || 'qwen3.5-flash',
                 messages: [
                     { role: 'system', content: combinedSystemPrompt },
                     ...this.messages.slice(0, -1).map(msg => ({ role: msg.role, content: msg.content })),
@@ -453,7 +453,8 @@ window.SpriteChatManager = class SpriteChatManager {
                 temperature: currentModel.temperature || 0.7,
                 max_tokens: currentModel.maxTokens || 1024,
                 top_p: currentModel.topP || 0.9,
-                stream: true
+                stream: true,
+                enable_thinking: false
             };
         } else if (currentModel.requestFormat === 'anthropic') {
             url = currentApiUrl;
@@ -515,6 +516,7 @@ window.SpriteChatManager = class SpriteChatManager {
         const decoder = new TextDecoder();
         let buffer = '';
         let fullContent = '';
+        let isAnswering = false;
         const messageElement = this.createStreamMessageElement();
         this.chatMessages.appendChild(messageElement);
 
@@ -536,8 +538,15 @@ window.SpriteChatManager = class SpriteChatManager {
                         }
                         try {
                             const parsed = JSON.parse(data);
-                            const content = this.extractContentFromStream(parsed, format);
+                            const { content, reasoning } = this.extractContentFromStream(parsed, format);
+                            
+                            if (reasoning && !isAnswering) {
+                                // For sprite chat, we handle it silently or log it
+                                console.log('Thinking:', reasoning);
+                            }
+                            
                             if (content) {
+                                isAnswering = true;
                                 fullContent += content;
                                 this.updateStreamMessage(messageElement, fullContent);
                             }
@@ -557,10 +566,16 @@ window.SpriteChatManager = class SpriteChatManager {
     }
 
     extractContentFromStream(data, format) {
-        if (format === 'openai') return data.choices?.[0]?.delta?.content || '';
-        if (format === 'anthropic') return data.content?.[0]?.text || '';
-        if (format === 'dashscope') return data.output?.text || '';
-        return '';
+        if (format === 'openai') {
+            const delta = data.choices?.[0]?.delta;
+            return {
+                content: delta?.content || '',
+                reasoning: delta?.reasoning_content || ''
+            };
+        }
+        if (format === 'anthropic') return { content: data.content?.[0]?.text || '', reasoning: '' };
+        if (format === 'dashscope') return { content: data.output?.text || '', reasoning: '' };
+        return { content: '', reasoning: '' };
     }
 
     createStreamMessageElement() {

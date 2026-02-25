@@ -400,7 +400,8 @@ class ChatManager {
                 temperature: currentModel.temperature,
                 max_tokens: currentModel.maxTokens,
                 top_p: currentModel.topP,
-                stream: true
+                stream: true,
+                enable_thinking: false
             };
         } else if (currentModel.requestFormat === 'anthropic') {
             url = currentApiUrl;
@@ -442,6 +443,7 @@ class ChatManager {
         const decoder = new TextDecoder();
         let buffer = '';
         let fullContent = '';
+        let isAnswering = false;
         const messageElement = this.createStreamMessageElement();
         this.chatMessages.appendChild(messageElement);
         try {
@@ -458,8 +460,15 @@ class ChatManager {
                         if (data === '[DONE]') { this.finalizeStreamMessage(messageElement, fullContent); return fullContent; }
                         try {
                             const parsed = JSON.parse(data);
-                            const content = this.extractContentFromStream(parsed, format);
-                            if (content) { fullContent += content; this.updateStreamMessage(messageElement, fullContent); }
+                            const { content, reasoning } = this.extractContentFromStream(parsed, format);
+                            if (reasoning && !isAnswering) {
+                                this.updateStreamReasoning(messageElement, reasoning);
+                            }
+                            if (content) {
+                                isAnswering = true;
+                                fullContent += content;
+                                this.updateStreamMessage(messageElement, fullContent);
+                            }
                         } catch (e) { console.warn('解析流式数据失败:', e); }
                     }
                 }
@@ -474,10 +483,16 @@ class ChatManager {
     }
 
     extractContentFromStream(data, format) {
-        if (format === 'openai') return data.choices?.[0]?.delta?.content || '';
-        if (format === 'anthropic') return data.content?.[0]?.text || '';
-        if (format === 'dashscope') return data.output?.text || '';
-        return '';
+        if (format === 'openai') {
+            const delta = data.choices?.[0]?.delta;
+            return {
+                content: delta?.content || '',
+                reasoning: delta?.reasoning_content || ''
+            };
+        }
+        if (format === 'anthropic') return { content: data.content?.[0]?.text || '', reasoning: '' };
+        if (format === 'dashscope') return { content: data.output?.text || '', reasoning: '' };
+        return { content: '', reasoning: '' };
     }
 
     createStreamMessageElement() {
@@ -488,12 +503,26 @@ class ChatManager {
         messageElement.innerHTML = `
             <div class="message-avatar assistant">✦</div>
             <div class="message-content">
+                <div class="reasoning-container" style="display: none; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem; border-left: 3px solid #ccc; color: #666;">
+                    <div style="font-weight: bold; margin-bottom: 4px; font-size: 0.75rem;">思考过程...</div>
+                    <div class="reasoning-content"></div>
+                </div>
                 <p class="streaming-content"></p>
                 <div class="streaming-cursor"></div>
                 <div class="message-time">${timeString}</div>
             </div>
         `;
         return messageElement;
+    }
+
+    updateStreamReasoning(messageElement, reasoning) {
+        const container = messageElement.querySelector('.reasoning-container');
+        const content = messageElement.querySelector('.reasoning-content');
+        if (container && content) {
+            container.style.display = 'block';
+            content.textContent += reasoning;
+        }
+        this.scrollToBottom();
     }
 
     updateStreamMessage(messageElement, content) {

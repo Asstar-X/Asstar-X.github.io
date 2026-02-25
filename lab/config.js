@@ -15,13 +15,13 @@ class ConfigManager {
         // 可用模型配置（可按需扩展与调整）
         this.models = {
             qwen: {
-                name: 'Qwen3-Max',
-                description: '阿里通义千问 OpenAI 兼容推理接口',
-                icon: '🧠',
+                name: 'Qwen 3.5 Flash',
+                description: '阿里通义千问 Qwen 3.5 高速推理模型',
+                icon: '⚡',
                 requestFormat: 'openai',
                 apiUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
                 headers: { 'Content-Type': 'application/json' },
-                model: 'qwen3-max',
+                model: 'qwen3.5-flash',
                 temperature: 0.7,
                 topP: 0.9,
                 maxTokens: 1024,
