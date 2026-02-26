@@ -177,6 +177,20 @@ body {
     transform: translateY(-50%);
     transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     background: transparent !important;
+    animation: navEntrance 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes navEntrance {
+    0% {
+        opacity: 0;
+        transform: translate(50px, -50%);
+        clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, -50%);
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
 }
 
 .nav {
@@ -302,6 +316,31 @@ body {
     background: linear-gradient(90deg, transparent, #fff);
     transition: width 0.3s ease;
     box-shadow: 0 0 10px #fff;
+}
+
+/* 初始扫描光效入场 - 单次动画 */
+.nav-link {
+    animation: scanlineGlow 2s ease-out forwards;
+}
+
+.nav-link:nth-child(1) { animation-delay: 0.2s; }
+.nav-link:nth-child(2) { animation-delay: 0.4s; }
+.nav-link:nth-child(3) { animation-delay: 0.6s; }
+.nav-link:nth-child(4) { animation-delay: 0.8s; }
+
+@keyframes scanlineGlow {
+    0% {
+        text-shadow: 0 0 0px rgba(255,255,255,0);
+        color: rgba(255, 255, 255, 0.2);
+    }
+    30% {
+        text-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4);
+        color: rgba(255, 255, 255, 0.9);
+    }
+    100% {
+        text-shadow: 0 0 5px rgba(255,255,255,0);
+        color: rgba(255, 255, 255, 0.2);
+    }
 }
 
 .nav-link:hover::after {

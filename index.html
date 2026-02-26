@@ -65,6 +65,48 @@
         #hero-3d-container canvas {
             display: block;
         }
+
+        /* 3D 交互提示 (Affordance) */
+        .hero-3d-hint {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-display, 'Orbitron', sans-serif);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            opacity: 0;
+            white-space: nowrap;
+            z-index: 10;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .hero-3d-hint.show {
+            opacity: 1;
+        }
+
+        .hero-3d-hint.hide {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .hero-3d-hint.blinking-cursor::after {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-left: 6px;
+            vertical-align: text-bottom;
+            animation: blinkCursor 0.75s infinite;
+        }
+
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 </head>
 
@@ -256,12 +298,49 @@
             let amplitude = 0.9;
             let speed = 1.0;
             let isHeroHovered = false; // Add hover state
+            let pulseObj = { scale: 0 }; // For idle pulse
 
-            heroContainer.addEventListener('mouseenter', () => isHeroHovered = true);
+            // --- 提示交互 (Affordance Hint) ---
+            const hintEl = document.createElement('div');
+            hintEl.className = 'hero-3d-hint';
+            heroContainer.appendChild(hintEl);
+            const hintText = "[ CLICK TO AWAKE ]";
+            let hintTimeout;
+            let typeInterval;
+
+            heroContainer.addEventListener('mouseenter', () => {
+                isHeroHovered = true;
+                
+                // Show hint with pseudo typing effect
+                hintEl.classList.remove('hide');
+                hintEl.classList.add('show', 'blinking-cursor');
+                hintEl.innerText = "";
+                
+                let charIndex = 0;
+                clearInterval(typeInterval);
+                typeInterval = setInterval(() => {
+                    if (charIndex < hintText.length) {
+                        hintEl.innerText += hintText[charIndex];
+                        charIndex++;
+                    } else {
+                        clearInterval(typeInterval);
+                        // Hide after a brief moment
+                        clearTimeout(hintTimeout);
+                        hintTimeout = setTimeout(() => {
+                            hintEl.classList.remove('show', 'blinking-cursor');
+                            hintEl.classList.add('hide');
+                        }, 3000);
+                    }
+                }, 40);
+            });
+
             heroContainer.addEventListener('mouseleave', () => {
                 isHeroHovered = false;
                 heroMouseX = 0;
                 heroMouseY = 0;
+                clearInterval(typeInterval);
+                hintEl.classList.remove('show', 'blinking-cursor');
+                hintEl.classList.add('hide');
             });
 
             heroContainer.addEventListener('mousemove', (event) => {
@@ -269,6 +348,19 @@
                 heroMouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
                 heroMouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
             });
+
+            // --- 动态光晕引导 (Pulse Guide) ---
+            setInterval(() => {
+                if (!isHeroHovered && !isGreeting) {
+                    gsap.to(pulseObj, {
+                        scale: 0.12,
+                        duration: 1.5,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "sine.inOut"
+                    });
+                }
+            }, 8000);
 
             // --- 点击交互：打招呼 (Click Interaction: Greet) ---
             const greetings = ["WELCOME TO ASSTAR !"];
@@ -342,8 +434,10 @@
 
                 // 2. Elastic Scale (The "Sticky" stretching feel)
                 const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
-                const targetScale = 1 + distToCenter * 0.15;
-                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+                const targetScale = 1 + distToCenter * 0.15 + pulseObj.scale;
+                if (!isGreeting) {
+                    particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+                }
 
                 // 3. Rotation (Auto + Reaching towards mouse)
                 particleSphere.rotation.y += 0.003; // Base rotation
@@ -357,8 +451,10 @@
                 const eyeScaleTarget = (isHeroHovered && distToCenter < 0.5) ? 1 : 0; 
                 const eyeScaleVec = new THREE.Vector3(eyeScaleTarget, eyeScaleTarget, eyeScaleTarget);
                 
-                leftEye.scale.lerp(eyeScaleVec, 0.1);
-                rightEye.scale.lerp(eyeScaleVec, 0.1);
+                if (!isGreeting) {
+                    leftEye.scale.lerp(eyeScaleVec, 0.1);
+                    rightEye.scale.lerp(eyeScaleVec, 0.1);
+                }
 
                 // 让眼睛稍微看向鼠标 (Eye pupils tracking)
                 const lookFactor = 0.4;

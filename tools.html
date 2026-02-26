@@ -253,10 +253,18 @@
             }
 
             .back-button {
-                top: 12px;
-                left: 12px;
-                padding: 8px 12px;
-                font-size: 14px;
+                top: 20px; /* Slight bump down for iOS/Android status bars */
+                left: 15px;
+                padding: 8px 14px;
+                font-size: 11px;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                z-index: 9999; /* Ensure it stays above everything on mobile */
+            }
+            
+            /* Add some padding to container so button doesn't overlap title */
+            .tools-container {
+                padding-top: 100px;
             }
         }
 
