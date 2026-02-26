@@ -15,6 +15,7 @@
     <title>Asstar</title>
     <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/time-rift.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
     <!-- 引入 Three.js 和 GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -93,25 +94,14 @@
         </nav>
     </header>
 
-    <main>
+    <main id="time-rift-main">
         <!-- 英雄区域 -->
-        <section id="home" class="hero">
+        <section id="home" class="hero rift-section">
             <div class="hero-container">
                 <div class="hero-content">
                     <div class="hero-badge">探索 • 专注 • 未来</div>
-                    <h1 class="hero-title">
-                        <span class="title-word">探索未知的边界</span>
-                    </h1>
+                    <h1 class="hero-title">探索未知的边界</h1>
                     <p class="hero-subtitle">欢迎来到Asstar，让意识，先于光速抵达未知。</p>
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" onclick="scrollToSection('about')">
-                            <span class="btn-text">开始探索</span>
-                            <span class="btn-icon">→</span>
-                        </button>
-                        <button class="btn btn-secondary" onclick="scrollToSection('contact')">
-                            <span class="btn-text">了解更多</span>
-                        </button>
-                    </div>
                 </div>
                 <div class="hero-visual">
                     <div id="hero-3d-container"></div>
@@ -120,7 +110,7 @@
         </section>
 
         <!-- 关于区域 (Redesigned: High-End Tech Reveal) -->
-        <section id="about" class="about">
+        <section id="about" class="about rift-section">
             <div class="container">
                 <div class="about-aura"></div>
                 <div class="about-content">
@@ -132,7 +122,7 @@
             </div>
         </section>
 
-        <section id="projects" class="projects">
+        <section id="projects" class="projects rift-section">
 
 
             <div class="galactic-timeline-container">
@@ -145,7 +135,7 @@
         </section>
 
         <!-- 联系区域 (Redesigned: High-End Tech Reveal) -->
-        <section id="contact" class="contact">
+        <section id="contact" class="contact rift-section">
             <div class="container">
                 <div class="lab-header">
                     <div class="lab-title-bg">CONTACT</div>
@@ -178,24 +168,11 @@
                         </div>
                     </a>
                 </div>
-            </div>
         </section>
     </main>
 
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img">
-                    <span class="logo-text">ASSTAR</span>
-                </div>
-                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
-            </div>
-        </div>
-    </footer>
-
     <script src="js/script.js"></script>
+    <script src="js/time-rift.js"></script>
     <script>
         loadProjects('galactic-timeline');
 

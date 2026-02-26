@@ -264,6 +264,7 @@ document.head.appendChild(rippleStyle);
 function typeWriter(element, text, speed = 100) {
     let i = 0;
     element.innerHTML = '';
+    text = text.trim(); // 去除首尾空白
 
     function type() {
         if (i < text.length) {
@@ -273,7 +274,9 @@ function typeWriter(element, text, speed = 100) {
         }
     }
 
-    type();
+    if (text.length > 0) {
+        type();
+    }
 }
 
 // 通用 Skeleton 加载生成器
@@ -306,8 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 为标题添加打字机效果
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {
-        const originalText = heroTitle.textContent;
-        typeWriter(heroTitle, originalText, 150);
+        let titleWord = heroTitle.querySelector('.title-word');
+        if (titleWord) {
+            const originalText = titleWord.textContent.trim();
+            typeWriter(titleWord, originalText, 100);
+        } else {
+            const originalText = heroTitle.textContent.trim();
+            typeWriter(heroTitle, originalText, 100);
+        }
     }
 
     // 添加粒子效果

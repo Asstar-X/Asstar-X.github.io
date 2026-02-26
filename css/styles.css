@@ -381,29 +381,43 @@ body {
 }
 
 .hero-content {
-    max-width: 500px;
+    max-width: 650px;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-badge {
     display: inline-block;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.03);
     color: #ffffff;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 400;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px; /* More tech-like sharp edges rather than pill */
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 3.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    letter-spacing: 3px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
 }
 
 .hero-title {
     font-family: var(--font-display);
-    font-size: 5rem;
-    font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 20px;
+    font-size: 4.2rem; /* Reduced to fit on one line */
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 50px;
     color: var(--text-primary);
-    letter-spacing: 10px;
+    letter-spacing: 12px;
+    white-space: nowrap; /* Force the title onto a single line */
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.2rem;
+        letter-spacing: 4px;
+    }
 }
 
 .title-word {
@@ -433,11 +447,32 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 40px;
-    line-height: 1.6;
-    letter-spacing: 2px;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0;
+    line-height: 1.8;
+    letter-spacing: 4px;
+    font-weight: 300;
+    
+    /* 动态入场效果 */
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(10px);
+    animation: subtitleReveal 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    animation-delay: 1.5s; /* 延迟到打字机结束后展现 */
+}
+
+@keyframes subtitleReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+        filter: blur(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
 }
 
 .hero-actions {
