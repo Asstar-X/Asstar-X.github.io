@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>SVG-XML可视化</title>
+    <link rel="icon" type="image/jpeg" href="../images/Asstar.jpg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap"
+        rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        :root {
+            --indent-size: 20px;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            margin: 0;
+            padding: 80px 16px 16px;
+            color: var(--text-primary);
+            background: #050505 !important;
+        }
+
+        /* 画布容器 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* 噪点遮罩 */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            padding-bottom: 1em;
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+        }
+
+        h1 {
+            margin: 0;
+            font-family: var(--font-display, inherit);
+        }
+
+        p {
+            color: var(--text-secondary, #b0b0b0);
+        }
+
+        #main-container {
+            display: flex;
+            height: calc(100vh - 180px);
+            margin-top: 1em;
+            gap: 1em;
+            align-items: stretch;
+        }
+
+        .panel {
+            flex: 1;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(6px);
+        }
+
+        .panel-header {
+            padding: 0.75em 1em;
+            background: rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        #svg-viewer {
+            padding: 1.5em;
+            flex-grow: 1;
+            overflow: hidden;
+            /* 由auto改为hidden，防止溢出滚动条 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+            position: relative;
+        }
+
+        #svg-zoom-wrap {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            will-change: transform;
+            cursor: grab;
+            transition: box-shadow 0.2s;
+        }
+
+        #svg-zoom-wrap.dragging {
+            cursor: grabbing;
+            box-shadow: 0 2px 24px 0 rgba(0, 212, 255, 0.11);
+        }
+
+        /* 伪类防止两栏高度不一致（补充flex) */
+        #svg-viewer svg * {
+            cursor: pointer;
+        }
+
+        #svg-viewer svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #code-container {
+            flex-grow: 1;
+            overflow: auto;
+            font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+            font-size: 14px;
+            padding: 1em;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+
+        .code-tree,
+        .code-tree ul {
+            list-style: none;
+            padding-left: var(--indent-size);
+            margin: 0;
+        }
+
+        .code-tree>li {
+            padding-left: 0;
+        }
+
+        .code-tree li {
+            position: relative;
+        }
+
+        .code-line {
+            padding: 2px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toggler {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            width: 1em;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .toggler::before {
+            content: '▼';
+            display: inline-block;
+            transition: transform 0.1s linear;
+        }
+
+        .collapsed>.code-line>.toggler::before {
+            transform: rotate(-90deg);
+        }
+
+        .collapsed>ul {
+            display: none;
+        }
+
+        .collapsed+li {
+            display: none;
+        }
+
+        .syntax-tag {
+            color: #8bd3ff;
+        }
+
+        .syntax-attr-name {
+            color: #ffd166;
+        }
+
+        .syntax-attr-value {
+            color: #a0e7e5;
+        }
+
+        .syntax-bracket {
+            color: #9aa0a6;
+        }
+
+        .highlight-svg-hover {
+            outline: 2px solid #00d4ff;
+            outline-offset: 2px;
+        }
+
+        .highlight-code-hover {
+            background-color: rgba(0, 212, 255, 0.18);
+        }
+
+        .highlight-svg-pinned {
+            outline: 3px solid #ff6b6b;
+            outline-offset: 2px;
+        }
+
+        .highlight-code-pinned {
+            background-color: rgba(255, 107, 107, 0.22);
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.35);
+        }
+
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                top: 12px;
+                left: 12px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            #main-container {
+                height: auto;
+                min-height: calc(100vh - 180px);
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+    <a href="../tools.html" class="back-button glass-panel">← 返回工具箱</a>
+    <div class="page-container">
+        <header>
+            <h1>SVG-XML可视化</h1>
+            <p>右侧代码为XML，支持与左侧 SVG 元素双向联动高亮。</p>
+            <input class="btn btn-secondary" type="file" id="svg-uploader" accept="image/svg+xml">
+        </header>
+        <div id="main-container">
+
+            <div class="panel">
+
+                <div class="panel-header">图像预览</div>
+
+                <div id="svg-viewer">
+                    <p>请先上传一个SVG文件</p>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="panel-header">XML 代码 (默认折叠)</div>
+
+                <div id="code-container">
+                    <p>此处将显示可交互的SVG源代码</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <script>
+
+        const uploader = document.getElementById('svg-uploader');
+
+        const svgViewer = document.getElementById('svg-viewer');
+
+        const codeContainer = document.getElementById('code-container');
+
+        let pinnedElementId = null;
+        // 缩放/平移同之前保留
+        let currentScale = 1;
+        const MIN_SCALE = 0.1;
+        const MAX_SCALE = 8;
+        const SCALE_STEP = 0.1;
+        let panX = 0, panY = 0, isDragging = false, lastX = 0, lastY = 0;
+
+
+
+        uploader.addEventListener('change', (event) => {
+
+            const file = event.target.files[0];
+
+            if (file && file.type === "image/svg+xml") {
+
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    try { localStorage.setItem('svgMonitor:lastSVG', content); } catch (e) { }
+                    processSVG(content);
+                };
+
+                reader.readAsText(file);
+
+            } else {
+
+                alert("请选择一个有效的SVG文件 (.svg)");
+
+            }
+
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const cached = localStorage.getItem('svgMonitor:lastSVG');
+                if (cached) processSVG(cached);
+            } catch (e) { }
+        });
+
+        function processSVG(svgContent) {
+
+            const parser = new DOMParser();
+
+            const svgDoc = parser.parseFromString(svgContent, "image/svg+xml");
+
+            const svgElement = svgDoc.documentElement;
+
+            // 用test.html的ID遍历逻辑
+            let idCounter = 0;
+            const assignIds = (el) => {
+                if (el.nodeType !== 1) return;
+                el.setAttribute('data-highlight-id', idCounter++);
+                for (const child of el.children) assignIds(child);
+            };
+            assignIds(svgElement);
+            // SVG预览支持缩放/拖动
+            const serializer = new XMLSerializer();
+            const html = serializer.serializeToString(svgElement);
+            svgViewer.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.id = 'svg-zoom-wrap';
+            wrapper.style.transformOrigin = '50% 50%';
+            wrapper.innerHTML = html;
+            svgViewer.appendChild(wrapper);
+            currentScale = 1; panX = 0; panY = 0; applyZoom();
+            // 替换生成代码树方式
+            buildCodeTree(svgElement);
+            addEventListeners();
+        }
+
+
+
+        function buildCodeTree(svgRoot) {
+
+            const treeContainer = document.createElement('ul');
+
+            treeContainer.className = 'code-tree';
+
+            treeContainer.style.paddingLeft = '0';
+
+            treeContainer.appendChild(createNode(svgRoot, true));
+
+            codeContainer.innerHTML = '';
+
+            codeContainer.appendChild(treeContainer);
+
+        }
+
+
+
+        // test.html算法版 createNode: 支持元素+文本混排
+        function createNode(element, isRoot = false) {
+            const fragment = document.createDocumentFragment();
+            const id = element.getAttribute('data-highlight-id');
+            const hasChildren = Array.from(element.childNodes).some(node =>
+                (node.nodeType === 1) ||
+                (node.nodeType === 3 && node.nodeValue.trim().length > 0)
+            );
+            // 开标签
+            const mainListItem = document.createElement('li');
+            mainListItem.dataset.highlightId = id;
+            let openingTagHTML = `<span class="syntax-bracket">&lt;</span><span class="syntax-tag">${element.tagName}</span>`;
+            for (const attr of element.attributes) {
+                if (attr.name !== 'data-highlight-id') {
+                    openingTagHTML += ` <span class="syntax-attr-name">${attr.name}</span>=<span class="syntax-attr-value">"${attr.value}"</span>`;
+                }
+            }
+            openingTagHTML += `<span class="syntax-bracket">${hasChildren ? '>' : ' /&gt;'}</span>`;
+            const codeLine = document.createElement('div');
+            codeLine.className = 'code-line';
+            if (element.children.length > 0) {
+                const toggler = document.createElement('span');
+                toggler.className = 'toggler';
+                codeLine.appendChild(toggler);
+            }
+            codeLine.innerHTML += openingTagHTML;
+            mainListItem.appendChild(codeLine);
+            if (element.children.length > 0 && !isRoot) {
+                mainListItem.classList.add('collapsed');
+            }
+            fragment.appendChild(mainListItem);
+            // 递归处理所有子节点
+            if (hasChildren) {
+                const childrenList = document.createElement('ul');
+                for (const childNode of element.childNodes) {
+                    if (childNode.nodeType === 1) {
+                        childrenList.appendChild(createNode(childNode, false));
+                    } else if (childNode.nodeType === 3) {
+                        const text = childNode.nodeValue.trim();
+                        if (text) {
+                            const textLi = document.createElement('li');
+                            textLi.dataset.highlightId = id;
+                            const textDiv = document.createElement('div');
+                            textDiv.className = 'code-line syntax-text';
+                            textDiv.textContent = text;
+                            textLi.appendChild(textDiv);
+                            childrenList.appendChild(textLi);
+                        }
+                    }
+                }
+                mainListItem.appendChild(childrenList);
+            }
+            // 闭标签
+            if (hasChildren) {
+                const closingListItem = document.createElement('li');
+                closingListItem.dataset.highlightId = id;
+                const closingTagDiv = document.createElement('div');
+                closingTagDiv.className = 'code-line';
+                closingTagDiv.innerHTML = `<span class="syntax-bracket">&lt;/</span><span class="syntax-tag">${element.tagName}</span><span class="syntax-bracket">&gt;</span>`;
+                closingListItem.appendChild(closingTagDiv);
+                fragment.appendChild(closingListItem);
+            }
+            return fragment;
+        }
+
+
+
+        // 事件绑定+高亮（用test.html方案）+其它滚轮+拖拽自定义功能保留
+        function addEventListeners() {
+            svgViewer.addEventListener('mouseover', handleSvgMouseOver);
+            svgViewer.addEventListener('mouseout', handleMouseOut);
+            svgViewer.addEventListener('click', handleSvgClick);
+            codeContainer.addEventListener('mouseover', handleCodeMouseOver);
+            codeContainer.addEventListener('mouseout', handleMouseOut);
+            codeContainer.addEventListener('click', handleCodeClick);
+            svgViewer.addEventListener('wheel', handleWheelZoom, { passive: false });
+            const wrapper = document.getElementById('svg-zoom-wrap');
+            if (wrapper) {
+                wrapper.addEventListener('mousedown', startDrag);
+                window.addEventListener('mousemove', onDrag);
+                window.addEventListener('mouseup', endDrag);
+            }
+        }
+
+        // ... (其余所有事件处理函数保持不变) ...
+
+
+
+        function handleSvgMouseOver(e) {
+
+            const target = e.target.closest('[data-highlight-id]');
+
+            if (!target) return;
+
+            const id = target.getAttribute('data-highlight-id');
+
+            if (id === pinnedElementId) return;
+
+            setHighlight(id, 'hover', false);
+
+        }
+
+        function handleSvgClick(e) {
+
+            const target = e.target.closest('[data-highlight-id]');
+
+            clearHighlight('pinned');
+
+            if (target) {
+
+                const id = target.getAttribute('data-highlight-id');
+
+                pinnedElementId = id;
+
+                setHighlight(id, 'pinned', true);
+
+            } else {
+
+                pinnedElementId = null;
+
+            }
+
+        }
+
+        function handleCodeMouseOver(e) {
+
+            const targetLi = e.target.closest('li[data-highlight-id]');
+
+            if (!targetLi) return;
+
+            const id = targetLi.dataset.highlightId;
+
+            if (id === pinnedElementId) return;
+
+            setHighlight(id, 'hover', false);
+
+        }
+
+        function handleCodeClick(e) {
+
+            if (e.target.classList.contains('toggler')) {
+
+                e.target.closest('li').classList.toggle('collapsed');
+
+                return;
+
+            }
+
+            const targetLi = e.target.closest('li[data-highlight-id]');
+
+            clearHighlight('pinned');
+
+            if (targetLi) {
+
+                const id = targetLi.dataset.highlightId;
+
+                pinnedElementId = id;
+
+                setHighlight(id, 'pinned', false);
+
+            } else {
+
+                pinnedElementId = null;
+
+            }
+
+        }
+
+        function handleMouseOut() { clearHighlight('hover'); }
+
+        function setHighlight(id, type, shouldScrollCode) {
+
+            const svgEl = svgViewer.querySelector(`[data-highlight-id="${id}"]`);
+
+            // 高亮所有相关li（包含文本）
+            const codeItems = codeContainer.querySelectorAll(`li[data-highlight-id="${id}"]`);
+
+            if (svgEl) svgEl.classList.add(`highlight-svg-${type}`);
+
+            codeItems.forEach((item) => {
+                const line = item.querySelector('.code-line');
+                if (line) line.classList.add(`highlight-code-${type}`);
+                else if (item.classList.contains('syntax-text')) item.classList.add(`highlight-code-${type}`);
+            });
+
+            if (shouldScrollCode && codeItems.length > 0) {
+                const firstLine = codeItems[0].querySelector('.code-line') || codeItems[0];
+                revealElement(firstLine);
+                firstLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+        }
+
+        function clearHighlight(type) {
+
+            const svgEl = svgViewer.querySelector(`.highlight-svg-${type}`);
+
+            const codeLines = codeContainer.querySelectorAll(`.highlight-code-${type}`);
+
+            if (svgEl) svgEl.classList.remove(`highlight-svg-${type}`);
+
+            codeLines.forEach(line => line.classList.remove(`highlight-code-${type}`));
+
+            if (type === 'pinned') pinnedElementId = null;
+
+        }
+
+        function revealElement(element) {
+
+            let parentLi = element.closest('li.collapsed');
+
+            while (parentLi) {
+
+                parentLi.classList.remove('collapsed');
+
+                parentLi = parentLi.parentElement.closest('li.collapsed');
+
+            }
+
+        }
+
+        // 滚轮缩放和平移拖动逻辑(原样保留不变)
+        function handleWheelZoom(e) {
+            e.preventDefault();
+            const delta = Math.sign(e.deltaY);
+            const prevScale = currentScale;
+            const next = clamp(currentScale - delta * SCALE_STEP, MIN_SCALE, MAX_SCALE);
+            if (next !== currentScale) {
+                const wrap = document.getElementById('svg-zoom-wrap');
+                if (wrap) {
+                    const rect = wrap.getBoundingClientRect();
+                    const viewerRect = svgViewer.getBoundingClientRect();
+                    const ox = e.clientX - viewerRect.left - viewerRect.width / 2 - panX;
+                    const oy = e.clientY - viewerRect.top - viewerRect.height / 2 - panY;
+                    panX -= ox * (next / prevScale - 1);
+                    panY -= oy * (next / prevScale - 1);
+                }
+                currentScale = next;
+                applyZoom();
+            }
+        }
+
+        function applyZoom() {
+            const wrap = document.getElementById('svg-zoom-wrap');
+            if (wrap) {
+                wrap.style.transform = `translate(-50%, -50%) scale(${currentScale}) translate(${panX / currentScale}px, ${panY / currentScale}px)`;
+            }
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            const wrap = document.getElementById('svg-zoom-wrap');
+            if (wrap) wrap.classList.add('dragging');
+        }
+        function onDrag(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+            panX += dx;
+            panY += dy;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            applyZoom();
+        }
+        function endDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            const wrap = document.getElementById('svg-zoom-wrap');
+            if (wrap) wrap.classList.remove('dragging');
+        }
+
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+    </script>
+
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

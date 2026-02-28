@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asstar Denoise Protocol</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@300;700&family=Syncopate:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        /* Page-Specific Styles */
+        :root {
+            --c-noise: #FF4D4D;
+            --c-noise-glow: rgba(255, 77, 77, 0.4);
+            --c-clean: #00F0FF;
+            --c-clean-glow: rgba(0, 240, 255, 0.4);
+            --glass-panel: rgba(10, 15, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            overflow-x: hidden;
+            /* Allow vertical scroll */
+        }
+
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Container */
+        .denoise-container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+            /* Space for fixed header */
+        }
+
+        /* Status Indicator */
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--c-noise);
+            color: var(--c-noise);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+        }
+
+        body.active .status-badge {
+            border-color: var(--c-clean);
+            color: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        /* Visualizer Frame */
+        .visualizer-frame {
+            width: 90%;
+            max-width: 900px;
+            height: 350px;
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.active .visualizer-frame {
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 20px 80px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Scanline */
+        .scanline {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.3;
+        }
+
+        /* Waves */
+        .waves {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 200px;
+            width: 80%;
+            z-index: 2;
+        }
+
+        .bar {
+            width: 8px;
+            background: var(--c-noise);
+            border-radius: 10px;
+            height: 10%;
+            box-shadow: 0 0 15px var(--c-noise-glow);
+            transition: background-color 0.5s, box-shadow 0.5s;
+            animation: noiseAnim 0.4s ease-in-out infinite alternate;
+        }
+
+        body.active .bar {
+            background: var(--c-clean);
+            box-shadow: 0 0 20px var(--c-clean-glow);
+            animation-name: cleanAnim;
+            animation-duration: 1.2s;
+        }
+
+        @keyframes noiseAnim {
+            0% {
+                height: 10%;
+                opacity: 0.5;
+            }
+
+            100% {
+                height: 100%;
+                opacity: 1;
+            }
+        }
+
+        @keyframes cleanAnim {
+
+            0%,
+            100% {
+                height: 30%;
+            }
+
+            50% {
+                height: 80%;
+            }
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 50px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .switch-label {
+            display: flex;
+            justify-content: space-between;
+            width: 280px;
+            margin: 0 auto 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            width: 280px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            margin: 0 auto;
+        }
+
+        .toggle-handle {
+            width: 130px;
+            height: 60px;
+            background: linear-gradient(145deg, #333, #222);
+            border-radius: 90px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #888;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), color 0.3s, background 0.3s;
+        }
+
+        .toggle-handle::before {
+            content: "RAW";
+        }
+
+        body.active .toggle-container {
+            border-color: var(--c-clean-glow);
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        body.active .toggle-handle {
+            transform: translateX(140px);
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 30px var(--c-clean-glow);
+        }
+
+        body.active .toggle-handle::before {
+            content: "PURE";
+        }
+
+        /* Metrics */
+        .metrics {
+            display: flex;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            min-width: 120px;
+        }
+
+        .metric-label {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Glitch Effect */
+        .glitch-text {
+            position: relative;
+        }
+
+        body:not(.active) .glitch-text {
+            animation: textShake 0.3s infinite;
+            color: var(--c-noise);
+            text-shadow: 2px 0 var(--c-noise-glow);
+        }
+
+        @keyframes textShake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            20% {
+                transform: translate(-1px, -2px);
+            }
+
+            40% {
+                transform: translate(-2px, 0);
+            }
+
+            60% {
+                transform: translate(2px, 0);
+            }
+
+            80% {
+                transform: translate(1px, -1px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* Scenarios Section */
+        .scenarios-section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(145deg, rgba(10, 15, 30, 0.8), rgba(20, 25, 40, 0.6));
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated border gradient */
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(45deg,
+                    #00d4ff,
+                    #0099cc,
+                    #00a8e8,
+                    #00d4ff);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: borderRotate 4s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes borderRotate {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Inner glow effect */
+        .scenario-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4),
+                0 0 80px rgba(0, 168, 232, 0.3);
+        }
+
+        .scenario-card:hover::before {
+            opacity: 1;
+            animation: borderRotate 2s linear infinite;
+        }
+
+        .scenario-card:hover::after {
+            opacity: 1;
+        }
+
+        .scenario-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 1;
+        }
+
+        .scenario-card:hover .scenario-icon {
+            transform: scale(1.2) rotate(10deg);
+            filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.9)) drop-shadow(0 0 40px rgba(0, 153, 204, 0.6));
+        }
+
+        .scenario-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #00d4ff, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-title {
+            background: linear-gradient(135deg, #00d4ff, #00a8e8, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .scenario-desc {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            position: relative;
+            z-index: 1;
+            padding: 80px 5% 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .contact-content {
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 50px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .contact-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-link {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .contact-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--c-clean-glow);
+        }
+
+        .contact-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--c-clean);
+            transition: width 0.3s ease;
+        }
+
+        .contact-link:hover::after {
+            width: 100%;
+        }
+
+        .contact-value {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            color: var(--c-clean);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .scenarios-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scenarios-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .contact-content {
+                padding: 40px 30px;
+            }
+        }
+
+        /* --- Scenarios 3D Section Styles (Imported & Scoped) --- */
+        .scenarios-3d-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background-color: transparent;
+            color: #e0e0e0;
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            cursor: default;
+            /* Use default cursor instead of custom */
+        }
+
+        .scenarios-3d-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .noise-overlay-scoped {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjAzIi8+PC9zdmc+');
+        }
+
+        .main-container-3d {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .core-hub {
+            position: absolute;
+            text-align: center;
+            z-index: 20;
+            pointer-events: none;
+            mix-blend-mode: exclusion;
+            animation: float 6s ease-in-out infinite;
+            top: 35%;
+            /* Adjusted position - slightly above center */
+        }
+
+        .brand-name {
+            font-family: 'Noto Serif SC', serif;
+            /* Changed to support Chinese */
+            font-size: 4rem;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* Removed glitch animation for stable display */
+        }
+
+        .slogan-3d {
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            margin-top: 10px;
+            opacity: 0.8;
+            font-weight: 300;
+            font-family: 'Syncopate', sans-serif;
+        }
+
+        .zones-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease-out;
+        }
+
+        .zone {
+            position: absolute;
+            width: 30vw;
+            height: 40vh;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            background: rgba(20, 20, 20, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+            overflow: hidden;
+            transform-origin: center center;
+            /* Ensure scaling from center */
+        }
+
+        .zone-corp {
+            top: 15%;
+            left: 10%;
+            border-right: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .zone-edu {
+            top: 15%;
+            right: 10%;
+            border-left: 2px solid rgba(255, 0, 255, 0.3);
+        }
+
+        .zone-public {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40vw;
+            height: 25vh;
+            border-top: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .zone h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+            font-weight: 300;
+            color: #fff;
+        }
+
+        .zone p {
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            max-width: 80%;
+            text-align: center;
+            line-height: 1.6;
+            z-index: 2;
+            color: #aaa;
+        }
+
+        .zone .bg-text {
+            position: absolute;
+            font-family: 'Syncopate', sans-serif;
+            font-size: 6rem;
+            /* Slightly smaller to fit */
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .zone .indicator {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .zone:hover {
+            background: rgba(30, 30, 30, 0.8);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            z-index: 30;
+            /* Removed scale transform to prevent jitter */
+        }
+
+        .zone-corp:hover {
+            border-color: #00f7ff;
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.1);
+            transform: scale(1.08);
+            /* Smooth scale effect */
+        }
+
+        .zone-edu:hover {
+            border-color: #d500f9;
+            box-shadow: 0 0 30px rgba(213, 0, 249, 0.1);
+            transform: scale(1.08);
+            /* Smooth scale effect */
+        }
+
+        .zone-public:hover {
+            border-color: #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+            transform: translateX(-50%) scale(1.08);
+            /* Preserve centering + scale */
+        }
+
+        .zone:hover p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+
+        /* Custom Cursor Scoped */
+        .cursor-custom {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: difference;
+            display: none;
+            /* Hidden by default, shown via JS */
+        }
+
+        .cursor-dot-custom {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .line-deco {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 5;
+        }
+
+        .line-v {
+            width: 1px;
+            height: 100vh;
+            left: 50%;
+            top: 0;
+        }
+
+        .line-h {
+            height: 1px;
+            width: 100vw;
+            top: 50%;
+            left: 0;
+        }
+
+        /* --- 动画定义 (Optimized: Light & Slow) --- */
+        @keyframes glitch {
+            0% {
+                text-shadow: 1px 1px 0px rgba(255, 0, 0, 0.1), -1px -1px 0px rgba(0, 0, 255, 0.1);
+            }
+
+            90% {
+                text-shadow: 1px 1px 0px rgba(255, 0, 0, 0.1), -1px -1px 0px rgba(0, 0, 255, 0.1);
+            }
+
+            95% {
+                text-shadow: -1px 1px 0px rgba(255, 0, 0, 0.1), 1px -1px 0px rgba(0, 0, 255, 0.1);
+                clip-path: inset(10% 0 80% 0);
+            }
+
+            100% {
+                text-shadow: 1px -1px 0px rgba(255, 0, 0, 0.1), -1px 1px 0px rgba(0, 0, 255, 0.1);
+                clip-path: inset(40% 0 20% 0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cosmic Background -->
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <a href="index.html" class="back-button glass-panel">← 返回首页</a>
+
+    <div class="denoise-container">
+        <div class="status-badge" id="status-text">NOISE DETECTED</div>
+
+        <div class="visualizer-frame">
+            <div class="scanline"></div>
+            <div class="waves" id="wave-container">
+                <!-- Bars generated by JS -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="switch-label">
+                <span>INPUT SIGNAL</span>
+                <span>PROCESSED</span>
+            </div>
+            <div class="toggle-container" id="denoise-toggle">
+                <div class="toggle-handle"></div>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric-item">
+                <span class="metric-val glitch-text" id="snr-val" data-text="-12 dB">-12 dB</span>
+                <span class="metric-label">SNR (Signal-to-Noise)</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-val" id="latency-val">12 ms</span>
+                <span class="metric-label">Real-time Latency</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scenarios Section (Optimized 3D Style) -->
+    <section class="scenarios-3d-wrapper" id="scenarios-3d-wrapper">
+        <!-- Noise Overlay removed for transparency -->
+
+        <!-- Custom Cursor Elements -->
+        <div class="cursor-custom" id="cursor-custom"></div>
+        <div class="cursor-dot-custom" id="cursor-dot-custom"></div>
+
+        <!-- Background Particles -->
+        <canvas id="canvas-scenarios"></canvas>
+
+        <!-- Deco Lines -->
+        <div class="line-deco line-v"></div>
+        <div class="line-deco line-h"></div>
+
+        <div class="main-container-3d">
+            <!-- Core Text -->
+            <div class="core-hub">
+                <div class="brand-name">应用场景</div>
+            </div>
+
+            <!-- Zones -->
+            <div class="zones-wrapper" id="zonesWrapper">
+                <!-- 1. Immersive Denoise -->
+                <div class="zone zone-corp">
+                    <span class="bg-text">IMMERSIVE</span>
+                    <h2>沉浸式降噪</h2>
+                    <p>为音乐、游戏和娱乐提供极致的沉浸式体验，消除环境噪音干扰</p>
+                    <div class="indicator"> IMMERSIVE EXPERIENCE</div>
+                </div>
+
+                <!-- 2. Industrial Denoise -->
+                <div class="zone zone-edu">
+                    <span class="bg-text">INDUSTRIAL</span>
+                    <h2>工业降噪</h2>
+                    <p>适用于工厂、建筑工地等高噪音环境，保护听力健康</p>
+                    <div class="indicator"> INDUSTRIAL SAFETY</div>
+                </div>
+
+                <!-- 3. Hearing Aids -->
+                <div class="zone zone-public">
+                    <span class="bg-text">HEARING</span>
+                    <h2>助听器</h2>
+                    <p>智能增强语音信号，过滤背景噪音，提升听障人士的听觉体验</p>
+                    <div class="indicator"> HEARING AID</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2 class="section-title">联系我们</h2>
+        <div class="contact-content">
+            <p class="contact-text">如需定制化需求或商务合作，请联系我们</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-label">邮箱:</span>
+                    <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-label">微信:</span>
+                    <span class="contact-value">GitscYee</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/script.js"></script>
+    <script>
+        const toggle = document.getElementById('denoise-toggle');
+        const body = document.body;
+        const waveContainer = document.getElementById('wave-container');
+        const statusText = document.getElementById('status-text');
+        const snrVal = document.getElementById('snr-val');
+
+        // 1. Generate Bars
+        const barCount = 30;
+        for (let i = 0; i < barCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('bar');
+            bar.style.animationDelay = `-${Math.random()}s`;
+            bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+            waveContainer.appendChild(bar);
+        }
+
+        const bars = document.querySelectorAll('.bar');
+        let isClean = false;
+
+        // 2. Toggle Logic
+        toggle.addEventListener('click', () => {
+            isClean = !isClean;
+
+            if (isClean) {
+                // === Clean Mode ===
+                body.classList.add('active');
+                statusText.innerText = "LIGHTWEIGHT AI DENOISE";
+                snrVal.innerText = "+48 dB";
+                snrVal.removeAttribute('data-text');
+
+                bars.forEach((bar, index) => {
+                    const delay = index * 0.1;
+                    bar.style.animationName = 'cleanAnim';
+                    bar.style.animationDuration = '1.5s';
+                    bar.style.animationDelay = `${delay}s`;
+                    bar.style.animationTimingFunction = 'ease-in-out';
+                    bar.style.transform = 'scaleY(1)';
+                });
+
+            } else {
+                // === Noise Mode ===
+                body.classList.remove('active');
+                statusText.innerText = "NOISE DETECTED";
+                snrVal.innerText = "-12 dB";
+                snrVal.setAttribute('data-text', '-12 dB');
+
+                bars.forEach((bar) => {
+                    bar.style.animationName = 'noiseAnim';
+                    bar.style.animationDuration = `${0.1 + Math.random() * 0.4}s`;
+                    bar.style.animationDelay = `-${Math.random()}s`;
+                    bar.style.animationTimingFunction = 'linear';
+                });
+            }
+        });
+
+        // --- 3. Scenarios 3D Logic ---
+        (function () {
+            const wrapper = document.getElementById('scenarios-3d-wrapper');
+            const cursor = document.getElementById('cursor-custom');
+            const cursorDot = document.getElementById('cursor-dot-custom');
+            const zonesWrapper = document.getElementById('zonesWrapper');
+            const zones = document.querySelectorAll('.zone');
+            const canvas = document.getElementById('canvas-scenarios');
+            const ctx = canvas.getContext('2d');
+
+            // Cursor Logic
+            document.addEventListener('mousemove', (e) => {
+                // Only update if visible
+                if (cursor.style.display === 'block') {
+                    cursor.style.left = e.clientX + 'px';
+                    cursor.style.top = e.clientY + 'px';
+                    cursorDot.style.left = e.clientX + 'px';
+                    cursorDot.style.top = e.clientY + 'px';
+                }
+
+                // 视差效果 (Disabled to prevent jitter)
+                // const rect = wrapper.getBoundingClientRect();
+                // if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                //     const x = (window.innerWidth / 2 - e.clientX) / 300;
+                //     const y = (window.innerHeight / 2 - e.clientY) / 300;
+                //     zonesWrapper.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+                // }
+            });
+
+            wrapper.addEventListener('mouseenter', () => {
+                // Custom cursor disabled
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                // Custom cursor disabled
+            });
+
+            zones.forEach(zone => {
+                zone.addEventListener('mouseenter', () => {
+                    // Custom cursor disabled
+                });
+                zone.addEventListener('mouseleave', () => {
+                    // Custom cursor disabled
+                });
+            });
+
+            // Particles Logic
+            let particles = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 2;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                const count = window.innerWidth < 768 ? 30 : 60;
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                // Only animate if section is visible (optimization)
+                // For now, just animate always or check intersection observer
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            ctx.strokeStyle = `rgba(150, 150, 150, ${1 - distance / 150})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+        })();
+    </script>
+</body>
+
+</html>
