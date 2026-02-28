@@ -189,21 +189,43 @@
 
                 <div class="contact-nexus">
                     <div class="contact-node">
-                        <div class="node-icon">📧</div>
+                        <div class="node-icon">
+                            <!-- Brutalist Mail / Folded Lines -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <path d="M3 4h18v16H3z" />
+                                <path d="M3 4l9 8 9-8" />
+                            </svg>
+                        </div>
                         <div class="node-content">
                             <h3>邮箱</h3>
                             <p>asstarx7@gmail.com</p>
                         </div>
                     </div>
                     <div class="contact-node">
-                        <div class="node-icon">👥</div>
+                        <div class="node-icon">
+                            <!-- Intersecting Nodes / Network Tracks -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <circle cx="17" cy="7" r="4" />
+                                <circle cx="7" cy="17" r="4" />
+                                <path d="M14.5 9.5l-5 5" />
+                                <circle cx="17" cy="17" r="1.5" />
+                                <path d="M17 11v4.5" />
+                            </svg>
+                        </div>
                         <div class="node-content">
                             <h3>微信</h3>
                             <p>GitscYee</p>
                         </div>
                     </div>
                     <a class="contact-node node--explore" href="voice-denoise.html">
-                        <div class="node-icon">🚀</div>
+                        <div class="node-icon">
+                            <!-- Ascending Light Cone / Vector Geometry -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <path d="M12 2L3 20h18L12 2z" />
+                                <path d="M12 2v18" />
+                                <path d="M7.5 11h9" />
+                            </svg>
+                        </div>
                         <div class="node-content">
                             <h3>探索</h3>
                             <p>SE</p>
@@ -249,14 +271,19 @@
                 vertexColors: true
             });
 
-            // Add colors (Cyan to Magenta gradient)
+            // Add colors (Cyber flow: Indigo to Purple to Cyan)
             const count = sphereGeometry.attributes.position.count;
             const colors = [];
-            const color1 = new THREE.Color(0xffffff); // White
-            const color2 = new THREE.Color(0xaaaaaa); // Light Gray
-
             for (let i = 0; i < count; i++) {
-                const mixedColor = color1.clone().lerp(color2, Math.random());
+                const mixedColor = new THREE.Color();
+                const ratio = Math.random();
+                if (ratio < 0.4) {
+                    mixedColor.setHex(0x0a0a2a).lerp(new THREE.Color(0x8a2be2), ratio / 0.4); // Indigo to Purple
+                } else if (ratio < 0.8) {
+                    mixedColor.setHex(0x8a2be2).lerp(new THREE.Color(0x00d2ff), (ratio - 0.4) / 0.4); // Purple to Cyan
+                } else {
+                    mixedColor.setHex(0x00d2ff).lerp(new THREE.Color(0xffffff), (ratio - 0.8) / 0.2); // Cyan to White
+                }
                 colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
             }
             sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -264,22 +291,32 @@
             const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
             heroScene.add(particleSphere);
 
-            // --- Eyes Setup (Nexus) ---
-            const eyeGroup = new THREE.Group();
-            heroScene.add(eyeGroup);
-
-            const eyeGeo = new THREE.SphereGeometry(0.35, 32, 32);
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            // --- Ordered State Setup ("Awake") ---
+            // Create a geometric data structure (3D Gaussian / Normal Distribution Bell Curve)
+            const awakePositions = new Float32Array(count * 3);
+            const sigma = 3.0;        // 方差大小，决定钟形分布的底部宽度
+            const heightScale = 14.0; // 钟形的波峰高度
+            const bellRadius = 12.0;  // 粒子的分布半径
             
-            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-            leftEye.position.set(-1.5, 1.2, 8.2); // Shifted up slightly
-            leftEye.scale.set(0, 0, 0); 
-            eyeGroup.add(leftEye);
+            for (let i = 0; i < count; i++) {
+                // 在圆盘面上随机均匀分布粒子 (使用 sqrt 确保分布面积均匀)
+                const r = bellRadius * Math.sqrt(Math.random()); 
+                const theta = Math.random() * Math.PI * 2;
+                
+                const ax = r * Math.cos(theta);
+                const az = r * Math.sin(theta);
+                
+                // 二维正态分布/高斯钟形曲面函数 (Gaussian Bell Curve)
+                // f(x,z) = A * e^(-(x^2 + z^2) / (2*sigma^2))
+                let ay = heightScale * Math.exp(-(ax*ax + az*az) / (2 * sigma * sigma)) - (heightScale / 2.5);
+                
+                // 增加极其微弱的 Z 轴（高度）噪点，避免表面过于绝对光滑，保留数字粒子的呼吸感
+                ay += (Math.random() - 0.5) * 0.3;
 
-            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-            rightEye.position.set(1.5, 1.2, 8.2); // Shifted up slightly
-            rightEye.scale.set(0, 0, 0); 
-            eyeGroup.add(rightEye);
+                awakePositions[i * 3] = ax;
+                awakePositions[i * 3 + 1] = ay;
+                awakePositions[i * 3 + 2] = az;
+            }
 
             // Store original positions for wave animation
             const originalPositions = sphereGeometry.attributes.position.array.slice();
@@ -298,13 +335,14 @@
             let amplitude = 0.9;
             let speed = 1.0;
             let isHeroHovered = false; // Add hover state
-            let pulseObj = { scale: 0 }; // For idle pulse
+            let pulseObj = { scale: 0, progress: 0 }; // scale for idle, progress for awake transition
+            let isAwake = false;
 
             // --- 提示交互 (Affordance Hint) ---
             const hintEl = document.createElement('div');
             hintEl.className = 'hero-3d-hint';
             heroContainer.appendChild(hintEl);
-            const hintText = "[ CLICK TO AWAKE ]";
+            let hintText = "[ CLICK TO AWAKE ]";
             let hintTimeout;
             let typeInterval;
 
@@ -351,7 +389,7 @@
 
             // --- 动态光晕引导 (Pulse Guide) ---
             setInterval(() => {
-                if (!isHeroHovered && !isGreeting) {
+                if (!isHeroHovered && !isAwake) {
                     gsap.to(pulseObj, {
                         scale: 0.12,
                         duration: 1.5,
@@ -362,46 +400,31 @@
                 }
             }, 8000);
 
-            // --- 点击交互：打招呼 (Click Interaction: Greet) ---
-            const greetings = ["WELCOME TO ASSTAR !"];
-            let isGreeting = false;
-
-            const greetingEl = document.createElement('div');
-            greetingEl.className = 'hero-greeting';
-            heroContainer.appendChild(greetingEl);
-
+            // --- 点击交互：秩序觉醒 (Click Interaction: Awaken to Order) ---
             heroContainer.addEventListener('click', () => {
-                if (isGreeting) return;
-                isGreeting = true;
+                isAwake = !isAwake;
+                
+                // Update text hint dynamically if visible
+                hintText = isAwake ? "[ STATUS: AWAKENED ]" : "[ CLICK TO AWAKE ]";
+                if (hintEl.classList.contains('show')) {
+                    hintEl.innerText = hintText;
+                }
 
-                // 1. Show Text Bubble
-                const randomText = greetings[Math.floor(Math.random() * greetings.length)];
-                greetingEl.innerText = randomText;
-                greetingEl.classList.add('show');
+                // Transition to/from ordered geometry
+                gsap.to(pulseObj, {
+                    progress: isAwake ? 1 : 0,
+                    duration: 2.5,
+                    ease: "power3.inOut"
+                });
 
-                // 2. Sphere Reaction (Blink & Pulse)
+                // Burst effect
                 gsap.to(particleSphere.scale, {
                     x: 1.2, y: 1.2, z: 1.2,
-                    duration: 0.1,
+                    duration: 0.3,
                     yoyo: true,
                     repeat: 1,
                     ease: "power2.out"
                 });
-
-                // Blink eyes
-                gsap.to([leftEye.scale, rightEye.scale], {
-                    y: 0.1,
-                    duration: 0.1,
-                    yoyo: true,
-                    repeat: 1,
-                    ease: "power2.inOut"
-                });
-
-                // 3. Auto Hide
-                setTimeout(() => {
-                    greetingEl.classList.remove('show');
-                    setTimeout(() => { isGreeting = false; }, 500);
-                }, 2000);
             });
 
             // 5. Animation Loop
@@ -411,6 +434,8 @@
 
                 // Wave Simulation
                 const positions = sphereGeometry.attributes.position.array;
+                const p = pulseObj.progress;
+                
                 for (let i = 0; i < count; i++) {
                     const px = originalPositions[i * 3];
                     const py = originalPositions[i * 3 + 1];
@@ -419,9 +444,30 @@
                     const noise = Math.sin(px * 0.5 + heroTime) * Math.cos(py * 0.3 + heroTime) * Math.sin(pz * 0.5 + heroTime);
                     const displacement = 1 + (noise * 0.18 * amplitude);
 
-                    positions[i * 3] = px * displacement;
-                    positions[i * 3 + 1] = py * displacement;
-                    positions[i * 3 + 2] = pz * displacement;
+                    const chaosX = px * displacement;
+                    const chaosY = py * displacement;
+                    const chaosZ = pz * displacement;
+                    
+                    if (p > 0) {
+                        const ax = awakePositions[i * 3];
+                        const ay = awakePositions[i * 3 + 1];
+                        const az = awakePositions[i * 3 + 2];
+
+                        // Organic dynamic rotation for the ordered state
+                        const orderRotation = heroTime * 0.3;
+                        const cosR = Math.cos(orderRotation);
+                        const sinR = Math.sin(orderRotation);
+                        const finalAx = ax * cosR - az * sinR;
+                        const finalAz = ax * sinR + az * cosR;
+
+                        positions[i * 3] = chaosX + (finalAx - chaosX) * p;
+                        positions[i * 3 + 1] = chaosY + (ay - chaosY) * p;
+                        positions[i * 3 + 2] = chaosZ + (finalAz - chaosZ) * p;
+                    } else {
+                        positions[i * 3] = chaosX;
+                        positions[i * 3 + 1] = chaosY;
+                        positions[i * 3 + 2] = chaosZ;
+                    }
                 }
                 sphereGeometry.attributes.position.needsUpdate = true;
 
@@ -435,33 +481,12 @@
                 // 2. Elastic Scale (The "Sticky" stretching feel)
                 const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
                 const targetScale = 1 + distToCenter * 0.15 + pulseObj.scale;
-                if (!isGreeting) {
-                    particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-                }
+                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
 
                 // 3. Rotation (Auto + Reaching towards mouse)
                 particleSphere.rotation.y += 0.003; // Base rotation
                 particleSphere.rotation.x += 0.05 * (heroMouseY * 0.4 - particleSphere.rotation.x);
                 particleSphere.rotation.z += 0.05 * (heroMouseX * 0.2 - particleSphere.rotation.z);
-
-                // --- 眼睛互动逻辑 (Eyes Interaction) ---
-                eyeGroup.position.copy(particleSphere.position);
-                
-                // Only trigger if hovering AND mouse is actually near the sphere (dist < 0.5)
-                const eyeScaleTarget = (isHeroHovered && distToCenter < 0.5) ? 1 : 0; 
-                const eyeScaleVec = new THREE.Vector3(eyeScaleTarget, eyeScaleTarget, eyeScaleTarget);
-                
-                if (!isGreeting) {
-                    leftEye.scale.lerp(eyeScaleVec, 0.1);
-                    rightEye.scale.lerp(eyeScaleVec, 0.1);
-                }
-
-                // 让眼睛稍微看向鼠标 (Eye pupils tracking)
-                const lookFactor = 0.4;
-                leftEye.position.x = -1.5 + heroMouseX * lookFactor;
-                leftEye.position.y = 1.2 - heroMouseY * lookFactor;
-                rightEye.position.x = 1.5 + heroMouseX * lookFactor;
-                rightEye.position.y = 1.2 - heroMouseY * lookFactor;
 
                 heroRenderer.render(heroScene, heroCamera);
             }
