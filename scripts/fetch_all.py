@@ -8,8 +8,9 @@ import os
 import sys
 import json
 import time
-import argparse
 import re
+import argparse
+import concurrent.futures
 from datetime import datetime, date
 from typing import Dict, List, Any, Optional
 from urllib.parse import urlencode
@@ -91,7 +92,7 @@ class GitHubTrendingScraper(BaseScraper):
             print(f"Fetching GitHub Trending ({period})...")
             url = f'https://github.com/trending?since={period}' if period != 'daily' else 'https://github.com/trending'
             html = self.get(url)
-            soup = BeautifulSoup(html, 'html.parser')
+            soup = BeautifulSoup(html, 'lxml')
             repos = []
             for article in soup.find_all('article', class_='Box-row')[:25]:
                 data = self._parse_repo_article(article)
@@ -273,11 +274,17 @@ def main():
     }
 
     if args.target == 'all':
-        for name, scraper in scrapers.items():
-            try:
-                scraper.run()
-            except Exception as e:
-                print(f"Critical error in {name}: {e}")
+        print(f"Starting parallel fetch for all {len(scrapers)} targets...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(scrapers)) as executor:
+            future_to_name = {executor.submit(scraper.run): name for name, scraper in scrapers.items()}
+            for future in concurrent.futures.as_completed(future_to_name):
+                name = future_to_name[future]
+                try:
+                    future.result()
+                    print(f"Successfully completed: {name}")
+                except Exception as e:
+                    print(f"Critical error in {name}: {e}")
+        print("All fetch operations completed.")
     else:
         scrapers[args.target].run()
 

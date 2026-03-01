@@ -364,6 +364,8 @@
         bindFocusTabs();
         loadFocus();
         addExtras();
+        // Auto refresh every 6 hours
+        setInterval(loadFocus, 6 * 60 * 60 * 1000);
       });
 
       function bindFocusTabs() {
