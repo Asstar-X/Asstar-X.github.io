@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>项目详情 | Asstar</title>
+    <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP（与前沿项目保持一致） -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- Preconnect to Utterances for faster loading -->
+    <link rel="preconnect" href="https://utteranc.es" crossorigin>
+    <link rel="dns-prefetch" href="https://utteranc.es">
+    <!-- Utterances will be loaded via script tag below -->
+    <style>
+        /* Utterances 自定义样式 */
+        .utterances {
+            margin-top: 3rem;
+        }
+
+        /* 项目内容样式 */
+        .project-content {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .project-content h1,
+        .project-content h2,
+        .project-content h3,
+        .project-content h4,
+        .project-content h5,
+        .project-content h6 {
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-content h1 {
+            font-size: 2rem;
+        }
+
+        .project-content h2 {
+            font-size: 1.75rem;
+        }
+
+        .project-content h3 {
+            font-size: 1.5rem;
+        }
+
+        .project-content h4 {
+            font-size: 1.25rem;
+        }
+
+        .project-content h5 {
+            font-size: 1.125rem;
+        }
+
+        .project-content h6 {
+            font-size: 1rem;
+        }
+
+        .project-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .project-content code {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .project-content pre {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .project-content pre code {
+            background: none;
+            color: var(--text-primary);
+            padding: 0;
+        }
+
+        .project-content blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .project-content ul,
+        .project-content ol {
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        .project-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .project-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .project-content a:hover {
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* 与 space.html 一致的玻璃拟态返回按钮样式 */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .back-button {
+                top: 12px;
+                left: 12px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 宇宙背景层，与前沿项目保持结构一致 -->
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <main>
+        <section class="project-detail">
+            <div class="container">
+                <a href="javascript:history.back()" class="back-button glass-panel">← 返回</a>
+
+                <div class="section-header">
+                    <h1 class="section-title" id="project-title">项目详情</h1>
+                    <div class="section-line"></div>
+                </div>
+
+                <div class="project-content" id="project-content">
+                    <!-- 项目内容将在这里动态加载 -->
+                </div>
+
+                <div class="utterances">
+                    <script src="https://utteranc.es/client.js" repo="Asstar-X/Asstar-X.github.io" issue-term="title"
+                        theme="photon-dark" crossorigin="anonymous" async>
+                        </script>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img">
+                    <span class="logo-text">ASSTAR</span>
+                </div>
+                <p class="footer-text">&copy; 2025 Asstar. 探索未知的边界。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // 获取URL参数并加载内容
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileParam = urlParams.get('file');
+
+        if (fileParam) {
+            fetch(fileParam)
+                .then(response => response.text())
+                .then(md => {
+                    let html = md
+                        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/`(.*?)`/g, '<code>$1</code>')
+                        .replace(/\n\n/g, '</p><p>')
+                        .replace(/^\n/, '<p>')
+                        .replace(/\n$/, '</p>');
+
+                    if (!html.startsWith('<p>')) html = '<p>' + html;
+                    if (!html.endsWith('</p>')) html = html + '</p>';
+
+                    document.getElementById('project-content').innerHTML = html;
+
+                    const fileName = fileParam.split('/').pop().replace('.md', '');
+                    document.getElementById('project-title').textContent = fileName;
+                    document.title = `${fileName} | Asstar`;
+                })
+                .catch(error => {
+                    console.error('Error loading file:', error);
+                    document.getElementById('project-content').innerHTML = '<p>无法加载项目内容。</p>';
+                });
+        } else {
+            document.getElementById('project-content').innerHTML = '<p>未指定项目文件。</p>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RBTWR9QNMQ');
+    </script>
+    <title>Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/time-rift.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+    <!-- 引入 Three.js 和 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <style>
+        /* 新增背景样式 */
+        body { 
+            background: #050505 !important; 
+            /* 注意：不添加 overflow: hidden 以保持原有滚动功能 */
+        }
+
+        /* 画布容器 */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 保持在内容之下 (内容 z-index >= 2) */
+        }
+
+        /* 噪点遮罩 - 增加电影质感 */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Hero 3D Container Styles */
+        #hero-3d-container {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #hero-3d-container canvas {
+            display: block;
+        }
+
+        /* 3D 交互提示 (Affordance) */
+        .hero-3d-hint {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-display, 'Orbitron', sans-serif);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            opacity: 0;
+            white-space: nowrap;
+            z-index: 10;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .hero-3d-hint.show {
+            opacity: 1;
+        }
+
+        .hero-3d-hint.hide {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .hero-3d-hint.blinking-cursor::after {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-left: 6px;
+            vertical-align: text-bottom;
+            animation: blinkCursor 0.75s infinite;
+        }
+
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 宇宙背景层 -->
+    <div class="noise-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <!-- 导航栏 -->
+    <header class="header">
+        <nav class="nav">
+            <a href="space.html" class="logo">
+                <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img" title="点击进入探索">
+                <span class="logo-text">ASSTAR</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="trending-project.html" class="nav-link">前沿项目</a></li>
+                <li><a href="huggingface-papers.html" class="nav-link">前沿论文</a></li>
+                <li><a href="focus.html" class="nav-link">焦点新闻</a></li>
+                <li><a href="tools.html" class="nav-link">提效工具</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main id="time-rift-main">
+        <!-- 英雄区域 -->
+        <section id="home" class="hero rift-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-badge">探索 • 专注 • 未来</div>
+                    <h1 class="hero-title">探索未知的边界</h1>
+                    <p class="hero-subtitle">欢迎来到Asstar，让意识，先于光速抵达未知。</p>
+                </div>
+                <div class="hero-visual">
+                    <div id="hero-3d-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于区域 (Redesigned: High-End Tech Reveal) -->
+        <section id="about" class="about rift-section">
+            <div class="container">
+                <div class="about-aura"></div>
+                <div class="about-content">
+                    <div class="about-text-wrapper">
+                        <p class="about-paragraph">在这里，硅基与碳基的认知边界被折叠，范式在零维坍缩，又在高维重写。</p>
+                        <p class="about-sub-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="projects rift-section">
+
+
+            <div class="galactic-timeline-container">
+                <div id="galactic-timeline" class="galactic-timeline">
+                    <svg id="galactic-svg" class="galactic-svg"></svg>
+                    <div id="galactic-nodes" class="galactic-nodes"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 联系区域 (Redesigned: High-End Tech Reveal) -->
+        <section id="contact" class="contact rift-section">
+            <div class="container">
+                <div class="lab-header">
+                    <div class="lab-title-bg">CONTACT</div>
+                    <div class="lab-title-wrapper">
+                        <h2 class="lab-title">联系我们</h2>
+                        <div class="lab-line-decoder"></div>
+                    </div>
+                </div>
+
+                <div class="contact-nexus">
+                    <div class="contact-node">
+                        <div class="node-icon">
+                            <!-- Brutalist Mail / Folded Lines -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <path d="M3 4h18v16H3z" />
+                                <path d="M3 4l9 8 9-8" />
+                            </svg>
+                        </div>
+                        <div class="node-content">
+                            <h3>邮箱</h3>
+                            <p>asstarx7@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-node">
+                        <div class="node-icon">
+                            <!-- Intersecting Nodes / Network Tracks -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <circle cx="17" cy="7" r="4" />
+                                <circle cx="7" cy="17" r="4" />
+                                <path d="M14.5 9.5l-5 5" />
+                                <circle cx="17" cy="17" r="1.5" />
+                                <path d="M17 11v4.5" />
+                            </svg>
+                        </div>
+                        <div class="node-content">
+                            <h3>微信</h3>
+                            <p>GitscYee</p>
+                        </div>
+                    </div>
+                    <a class="contact-node node--explore" href="voice-denoise.html">
+                        <div class="node-icon">
+                            <!-- Ascending Light Cone / Vector Geometry -->
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
+                                <path d="M12 2L3 20h18L12 2z" />
+                                <path d="M12 2v18" />
+                                <path d="M7.5 11h9" />
+                            </svg>
+                        </div>
+                        <div class="node-content">
+                            <h3>探索</h3>
+                            <p>SE</p>
+                        </div>
+                    </a>
+                </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script src="js/time-rift.js"></script>
+    <script>
+        loadProjects('galactic-timeline');
+
+        // --- Hero "Voice" 3D Particle Sphere ---
+        (function() {
+            const heroContainer = document.getElementById('hero-3d-container');
+            if (!heroContainer) return;
+
+            const containerWidth = heroContainer.offsetWidth || 500;
+            const containerHeight = heroContainer.offsetHeight || 500;
+
+            // 1. Setup Scene
+            const heroScene = new THREE.Scene();
+            heroScene.fog = new THREE.FogExp2(0x050505, 0.015);
+
+            const heroCamera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+            heroCamera.position.z = 25;
+
+            const heroRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            heroRenderer.setSize(containerWidth, containerHeight);
+            heroRenderer.setPixelRatio(window.devicePixelRatio);
+            heroContainer.appendChild(heroRenderer.domElement);
+
+            // 2. The "Voice" Particle Sphere
+            const sphereGeometry = new THREE.SphereGeometry(8, 128, 128);
+            const sphereMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.85,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            // Add colors (Cyber flow: Indigo to Purple to Cyan)
+            const count = sphereGeometry.attributes.position.count;
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                const mixedColor = new THREE.Color();
+                const ratio = Math.random();
+                if (ratio < 0.4) {
+                    mixedColor.setHex(0x0a0a2a).lerp(new THREE.Color(0x8a2be2), ratio / 0.4); // Indigo to Purple
+                } else if (ratio < 0.8) {
+                    mixedColor.setHex(0x8a2be2).lerp(new THREE.Color(0x00d2ff), (ratio - 0.4) / 0.4); // Purple to Cyan
+                } else {
+                    mixedColor.setHex(0x00d2ff).lerp(new THREE.Color(0xffffff), (ratio - 0.8) / 0.2); // Cyan to White
+                }
+                colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
+            }
+            sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
+            heroScene.add(particleSphere);
+
+            // --- Ordered State Setup ("Awake") ---
+            // Create a geometric data structure (3D Gaussian / Normal Distribution Bell Curve)
+            const awakePositions = new Float32Array(count * 3);
+            const sigma = 3.0;        // 方差大小，决定钟形分布的底部宽度
+            const heightScale = 14.0; // 钟形的波峰高度
+            const bellRadius = 12.0;  // 粒子的分布半径
+            
+            for (let i = 0; i < count; i++) {
+                // 在圆盘面上随机均匀分布粒子 (使用 sqrt 确保分布面积均匀)
+                const r = bellRadius * Math.sqrt(Math.random()); 
+                const theta = Math.random() * Math.PI * 2;
+                
+                const ax = r * Math.cos(theta);
+                const az = r * Math.sin(theta);
+                
+                // 二维正态分布/高斯钟形曲面函数 (Gaussian Bell Curve)
+                // f(x,z) = A * e^(-(x^2 + z^2) / (2*sigma^2))
+                let ay = heightScale * Math.exp(-(ax*ax + az*az) / (2 * sigma * sigma)) - (heightScale / 2.5);
+                
+                // 增加极其微弱的 Z 轴（高度）噪点，避免表面过于绝对光滑，保留数字粒子的呼吸感
+                ay += (Math.random() - 0.5) * 0.3;
+
+                awakePositions[i * 3] = ax;
+                awakePositions[i * 3 + 1] = ay;
+                awakePositions[i * 3 + 2] = az;
+            }
+
+            // Store original positions for wave animation
+            const originalPositions = sphereGeometry.attributes.position.array.slice();
+
+            // 3. Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            heroScene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            heroScene.add(pointLight);
+
+            // 4. Interaction Variables
+            let heroMouseX = 0;
+            let heroMouseY = 0;
+            let heroTime = 0;
+            let amplitude = 0.9;
+            let speed = 1.0;
+            let isHeroHovered = false; // Add hover state
+            let pulseObj = { scale: 0, progress: 0 }; // scale for idle, progress for awake transition
+            let isAwake = false;
+
+            // --- 提示交互 (Affordance Hint) ---
+            const hintEl = document.createElement('div');
+            hintEl.className = 'hero-3d-hint';
+            heroContainer.appendChild(hintEl);
+            let hintText = "[ CLICK TO AWAKE ]";
+            let hintTimeout;
+            let typeInterval;
+
+            heroContainer.addEventListener('mouseenter', () => {
+                isHeroHovered = true;
+                
+                // Show hint with pseudo typing effect
+                hintEl.classList.remove('hide');
+                hintEl.classList.add('show', 'blinking-cursor');
+                hintEl.innerText = "";
+                
+                let charIndex = 0;
+                clearInterval(typeInterval);
+                typeInterval = setInterval(() => {
+                    if (charIndex < hintText.length) {
+                        hintEl.innerText += hintText[charIndex];
+                        charIndex++;
+                    } else {
+                        clearInterval(typeInterval);
+                        // Hide after a brief moment
+                        clearTimeout(hintTimeout);
+                        hintTimeout = setTimeout(() => {
+                            hintEl.classList.remove('show', 'blinking-cursor');
+                            hintEl.classList.add('hide');
+                        }, 3000);
+                    }
+                }, 40);
+            });
+
+            heroContainer.addEventListener('mouseleave', () => {
+                isHeroHovered = false;
+                heroMouseX = 0;
+                heroMouseY = 0;
+                clearInterval(typeInterval);
+                hintEl.classList.remove('show', 'blinking-cursor');
+                hintEl.classList.add('hide');
+            });
+
+            heroContainer.addEventListener('mousemove', (event) => {
+                const rect = heroContainer.getBoundingClientRect();
+                heroMouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+                heroMouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+            });
+
+            // --- 动态光晕引导 (Pulse Guide) ---
+            setInterval(() => {
+                if (!isHeroHovered && !isAwake) {
+                    gsap.to(pulseObj, {
+                        scale: 0.12,
+                        duration: 1.5,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "sine.inOut"
+                    });
+                }
+            }, 8000);
+
+            // --- 点击交互：秩序觉醒 (Click Interaction: Awaken to Order) ---
+            heroContainer.addEventListener('click', () => {
+                isAwake = !isAwake;
+                
+                // Update text hint dynamically if visible
+                hintText = isAwake ? "[ STATUS: AWAKENED ]" : "[ CLICK TO AWAKE ]";
+                if (hintEl.classList.contains('show')) {
+                    hintEl.innerText = hintText;
+                }
+
+                // Transition to/from ordered geometry
+                gsap.to(pulseObj, {
+                    progress: isAwake ? 1 : 0,
+                    duration: 2.5,
+                    ease: "power3.inOut"
+                });
+
+                // Burst effect
+                gsap.to(particleSphere.scale, {
+                    x: 1.2, y: 1.2, z: 1.2,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.out"
+                });
+            });
+
+            // 5. Animation Loop
+            function animateHeroSphere() {
+                requestAnimationFrame(animateHeroSphere);
+                heroTime += 0.01 * speed;
+
+                // Wave Simulation
+                const positions = sphereGeometry.attributes.position.array;
+                const p = pulseObj.progress;
+                
+                for (let i = 0; i < count; i++) {
+                    const px = originalPositions[i * 3];
+                    const py = originalPositions[i * 3 + 1];
+                    const pz = originalPositions[i * 3 + 2];
+
+                    const noise = Math.sin(px * 0.5 + heroTime) * Math.cos(py * 0.3 + heroTime) * Math.sin(pz * 0.5 + heroTime);
+                    const displacement = 1 + (noise * 0.18 * amplitude);
+
+                    const chaosX = px * displacement;
+                    const chaosY = py * displacement;
+                    const chaosZ = pz * displacement;
+                    
+                    if (p > 0) {
+                        const ax = awakePositions[i * 3];
+                        const ay = awakePositions[i * 3 + 1];
+                        const az = awakePositions[i * 3 + 2];
+
+                        // Organic dynamic rotation for the ordered state
+                        const orderRotation = heroTime * 0.3;
+                        const cosR = Math.cos(orderRotation);
+                        const sinR = Math.sin(orderRotation);
+                        const finalAx = ax * cosR - az * sinR;
+                        const finalAz = ax * sinR + az * cosR;
+
+                        positions[i * 3] = chaosX + (finalAx - chaosX) * p;
+                        positions[i * 3 + 1] = chaosY + (ay - chaosY) * p;
+                        positions[i * 3 + 2] = chaosZ + (finalAz - chaosZ) * p;
+                    } else {
+                        positions[i * 3] = chaosX;
+                        positions[i * 3 + 1] = chaosY;
+                        positions[i * 3 + 2] = chaosZ;
+                    }
+                }
+                sphereGeometry.attributes.position.needsUpdate = true;
+
+                // Interaction Logic: Magnetic Stickiness & Elasticity
+                // 1. Position Magnetism (The "Pull" feel)
+                const targetPosX = heroMouseX * 1.2;
+                const targetPosY = -heroMouseY * 1.2;
+                particleSphere.position.x += 0.08 * (targetPosX - particleSphere.position.x);
+                particleSphere.position.y += 0.08 * (targetPosY - particleSphere.position.y);
+
+                // 2. Elastic Scale (The "Sticky" stretching feel)
+                const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
+                const targetScale = 1 + distToCenter * 0.15 + pulseObj.scale;
+                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+
+                // 3. Rotation (Auto + Reaching towards mouse)
+                particleSphere.rotation.y += 0.003; // Base rotation
+                particleSphere.rotation.x += 0.05 * (heroMouseY * 0.4 - particleSphere.rotation.x);
+                particleSphere.rotation.z += 0.05 * (heroMouseX * 0.2 - particleSphere.rotation.z);
+
+                heroRenderer.render(heroScene, heroCamera);
+            }
+
+            animateHeroSphere();
+
+            // 6. Resize Handler
+            const resizeObserver = new ResizeObserver(() => {
+                const newWidth = heroContainer.offsetWidth;
+                const newHeight = heroContainer.offsetHeight;
+                heroCamera.aspect = newWidth / newHeight;
+                heroCamera.updateProjectionMatrix();
+                heroRenderer.setSize(newWidth, newHeight);
+            });
+            resizeObserver.observe(heroContainer);
+        })();
+    </script>
+</body>
+
+</html>
