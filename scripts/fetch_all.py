@@ -33,8 +33,9 @@ class BaseScraper:
             try:
                 resp = self.session.get(url, timeout=self.timeout)
                 resp.raise_for_status()
-                # Ensure correct encoding for Tophub and others
-                resp.encoding = resp.apparent_encoding or 'utf-8'
+                # Use header encoding if available, otherwise fallback to apparent or utf-8
+                if not resp.encoding or resp.encoding.lower() == 'iso-8859-1':
+                    resp.encoding = resp.apparent_encoding or 'utf-8'
                 return resp.text
             except Exception as e:
                 if attempt == self.max_retries:
@@ -203,37 +204,70 @@ class HFPapersScraper(BaseScraper):
 class TophubScraper(BaseScraper):
     def run(self):
         specs = {
-            'finance': {'url': 'https://tophub.today/c/finance', 'targets': ['第一财经', '雪球', '华尔街见闻', '集思录']},
-            'tech': {'url': 'https://tophub.today/c/tech', 'targets': ['36氪', '少数派', 'IT之家']},
-            'developer': {'url': 'https://tophub.today/c/developer', 'targets': ['CSDN', '人人都是产品经理', '掘金']}
+            'finance': [
+                {'url': 'https://tophub.today/c/finance', 'targets': ['第一财经', '雪球', '华尔街见闻', '集思录']},
+                {'url': 'https://tophub.today/c/finance?&p=3', 'targets': ['格隆汇', '金融界', '慧博投研资讯', '英为财情', '证券日报网', '美股市值']},
+                {'url': 'https://tophub.today/c/finance?&p=4', 'targets': ['同花顺财经']}
+            ],
+            'tech': [
+                {'url': 'https://tophub.today/c/tech', 'targets': ['36氪', '少数派', 'IT之家']},
+                {'url': 'https://tophub.today/c/developer', 'targets': ['人人都是产品经理', '掘金']},
+                {'url': 'https://tophub.today/c/ai', 'targets': ['量子位', '超神经']},
+                {'url': 'https://tophub.today/c/ai?&p=3', 'targets': ['增长黑客']},
+                {'url': 'https://tophub.today/c/ai?&p=4', 'targets': ['首席安全官']}
+            ],
+            'ai': [
+                {'url': 'https://tophub.today/c/ai', 'targets': ['AIbase', 'AI工具集', 'AI产品榜']},
+                {'url': 'https://tophub.today/c/ai?&p=2', 'targets': ['智源社区', 'AIHub', 'Hugging Face']},
+                {'url': 'https://tophub.today/c/ai?&p=3', 'targets': ['Aminer', '三花 AI']},
+                {'url': 'https://tophub.today/c/ai?&p=5', 'targets': ['AI开发者de频道']}
+            ]
         }
         output = {'savedAt': datetime.now().isoformat(), 'categories': {}}
-        for cat, spec in specs.items():
+        for cat, page_specs in specs.items():
             print(f"Fetching Tophub ({cat})...")
-            html = self.get(spec['url'])
-            soup = BeautifulSoup(html, 'lxml')
-            cards = soup.select('.cc-cd')
-            parsed = {t: [] for t in spec['targets']}
-            for card in cards:
-                label = card.select_one('.cc-cd-lb').get_text(strip=True) if card.select_one('.cc-cd-lb') else ''
-                target = next((t for t in spec['targets'] if t in label), None)
-                if not target: continue
-                s_title = card.select_one('.cc-cd-sb-st').get_text(strip=True) if card.select_one('.cc-cd-sb-st') else ''
-                items = []
-                for a in card.select('.cc-cd-cb a[href]'):
-                    href = a.get('href', '').strip()
-                    if not (href.startswith('http')): continue
-                    row = a.select_one('.cc-cd-cb-ll')
-                    if not row: continue
-                    items.append({
-                        'rank': row.select_one('.s').get_text(strip=True) if row.select_one('.s') else '',
-                        'title': row.select_one('.t').get_text(strip=True) if row.select_one('.t') else '',
-                        'extra': row.select_one('.e').get_text(strip=True) if row.select_one('.e') else '',
-                        'url': href
-                    })
-                parsed[target].append({'section': s_title, 'items': items})
-            output['categories'][cat] = {'sourceUrl': spec['url'], 'sections': parsed}
-            time.sleep(2)
+            # Initialize parsed dict with all targets for this category
+            all_targets = []
+            for spec in page_specs:
+                all_targets.extend(spec['targets'])
+            parsed = {t: [] for t in all_targets}
+            
+            for spec in page_specs:
+                print(f"  Fetching page: {spec['url']}")
+                html = self.get(spec['url'])
+                soup = BeautifulSoup(html, 'lxml')
+                cards = soup.select('.cc-cd')
+                for card in cards:
+                    label_el = card.select_one('.cc-cd-lb')
+                    label = label_el.get_text(strip=True) if label_el else ''
+                    # Match target if it's in the current page's target list
+                    target = next((t for t in spec['targets'] if t in label), None)
+                    if not target: continue
+                    
+                    s_title_el = card.select_one('.cc-cd-sb-st')
+                    s_title = s_title_el.get_text(strip=True) if s_title_el else ''
+                    items = []
+                    for a in card.select('.cc-cd-cb a[href]'):
+                        href = a.get('href', '').strip()
+                        if not (href.startswith('http')): continue
+                        # Fix malformed URLs like https:https:// found in some sources
+                        if href.startswith('https:https://'):
+                            href = href.replace('https:https://', 'https://', 1)
+                        elif href.startswith('http:http://'):
+                            href = href.replace('http:http://', 'http://', 1)
+                        
+                        row = a.select_one('.cc-cd-cb-ll')
+                        if not row: continue
+                        items.append({
+                            'rank': row.select_one('.s').get_text(strip=True) if row.select_one('.s') else '',
+                            'title': row.select_one('.t').get_text(strip=True) if row.select_one('.t') else '',
+                            'extra': row.select_one('.e').get_text(strip=True) if row.select_one('.e') else '',
+                            'url': href
+                        })
+                    parsed[target].append({'section': s_title, 'items': items})
+                time.sleep(1)
+
+            output['categories'][cat] = {'sourceUrl': page_specs[0]['url'], 'sections': parsed}
 
         # EastMoney Integration
         try:

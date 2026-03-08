@@ -45,9 +45,13 @@
         }
 
         .trending-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-secondary);
             margin-bottom: 30px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            text-transform: uppercase;
         }
 
         .source-tabs {
@@ -448,7 +452,7 @@
             <div class="container">
                 <div class="trending-header">
                     <h1 class="trending-title">Trending Project</h1>
-                    <p class="trending-subtitle">每日GitHub 与 HuggingFace 热门项目</p>
+                    <p class="trending-subtitle" id="last-updated">Synchronizing Quantum Data...</p>
                     <div class="source-tabs" id="source-tabs">
                         <button class="source-tab active" data-source="github">GitHub</button>
                         <button class="source-tab" data-source="huggingface">HuggingFace</button>
@@ -547,17 +551,39 @@
 
                 async loadData() {
                     const container = document.getElementById('trending-content');
+                    const timeEl = document.getElementById('last-updated');
                     if (!container) return;
                     container.innerHTML = window.generateSkeleton(6);
                     try {
+                        let list = [];
+                        let rawJson = null;
                         if (this.source === 'github') {
-                            const list = await this.fetchGithub();
+                            const res = await fetch('feeds/trending-data.json', { cache: 'no-store' });
+                            if (res.ok) {
+                                rawJson = await res.json();
+                                list = rawJson[this.period] || [];
+                            }
                             this.githubData = list;
                             this.renderGithub();
                         } else {
-                            const list = await this.fetchHuggingface();
+                            const res = await fetch('feeds/huggingface-data.json', { cache: 'no-store' });
+                            if (res.ok) {
+                                rawJson = await res.json();
+                                list = rawJson[this.category] || [];
+                            }
                             this.hfData = list;
                             this.renderHuggingface();
+                        }
+
+                        if (timeEl && rawJson && rawJson.lastUpdated) {
+                            const date = new Date(rawJson.lastUpdated);
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const d = String(date.getDate()).padStart(2, '0');
+                            const hh = String(date.getHours()).padStart(2, '0');
+                            const mm = String(date.getMinutes()).padStart(2, '0');
+                            const ss = String(date.getSeconds()).padStart(2, '0');
+                            timeEl.innerText = `${y}.${m}.${d} ${hh}:${mm}:${ss}`;
                         }
                     } catch (err) {
                         console.error('加载失败', err);

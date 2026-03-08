@@ -88,9 +88,13 @@
     }
 
     .trending-subtitle {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--text-secondary);
       margin-bottom: 30px;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      opacity: 0.8;
+      text-transform: uppercase;
     }
 
     .source-tabs {
@@ -332,11 +336,11 @@
       <div class="container">
         <div class="trending-header">
           <h1 class="trending-title">Live Focus</h1>
-          <p class="trending-subtitle">每日财经、科技、产品的热门资讯聚合</p>
+          <p class="trending-subtitle" id="last-updated">数据同步中...</p>
           <div class="source-tabs" id="focus-tabs">
             <button class="source-tab active" data-category="finance">财经</button>
             <button class="source-tab" data-category="tech">科技</button>
-            <button class="source-tab" data-category="developer">产品</button>
+            <button class="source-tab" data-category="ai">AI</button>
           </div>
           <div id="controls"></div>
         </div>
@@ -384,12 +388,25 @@
 
       async function loadFocus() {
         const container = document.getElementById('focus-content');
+        const timeEl = document.getElementById('last-updated');
         if (!container) return;
         container.innerHTML = window.generateSkeleton(6);
         try {
           const res = await fetch('feeds/realtime-focus.json', { cache: 'no-store' });
           if (!res.ok) throw new Error('无法加载 feeds/realtime-focus.json');
           state.data = await res.json();
+          
+          if (timeEl && state.data.savedAt) {
+            const date = new Date(state.data.savedAt);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const hh = String(date.getHours()).padStart(2, '0');
+            const mm = String(date.getMinutes()).padStart(2, '0');
+            const ss = String(date.getSeconds()).padStart(2, '0');
+            timeEl.innerText = `${y}.${m}.${d} ${hh}:${mm}:${ss}`;
+          }
+
           renderControls();
           renderFocus();
         } catch (err) {
@@ -411,7 +428,21 @@
         const all = state.data && state.data.categories ? state.data.categories : {};
         const cat = all[state.category] || {};
         const sections = cat.sections || {};
-        const sources = Object.keys(sections);
+        let sources = Object.keys(sections);
+
+        // 自定义排序顺序
+        if (state.category === 'finance') {
+          const financeOrder = ['东方财富网', '同花顺财经', '第一财经', '雪球', '英为财情', '金融界', '华尔街见闻', '证券日报网', '格隆汇', '集思录', '慧博投研资讯', '美股市值'];
+          sources.sort((a, b) => {
+            const idxA = financeOrder.indexOf(a);
+            const idxB = financeOrder.indexOf(b);
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+        }
+
         if (!state.subSource || !sources.includes(state.subSource)) {
           state.subSource = sources[0] || '';
         }
