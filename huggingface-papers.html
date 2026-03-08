@@ -354,13 +354,20 @@
                         
                         if (timeEl && all.lastUpdated) {
                             const date = new Date(all.lastUpdated);
-                            const y = date.getFullYear();
-                            const m = String(date.getMonth() + 1).padStart(2, '0');
-                            const d = String(date.getDate()).padStart(2, '0');
-                            const hh = String(date.getHours()).padStart(2, '0');
-                            const mm = String(date.getMinutes()).padStart(2, '0');
-                            const ss = String(date.getSeconds()).padStart(2, '0');
-                            timeEl.innerText = `${y}.${m}.${d} ${hh}:${mm}:${ss}`;
+                            const opts = {
+                                timeZone: 'Asia/Shanghai',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                            };
+                            const parts = new Intl.DateTimeFormat('zh-CN', opts).formatToParts(date);
+                            const m = {};
+                            parts.forEach(p => m[p.type] = p.value);
+                            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
                         }
 
                         this.papersData = all[this.currentCategory] || [];

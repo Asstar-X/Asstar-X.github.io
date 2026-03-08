@@ -11,7 +11,7 @@ import time
 import re
 import argparse
 import concurrent.futures
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Dict, List, Any, Optional
 from urllib.parse import urlencode
 
@@ -101,7 +101,7 @@ class GitHubTrendingScraper(BaseScraper):
             all_data[period] = repos
             time.sleep(2)
 
-        output = {**all_data, 'lastUpdated': datetime.now().isoformat(), 'totalRepositories': sum(len(r) for r in all_data.values())}
+        output = {**all_data, 'lastUpdated': datetime.now(timezone.utc).isoformat(), 'totalRepositories': sum(len(r) for r in all_data.values())}
         with open(get_output_path('trending-data.json'), 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
         print(f"Saved GitHub Trending data. Total: {output['totalRepositories']}")
@@ -139,7 +139,7 @@ class HuggingFaceScraper(BaseScraper):
             all_data[cat] = parsed_models
             time.sleep(2)
 
-        output = {**all_data, 'lastUpdated': datetime.now().isoformat(), 'totalModels': sum(len(m) for m in all_data.values())}
+        output = {**all_data, 'lastUpdated': datetime.now(timezone.utc).isoformat(), 'totalModels': sum(len(m) for m in all_data.values())}
         dest = get_output_path('huggingface-data.json')
         if output['totalModels'] > 0 or not os.path.exists(dest):
             with open(dest, 'w', encoding='utf-8') as f:
@@ -191,7 +191,7 @@ class HFPapersScraper(BaseScraper):
             except Exception as e:
                 print(f"  Failed {key}: {e}"); payload[key] = []
         
-        payload['lastUpdated'] = datetime.now().isoformat()
+        payload['lastUpdated'] = datetime.now(timezone.utc).isoformat()
         payload['totals'] = {k: len(v) for k, v in payload.items() if isinstance(v, list)}
         dest = get_output_path('huggingface-papers-data.json')
         if sum(payload['totals'].values()) > 0 or not os.path.exists(dest):
@@ -223,7 +223,7 @@ class TophubScraper(BaseScraper):
                 {'url': 'https://tophub.today/c/ai?&p=5', 'targets': ['AI开发者de频道']}
             ]
         }
-        output = {'savedAt': datetime.now().isoformat(), 'categories': {}}
+        output = {'savedAt': datetime.now(timezone.utc).isoformat(), 'categories': {}}
         for cat, page_specs in specs.items():
             print(f"Fetching Tophub ({cat})...")
             # Initialize parsed dict with all targets for this category
