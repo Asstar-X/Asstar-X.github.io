@@ -132,21 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // 限制极端值
         opacity = Math.max(0, Math.min(1, opacity));
 
-        // 动态计算 z-index：保证视觉上在前面的元素，DOM 渲染层级也最高
-        // distance 越小（越负，即越靠近镜头），z-index 越大
-        const zIndex = Math.round(100 - distance * 10);
+        // 动态计算 z-index：保证视觉深度的正确顺位
+        // 飞入镜头近处的元素 (distance < 0) 会堆叠在上方，飞往深处的则在下方
+        const zIndex = opacity > 0.01 ? Math.round(100 - distance * 10) : 0;
 
         // 应用样式 (启用3D硬件加速)
         if (opacity > 0.01) {
             section.style.visibility = 'visible';
-            section.style.pointerEvents = distance === 0 && Math.abs(currentProgress - targetProgress) < 0.1 ? 'auto' : 'none';
+            section.style.pointerEvents = Math.abs(distance) < 0.1 ? 'auto' : 'none';
             section.style.opacity = opacity;
             section.style.transform = `translate3d(0, 0, ${-z}px) scale(${scale})`;
             section.style.filter = filter;
             section.style.zIndex = zIndex;
             section.classList.toggle('is-active', Math.abs(distance) < 0.1);
         } else {
+            section.style.opacity = 0;
             section.style.visibility = 'hidden';
+            section.style.zIndex = 0;
             section.style.pointerEvents = 'none';
         }
     }

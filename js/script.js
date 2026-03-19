@@ -279,30 +279,7 @@ function typeWriter(element, text, speed = 100) {
     }
 }
 
-// 通用 Skeleton 加载生成器
-window.generateSkeleton = function(count = 6) {
-    let items = '';
-    for (let i = 0; i < count; i++) {
-        items += `
-            <div class="skeleton-card">
-                <div class="skeleton-shimmer"></div>
-                <div class="skeleton-item skeleton-title"></div>
-                <div class="skeleton-item skeleton-line"></div>
-                <div class="skeleton-item skeleton-line"></div>
-                <div class="skeleton-item skeleton-line short"></div>
-            </div>
-        `;
-    }
-    return `
-        <div class="loading-container">
-            <div class="digital-pulse"><div></div><div></div></div>
-            <p class="loading-text">正在同步量子数据...</p>
-        </div>
-        <div class="skeleton-grid">
-            ${items}
-        </div>
-    `;
-};
+// generateSkeleton moved to utils.js
 
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', () => {
@@ -476,11 +453,16 @@ function renderGalacticTimeline(container, projects) {
     const maxSpacing = 400; 
     spacing = Math.min(Math.max(spacing, minSpacing), maxSpacing);
     
-    const sideMargin = 150; // 左右留白
-    const totalContentWidth = spacing * count + sideMargin * 2;
-    const startX = (totalContentWidth < viewportWidth) ? (viewportWidth - totalContentWidth) / 2 : sideMargin;
+    const sideMargin = 200; 
+    const totalNodesWidth = spacing * count;
+    const totalContentWidth = totalNodesWidth + sideMargin * 2;
     
-    // 设置容器宽度：使其刚好容纳所有节点及留白，严禁滑出界限
+    // 折中处理：将原来的 150px 偏移减半到 80px，寻找视觉甜点
+    const startX = (totalContentWidth < viewportWidth) ? 
+                  ((viewportWidth - totalNodesWidth) / 2) - 80 : 
+                  sideMargin - 80;
+    
+    // 设置容器宽度
     container.style.width = `${Math.max(totalContentWidth, viewportWidth)}px`;
     
     // --- 新增：边缘感应自动滑动 (Magnetic Edge Scrolling) ---
@@ -559,8 +541,12 @@ function renderGalacticTimeline(container, projects) {
     });
     
     // --- 核心重构：以太纤波轨道 (Nebula Threads) ---
+    const segmentPaths = [];
+    const photons = [];
+    const dustStars = [];
+
     if (points.length > 1) {
-        // 定义三种不同扰动的路径
+        // 定义三种不同扰动的路径 (为了光子保留整段路径函数)
         const createPathD = (offsetY = 0, tension = 0.6) => {
             let d = `M ${points[0].x} ${points[0].y + offsetY}`;
             for (let i = 0; i < points.length - 1; i++) {
@@ -573,37 +559,50 @@ function renderGalacticTimeline(container, projects) {
             return d;
         };
 
-        // 1. 渲染三层极细丝线
         const pathConfigs = [
             { class: 'path-core', offset: 0, tension: 0.6 },
             { class: 'path-aura-1', offset: 2, tension: 0.62 },
             { class: 'path-aura-2', offset: -2, tension: 0.58 }
         ];
 
-        pathConfigs.forEach(cfg => {
-            const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            p.setAttribute("d", createPathD(cfg.offset, cfg.tension));
-            p.setAttribute("class", `galactic-path ${cfg.class}`);
-            svg.appendChild(p);
-        });
+        // 1. 分段渲染极细丝线（为了彻底实现"点亮一个点，然后伸出线连接下一个"的串联动画）
+        for (let i = 0; i < points.length - 1; i++) {
+            pathConfigs.forEach(cfg => {
+                const p0 = points[i];
+                const p1 = points[i + 1];
+                const tension = cfg.tension;
+                const offsetY = cfg.offset;
+                
+                const cp1x = p0.x + (p1.x - p0.x) * tension;
+                const cp2x = p1.x - (p1.x - p0.x) * (tension + 0.05);
+                const d = `M ${p0.x} ${p0.y + offsetY} C ${cp1x} ${p0.y + offsetY}, ${cp2x} ${p1.y + offsetY}, ${p1.x} ${p1.y + offsetY}`;
+                
+                const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                p.setAttribute("d", d);
+                p.setAttribute("class", `galactic-path ${cfg.class}`);
+                p.style.opacity = 0;
+                p.dataset.segmentIndex = i; // 标记这是连接第i和i+1个节点的线
+                
+                svg.appendChild(p);
+                segmentPaths.push(p);
+            });
+        }
 
         // 2. 渲染光子微粒流 (取代刻板的流光段)
         for (let i = 0; i < 5; i++) {
             const photon = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             photon.setAttribute("r", 2);
             photon.setAttribute("class", "galactic-photon");
-            // 给每个光子分配不同的动画延迟和速度
             photon.style.animationDelay = `${i * 1.5}s`;
             photon.style.animationDuration = `${5 + Math.random() * 3}s`;
+            photon.style.opacity = 0; // 初始化隐藏
             
-            // 为光子创建一个独立的路径引用（隐藏）
             const animatePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
             animatePath.setAttribute("d", createPathD(0, 0.6));
             animatePath.setAttribute("id", `photon-path-${i}`);
             animatePath.style.fill = "none";
             svg.appendChild(animatePath);
 
-            // 使用 mpath 让光子沿路径移动
             const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
             anim.setAttribute("dur", `${6 + Math.random() * 4}s`);
             anim.setAttribute("repeatCount", "indefinite");
@@ -613,6 +612,7 @@ function renderGalacticTimeline(container, projects) {
             photon.appendChild(anim);
             
             svg.appendChild(photon);
+            photons.push(photon);
         }
         
         // 3. 繁星背景（调淡并增加景深感）
@@ -624,37 +624,94 @@ function renderGalacticTimeline(container, projects) {
             star.setAttribute("r", Math.random() * 1.2);
             star.setAttribute("class", "galactic-dust");
             star.style.animationDelay = `${Math.random() * 5}s`;
-            star.style.opacity = Math.random() * 0.3;
+            star.style.opacity = 0; 
+            star.dataset.targetOpacity = Math.random() * 0.3;
             svg.appendChild(star);
+            dustStars.push(star);
         }
     }
 
-    // --- 新增：GSAP 入场动画与动态漂浮 ---
+    // --- 新增：滚动触发 (Intersection Observer) + 点线交替的串联序列 ---
     const nodes = container.querySelectorAll('.planet-node');
+    
     if (typeof gsap !== 'undefined') {
-        gsap.from(nodes, {
-            y: "+=50",
-            opacity: 0,
-            scale: 0.5,
-            duration: 1,
-            stagger: 0.15,
-            ease: "back.out(1.7)",
-            onComplete: () => {
-                // 入场后开启各自的微小漂浮动画
-                nodes.forEach((node, i) => {
-                    const driftY = 5 + Math.random() * 10;
-                    const duration = 3 + Math.random() * 3;
-                    gsap.to(node, {
-                        y: `+=${driftY}`,
-                        duration: duration,
-                        repeat: -1,
-                        yoyo: true,
-                        ease: "sine.inOut",
-                        delay: i * 0.2
-                    });
-                });
-            }
-        });
+        // 初始状态设定，中心绽放
+        gsap.set(nodes, { opacity: 0, scale: 0 });
+        
+        // 获取分段线条长度用于虚线动画 (必须略微延时确保渲染树计算完毕)
+        setTimeout(() => {
+            segmentPaths.forEach(p => {
+                const length = p.getTotalLength();
+                p.style.strokeDasharray = length;
+                p.style.strokeDashoffset = length; // 隐藏线条内容
+                p.style.opacity = 1; // 恢复透明度以供绘制
+            });
+        }, 50);
+
+        const observerOption = { threshold: 0.2 };
+        const timelineObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    obs.unobserve(entry.target);
+                    
+                    const tl = gsap.timeline();
+                    
+                    // 1. 繁星背景渐显
+                    if (dustStars.length > 0) {
+                        tl.to(dustStars, {
+                            duration: 2,
+                            opacity: (i, el) => el.dataset.targetOpacity,
+                            stagger: 0.01,
+                            ease: "power2.inOut"
+                        }, "start");
+                    }
+
+                    // 2. 依次遍历每个节点：点亮 -> 画线 -> 点亮下一个 -> 画下一个线
+                    for (let i = 0; i < count; i++) {
+                        // 点亮当前节点
+                        tl.to(nodes[i], {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 0.4,
+                            ease: "back.out(2)",
+                            onComplete: () => {
+                                // 入场后开启各自的微小漂浮动画
+                                const driftY = 5 + Math.random() * 10;
+                                const durationAnim = 3 + Math.random() * 3;
+                                gsap.to(nodes[i], {
+                                    y: `+=${driftY}`,
+                                    duration: durationAnim,
+                                    repeat: -1,
+                                    yoyo: true,
+                                    ease: "sine.inOut"
+                                });
+                            }
+                        });
+
+                        // 如果不是最后一个节点，画出连向下一个节点的丝线
+                        if (i < count - 1) {
+                            const currentSegmentLines = segmentPaths.filter(p => parseInt(p.dataset.segmentIndex) === i);
+                            tl.to(currentSegmentLines, {
+                                strokeDashoffset: 0,
+                                duration: 0.3, // 线条快速画过去的时间
+                                ease: "power1.inOut"
+                            }, "-=0.1"); // 稍微和上一个节点的出现时刻重叠一点点，显得更顺滑连贯
+                        }
+                    }
+
+                    // 3. 所有线串联完后，光子流最后汇聚展现
+                    if (photons.length > 0) {
+                        tl.to(photons, {
+                            opacity: 1,
+                            duration: 1.5,
+                            stagger: 0.3
+                        });
+                    }
+                }
+            });
+        }, observerOption);
+        
+        timelineObserver.observe(parentContainer);
     }
 }
 

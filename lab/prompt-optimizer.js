@@ -8,21 +8,20 @@ class ChatManager {
         this.renderMode = 'text';
 
         this.chatMessages = document.getElementById('chat-messages');
-        this.chatInput = document.getElementById('chat-input');
+        this.chatInput = document.getElementById('user-input');
         this.sendButton = document.getElementById('send-button');
         this.typingIndicator = document.getElementById('typing-indicator');
-        this.clearButton = document.getElementById('clear-button');
-        this.modelSelectButton = document.getElementById('model-select-button');
-        this.templateToggleButton = document.getElementById('template-toggle-button');
+        this.clearButton = document.getElementById('clear-chat');
+        this.modelSelectButton = document.getElementById('select-model');
+        this.templateToggleButton = document.getElementById('toggle-templates');
 
         this.renderTextOption = document.getElementById('render-text');
         this.renderMarkdownOption = document.getElementById('render-markdown');
 
         this.modelModal = document.getElementById('model-modal');
         this.modelList = document.getElementById('model-list');
-        this.modelModalClose = document.getElementById('model-modal-close');
-        this.cancelModelSelect = document.getElementById('cancel-model-select');
-        this.confirmModelSelect = document.getElementById('confirm-model-select');
+        this.modelModalClose = document.getElementById('close-model-modal');
+        this.confirmModelSelect = document.getElementById('save-model-settings');
         this.useDefaultKey = document.getElementById('use-default-key');
         this.useCustomKey = document.getElementById('use-custom-key');
         this.customApiKey = document.getElementById('custom-api-key');
@@ -30,8 +29,7 @@ class ChatManager {
 
         this.templateModal = document.getElementById('template-modal');
         this.templateList = document.getElementById('template-list');
-        this.templateModalClose = document.getElementById('template-modal-close');
-        this.cancelTemplateSelect = document.getElementById('cancel-template-select');
+        this.templateModalClose = document.getElementById('close-template-modal');
         this.confirmTemplateSelect = document.getElementById('confirm-template-select');
 
         this.loadingOverlay = document.getElementById('loading-overlay');
@@ -59,12 +57,14 @@ class ChatManager {
         this.renderMarkdownOption.addEventListener('change', () => this.updateRenderMode());
 
         this.modelModalClose.addEventListener('click', () => this.hideModelSelector());
-        this.cancelModelSelect.addEventListener('click', () => this.hideModelSelector());
+        const cancelModelBtn = document.getElementById('cancel-model-select');
+        if (cancelModelBtn) cancelModelBtn.addEventListener('click', () => this.hideModelSelector());
         this.confirmModelSelect.addEventListener('click', () => this.confirmModelSelection());
 
         this.templateModalClose.addEventListener('click', () => this.hideTemplateSelector());
-        this.cancelTemplateSelect.addEventListener('click', () => this.hideTemplateSelector());
-        this.confirmTemplateSelect.addEventListener('click', () => this.confirmTemplateSelection());
+        const cancelTemplateBtn = document.getElementById('cancel-template-select');
+        if (cancelTemplateBtn) cancelTemplateBtn.addEventListener('click', () => this.hideTemplateSelector());
+        if (this.confirmTemplateSelect) this.confirmTemplateSelect.addEventListener('click', () => this.confirmTemplateSelection());
 
         this.useDefaultKey.addEventListener('change', () => this.toggleKeyInput());
         this.useCustomKey.addEventListener('change', () => this.toggleKeyInput());
@@ -105,14 +105,14 @@ class ChatManager {
             const model = models[modelKey];
             const isSelected = modelKey === this.configManager.selectedModel;
             const modelItem = document.createElement('div');
-            modelItem.className = `model-item ${isSelected ? 'selected' : ''}`;
+            modelItem.className = `item-card ${isSelected ? 'selected' : ''}`;
             modelItem.dataset.modelKey = modelKey;
             modelItem.innerHTML = `
-                <div class="model-item-header">
-                    <div class="model-icon">${model.icon}</div>
-                    <div>
-                        <h4 class="model-name">${model.name}</h4>
-                        <p class="model-description">${model.description}</p>
+                <div style="display: flex; gap: 1rem; align-items: start;">
+                    <div class="model-icon" style="font-size: 1.5rem; background: rgba(255,255,255,0.05); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">${model.icon}</div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.4rem 0; font-family: var(--font-display);">${model.name}</h4>
+                        <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.4);">${model.description}</p>
                     </div>
                 </div>
             `;
@@ -123,14 +123,14 @@ class ChatManager {
     }
 
     selectModel(modelKey) {
-        this.modelList.querySelectorAll('.model-item').forEach(item => { item.classList.remove('selected'); });
+        this.modelList.querySelectorAll('.item-card').forEach(item => { item.classList.remove('selected'); });
         const selectedItem = this.modelList.querySelector(`[data-model-key="${modelKey}"]`);
         if (selectedItem) selectedItem.classList.add('selected');
         this.updateKeyOptions();
     }
 
     updateKeyOptions() {
-        const selectedModelKey = this.modelList.querySelector('.model-item.selected')?.dataset.modelKey;
+        const selectedModelKey = this.modelList.querySelector('.item-card.selected')?.dataset.modelKey;
         if (!selectedModelKey) return;
         const hasDefaultKey = this.configManager.hasDefaultKey(selectedModelKey);
         const customKey = this.configManager.apiKeys[selectedModelKey] || '';
@@ -159,7 +159,7 @@ class ChatManager {
     hideModelSelector() { this.modelModal.classList.remove('show'); }
 
     async confirmModelSelection() {
-        const selectedModelKey = this.modelList.querySelector('.model-item.selected')?.dataset.modelKey;
+        const selectedModelKey = this.modelList.querySelector('.item-card.selected')?.dataset.modelKey;
         if (!selectedModelKey) { alert('请选择一个AI模型'); return; }
         this.configManager.setSelectedModel(selectedModelKey);
         
@@ -301,7 +301,7 @@ class ChatManager {
     hideTemplateSelector() { this.templateModal.classList.remove('show'); }
 
     initTemplateSelector() {
-        const templateItems = this.templateList.querySelectorAll('.template-item');
+        const templateItems = this.templateList.querySelectorAll('.item-card');
         templateItems.forEach(item => {
             item.classList.remove('selected');
             if (item.dataset.template === this.currentTemplate) item.classList.add('selected');
@@ -310,13 +310,13 @@ class ChatManager {
     }
 
     selectTemplate(templateKey) {
-        this.templateList.querySelectorAll('.template-item').forEach(item => { item.classList.remove('selected'); });
+        this.templateList.querySelectorAll('.item-card').forEach(item => { item.classList.remove('selected'); });
         const selectedItem = this.templateList.querySelector(`[data-template="${templateKey}"]`);
         if (selectedItem) selectedItem.classList.add('selected');
     }
 
     confirmTemplateSelection() {
-        const selectedTemplate = this.templateList.querySelector('.template-item.selected')?.dataset.template;
+        const selectedTemplate = this.templateList.querySelector('.item-card.selected')?.dataset.template;
         if (!selectedTemplate) { alert('请选择一个提示词模版'); return; }
         this.currentTemplate = selectedTemplate;
         this.hideTemplateSelector();

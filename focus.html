@@ -4,332 +4,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBTWR9QNMQ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-RBTWR9QNMQ');
-  </script>
+  <!-- Shared Utils & Components -->
+  <script src="js/utils.js"></script>
+  <script>window.initGA();</script>
+  
   <title>实时焦点 | Asstar</title>
-  <link rel="icon" type="image/jpeg" href="images/Asstar.jpg">
+  <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/common.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap"
     rel="stylesheet">
-  <!-- 引入 Three.js 和 GSAP -->
+  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <!-- 引入共享的小精灵和聊天功能样式 -->
+  <!-- Sprite Chat Styles -->
   <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body class="reading-mode">
-  <div class="noise-overlay"></div>
-  <div id="canvas-container"></div>
-  <div id="sprite-container"></div>
-  <a href="index.html" class="back-button glass-panel">← 返回首页</a>
-  
-  <!-- Chat Dialog -->
-  <div class="chat-dialog" id="chat-dialog">
-    <div class="chat-dialog-header">
-      <div class="chat-dialog-title">
-        <span>✨</span>
-        <span>As</span>
-      </div>
-      <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
-    </div>
-    <div class="chat-dialog-messages" id="chat-dialog-messages">
-      <div class="chat-message assistant">
-        <div class="chat-message-avatar">✨</div>
-        <div class="chat-message-content">
-          你好！我是As，可以帮你了解这些焦点新闻的信息。有什么想知道的吗？
-        </div>
-      </div>
-    </div>
-    <div class="chat-dialog-input-container">
-      <div class="chat-dialog-input-wrapper">
-        <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
-        <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
-      </div>
-      <div class="typing-indicator" id="chat-typing-indicator">
-        <span>As 正在思考</span>
-        <div class="typing-dots">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .trending-container {
-      padding: 80px 0 60px;
-      min-height: 100vh;
-    }
-
-    .trending-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .trending-title {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 900;
-      background: #ffffff;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 20px;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-    }
-
-    .trending-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      margin-bottom: 30px;
-      font-family: 'Orbitron', sans-serif;
-      letter-spacing: 2px;
-      opacity: 0.8;
-      text-transform: uppercase;
-    }
-
-    .source-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .source-tab {
-      padding: 10px 18px;
-      border: 2px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: var(--font-primary);
-      font-weight: 400;
-    }
-
-    .source-tab:hover {
-      border-color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .source-tab.active {
-      border-color: #ffffff;
-      background: #ffffff;
-      color: #000000;
-    }
-
-    .category-filter {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .category-btn {
-      padding: 10px 18px;
-      border: 2px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: var(--font-primary);
-      font-weight: 400;
-    }
-
-    .category-btn:hover {
-      border-color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .category-btn.active {
-      border-color: #ffffff;
-      background: #ffffff;
-      color: #000000;
-    }
-
-    .trending-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 30px;
-      margin-top: 20px;
-    }
-
-    .trending-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 25px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .trending-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-    }
-
-    .trending-card:hover::before {
-      opacity: 1;
-    }
-
-    .trending-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
-      border-color: #ffffff;
-    }
-
-    .trending-card-content {
-      position: relative;
-      z-index: 2;
-    }
-
-    .model-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .model-icon {
-      width: 40px;
-      height: 40px;
-      background: #ffffff;
-      color: #000000;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 15px;
-      font-size: 1.2rem;
-    }
-
-    .model-info h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--text-primary);
-    }
-
-    .model-info p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
-    .model-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #ffffff;
-      background: transparent;
-      padding: 8px 0;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .model-link:hover {
-      color: #ffffff;
-      transform: translateX(5px);
-      text-decoration: underline;
-    }
-
-    .loading-container {
-      margin-top: 40px;
-    }
-
-    .error-message {
-      text-align: center;
-      padding: 60px 0;
-      color: var(--secondary-color);
-    }
-
-    .refresh-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: var(--gradient-secondary);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .refresh-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-    }
-
-    /* 与 space.html 一致的玻璃拟态返回按钮样式 */
-    .glass-panel {
-      background: rgba(10, 15, 30, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-    }
-
-    .back-button {
-      position: fixed;
-      top: 30px;
-      left: 30px;
-      padding: 12px 24px;
-      border-radius: 30px;
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: 300;
-      letter-spacing: 1px;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      z-index: 100;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.3);
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-
-    .back-button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #ffffff;
-      text-shadow: 0 0 10px #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .trending-title {
-        font-size: 2rem;
-      }
-
-      .trending-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .back-button {
-        top: 12px;
-        left: 12px;
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-    }
-
-  </style>
+  <!-- Components injected by js/components.js -->
+  <script src="js/components.js"></script>
 
   <main>
     <section class="trending-container">
@@ -345,16 +40,11 @@
           <div id="controls"></div>
         </div>
         <div id="focus-content">
-          <div class="loading-container">
-            <div class="digital-pulse"><div></div><div></div></div>
-            <p class="loading-text">正在同步量子数据...</p>
-          </div>
+          <!-- skeleton will be injected by JS -->
         </div>
       </div>
     </section>
   </main>
-
-
 
   <script>
     (function () {
@@ -365,6 +55,7 @@
       };
 
       document.addEventListener('DOMContentLoaded', () => {
+        window.initEntranceAnimation();
         bindFocusTabs();
         loadFocus();
         addExtras();
@@ -509,7 +200,7 @@
         cards.slice(0, 90).forEach(item => grid.appendChild(focusCard(item)));
         container.innerHTML = '';
         container.appendChild(grid);
-        animateCards(grid);
+        window.animateCards(grid);
       }
 
       function focusCard(item) {
@@ -520,27 +211,14 @@
               <div class="model-header">
                 <div class="model-icon">📰</div>
                 <div class="model-info">
-                  <h3>${escapeHtml(item.title)}</h3>
-                  <p>${escapeHtml(item.source)}${item.section ? ` • ${escapeHtml(item.section)}` : ''}</p>
+                  <h3>${window.escapeHtml(item.title)}</h3>
+                  <p>${window.escapeHtml(item.source)}${item.section ? ` • ${window.escapeHtml(item.section)}` : ''}</p>
                 </div>
               </div>
               <a href="${item.url}" target="_blank" class="model-link">查看详情 <span>→</span></a>
             </div>
           `;
         return card;
-      }
-
-      function animateCards(grid) {
-        const cards = grid.querySelectorAll('.trending-card');
-        cards.forEach((card, index) => {
-          card.style.opacity = '0';
-          card.style.transform = 'translateY(30px)';
-          setTimeout(() => {
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-          }, index * 60);
-        });
       }
 
       function addExtras() {
@@ -559,15 +237,6 @@
           if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
           else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
         });
-      }
-
-      function escapeHtml(s) {
-        return String(s || '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
       }
     })();
   </script>

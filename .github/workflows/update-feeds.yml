@@ -2,10 +2,10 @@ name: Update All Feeds Data
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # UTC 00:00 (北京 08:00)
-    - cron: '0 4 * * *'  # UTC 04:00 (北京 12:00)
-    - cron: '0 8 * * *'  # UTC 08:00 (北京 16:00)
-    - cron: '0 12 * * *' # UTC 12:00 (北京 20:00)
+    - cron: '0 23 * * *' # UTC 23:00 (北京 07:00)
+    - cron: '0 3 * * *'  # UTC 03:00 (北京 11:00)
+    - cron: '0 7 * * *'  # UTC 07:00 (北京 15:00)
+    - cron: '0 11 * * *' # UTC 11:00 (北京 19:00)
   workflow_dispatch:
 
 jobs:
