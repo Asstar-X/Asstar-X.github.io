@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="js/utils.js"></script>
+    <script>window.initGA();</script>
+    
+    <title>工具 - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- Sprite Chat Styles -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
+    
+    <link rel="stylesheet" href="css/tools.css">
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <!-- Components injected by js/components.js -->
+    <script src="js/components.js"></script>
+
+    <main>
+        <section class="tools-container">
+            <div class="container">
+                <div class="tools-header">
+                    <h1 class="tools-title">Tools</h1>
+                    <p class="tools-subtitle">提效工具箱 · 自研与精选（All Free💕）</p>
+                    <div class="tools-search">
+                        <span class="tools-search-icon">🔎</span>
+                        <input class="tools-input" type="text" placeholder="搜索工具、能力或用途...（如：论文、Prompt、趋势、可视化）"
+                            oninput="filterTools(this.value)">
+                    </div>
+                    <div class="filters">
+                        <div class="category-tabs" role="tablist" aria-label="类别筛选">
+                            <button class="tab active" onclick="setCategory('all', this)">全部</button>
+                            <button class="tab" onclick="setCategory('vision', this)">图像</button>
+                            <button class="tab" onclick="setCategory('audio', this)">音频</button>
+                            <button class="tab" onclick="setCategory('nlp', this)">文本</button>
+                            <button class="tab" onclick="setCategory('code', this)">代码</button>
+                        </div>
+                        <div class="source-toggle" role="tablist" aria-label="来源筛选">
+                            <button class="active" onclick="setSource('all', this)">全部</button>
+                            <button onclick="setSource('local', this)">自研</button>
+                            <button onclick="setSource('external', this)">精选</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tools-section">
+                    <div class="trending-grid" id="tools-grid">
+                        <div class="trending-card" data-source="local" data-category="nlp">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🧩</div>
+                                    <div class="model-info">
+                                        <h3>Prompt优化器</h3>
+                                        <p>文本 • 自研</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">将想法转化为高质量提示词，支持模板选择与多模型调用。</p>
+                                <a href="lab/prompt-optimizer.html" class="model-link">进入实验室 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="local" data-category="nlp">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🔓</div>
+                                    <div class="model-info">
+                                        <h3>Prompt越狱</h3>
+                                        <p>文本 • 自研</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">专注于大语言模型提示词攻防与提示词越狱研究的开源项目。</p>
+                                <a href="https://github.com/Asstar-X/JailPrompter" target="_blank" class="model-link">查看项目 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="local" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🖼️</div>
+                                    <div class="model-info">
+                                        <h3>SVG-XML可视化</h3>
+                                        <p>图像 • 可视化</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">上传SVG，左侧预览，右侧可折叠XML树，双向高亮联动。</p>
+                                <a href="lab/svg-monitor.html" class="model-link">进入实验室 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🖍️</div>
+                                    <div class="model-info">
+                                        <h3>改图宝</h3>
+                                        <p>图像 • 精选</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">一站式图片压缩、裁剪、格式转换、加水印。</p>
+                                <a href="https://www.gaitubao.com/" target="_blank" class="model-link">浏览网站 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📊</div>
+                                    <div class="model-info">
+                                        <h3>Mermaid 图表生成</h3>
+                                        <p>图像 • 可视化</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">在线将Mermaid文本实时渲染为SVG图表。</p>
+                                <a href="https://www.min2k.com/tools/mermaid/" target="_blank" class="model-link">浏览网站 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🖌️</div>
+                                    <div class="model-info">
+                                        <h3>RevizePic 图像优化</h3>
+                                        <p>图像 • 优化</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">AI驱动的智能图片超分/降噪/无损修复。</p>
+                                <a href="https://revizepic.toolooz.com/" target="_blank" class="model-link">浏览网站 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="audio">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📥</div>
+                                    <div class="model-info">
+                                        <h3>B站视频下载</h3>
+                                        <p>视频 • bilibili</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">无需登录自由保存B站视频音频弹幕。</p>
+                                <a href="https://snapany.com/zh/bilibili" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="audio">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">▶️</div>
+                                    <div class="model-info">
+                                        <h3>YouTube视频下载</h3>
+                                        <p>视频 • youtube</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">转换/下载YouTube音视频，支持多格式。</p>
+                                <a href="https://youtube.iiilab.com/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="audio">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🎬</div>
+                                    <div class="model-info">
+                                        <h3>抖音视频下载</h3>
+                                        <p>视频 • 抖音</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">免费下载无水印抖音（TikTok）视频。</p>
+                                <a href="https://dy.kukutool.com/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="audio">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🎤</div>
+                                    <div class="model-info">
+                                        <h3>语音质量评估</h3>
+                                        <p>音频 • 评估</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">专业的语音质量评估工具，评估信号清晰度与质量。</p>
+                                <a href="https://huggingface.co/spaces/alibabasglab/SpeechScore" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="audio">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">✂️</div>
+                                    <div class="model-info">
+                                        <h3>音频切割器</h3>
+                                        <p>音频 • 编辑</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">在线音频切割工具，支持精确裁剪和编辑音频文件。</p>
+                                <a href="https://vocalremover.org/zh/cutter" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🖼️</div>
+                                    <div class="model-info">
+                                        <h3>Base64转图片</h3>
+                                        <p>图像 • 转换</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">粘贴Base64字符串，直接在线生成图片。</p>
+                                <a href="https://tool.jisuapi.com/base642pic.html" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="code">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🔎</div>
+                                    <div class="model-info">
+                                        <h3>Json格式验证</h3>
+                                        <p>格式化 • JSON</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">一键查错JSON语法并高亮可视化定位问题。</p>
+                                <a href="https://jsonlint.com/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="code">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🛠️</div>
+                                    <div class="model-info">
+                                        <h3>Json一键排版</h3>
+                                        <p>美化 • JSON</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">快速美化、折叠、压缩JSON并高亮。</p>
+                                <a href="https://jsonformatter.org/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="nlp">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📄</div>
+                                    <div class="model-info">
+                                        <h3>PDF转Word</h3>
+                                        <p>文本 • PDF</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">支持PDF转Word、Excel、PPT等格式文档互转。</p>
+                                <a href="https://www.alltoall.net/md_pdf/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="nlp">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">✂️</div>
+                                    <div class="model-info">
+                                        <h3>拆分PDF</h3>
+                                        <p>文本 • PDF</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">将PDF文件拆分为多个文件或提取特定页面。</p>
+                                <a href="https://www.ilovepdf.com/zh-cn/split_pdf" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📐</div>
+                                    <div class="model-info">
+                                        <h3>Draw.io</h3>
+                                        <p>图像 • 绘图</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">功能强大的在线流程图与图表绘制工具。</p>
+                                <a href="https://app.diagrams.net/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">✏️</div>
+                                    <div class="model-info">
+                                        <h3>手稿画图</h3>
+                                        <p>图像 • 绘图</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">Excalidraw - 虚拟白板，手绘风格绘图工具。</p>
+                                <a href="https://excalidraw.com/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🖥️</div>
+                                    <div class="model-info">
+                                        <h3>在线屏幕检测</h3>
+                                        <p>图像 • 测试</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">检测屏幕坏点、漏光、颜色显示等显示器问题。</p>
+                                <a href="https://screen.bmcx.com/#welcome" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="nlp">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🔢</div>
+                                    <div class="model-info">
+                                        <h3>Token计算</h3>
+                                        <p>文本 • 计算</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">OpenAI 官方 Token 计算工具，精确计算文本数量。</p>
+                                <a href="https://platform.openai.com/tokenizer" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="vision">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🎨</div>
+                                    <div class="model-info">
+                                        <h3>Draw.io AI 流程图</h3>
+                                        <p>图像 • 绘图</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">AI 驱动的智能绘图工具，支持多种绘图风格模式。</p>
+                                <a href="https://next-ai-drawio.jiang.jp/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="code">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🌐</div>
+                                    <div class="model-info">
+                                        <h3>在线 IP 地址检测</h3>
+                                        <p>网络 • 检测</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">检测 IP 地址、DNS 泄露、WebRTC 泄露等隐私。</p>
+                                <a href="https://ipleak.net/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    
+    <script src="js/script.js"></script>
+    <script src="lab/config.js"></script>
+    <script src="js/sprite-chat.js"></script>
+    <script src="js/tools.js"></script>
+</body>
+
+</html>
