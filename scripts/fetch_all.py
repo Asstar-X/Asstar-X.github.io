@@ -211,16 +211,12 @@ class TophubScraper(BaseScraper):
             ],
             'tech': [
                 {'url': 'https://tophub.today/c/tech', 'targets': ['36氪', '少数派', 'IT之家']},
-                {'url': 'https://tophub.today/c/developer', 'targets': ['人人都是产品经理', '掘金']},
-                {'url': 'https://tophub.today/c/ai', 'targets': ['量子位', '超神经']},
-                {'url': 'https://tophub.today/c/ai?&p=3', 'targets': ['增长黑客']},
-                {'url': 'https://tophub.today/c/ai?&p=4', 'targets': ['首席安全官']}
+                {'url': 'https://tophub.today/c/developer', 'targets': ['人人都是产品经理']},
+                {'url': 'https://tophub.today/c/ai', 'targets': ['量子位']}
             ],
             'ai': [
-                {'url': 'https://tophub.today/c/ai', 'targets': ['AIbase', 'AI工具集', 'AI产品榜']},
-                {'url': 'https://tophub.today/c/ai?&p=2', 'targets': ['智源社区', 'AIHub', 'Hugging Face']},
-                {'url': 'https://tophub.today/c/ai?&p=3', 'targets': ['Aminer', '三花 AI']},
-                {'url': 'https://tophub.today/c/ai?&p=5', 'targets': ['AI开发者de频道']}
+                {'url': 'https://tophub.today/c/ai', 'targets': ['AIbase', 'AI工具集']},
+                {'url': 'https://tophub.today/c/ai?&p=2', 'targets': ['AIHub', 'Hugging Face']}
             ]
         }
         output = {'savedAt': datetime.now(timezone.utc).isoformat(), 'categories': {}}
