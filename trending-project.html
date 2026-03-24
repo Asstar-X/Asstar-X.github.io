@@ -128,6 +128,7 @@
                     <div class="source-tabs" id="source-tabs">
                         <button class="source-tab active" data-source="github">GitHub</button>
                         <button class="source-tab" data-source="huggingface">HuggingFace</button>
+                        <button class="source-tab" data-source="interest">Interest</button>
                     </div>
                     <div id="controls"></div>
                 </div>
@@ -152,11 +153,19 @@
         (function () {
             class TrendingProject {
                 constructor() {
-                    this.source = 'github'; // 'github' | 'huggingface'
+                    this.source = 'github'; // 'github' | 'huggingface' | 'interest'
                     this.period = 'daily'; // github periods: daily | weekly | monthly
                     this.category = 'trending'; // hf categories: trending | likes | downloads
+                    this.interestCat = 'voice'; // interest categories: voice | multimodal | vision
+                    this.interestSubCat = 'text-to-speech';
+                    this.subCategories = {
+                        voice: ['text-to-speech', 'automatic-speech-recognition', 'text-to-audio', 'voice-activity-detection', 'audio-to-audio', 'audio-classification'],
+                        multimodal: ['audio-text-to-text', 'image-text-to-video', 'image-text-to-image', 'image-text-to-text', 'visual-question-answering', 'document-question-answering'],
+                        vision: ['image-classification', 'object-detection', 'image-segmentation', 'zero-shot-image-classification', 'zero-shot-object-detection', 'image-feature-extraction']
+                    };
                     this.githubData = [];
                     this.hfData = [];
+                    this.interestData = [];
                     this.init();
                 }
 
@@ -201,7 +210,7 @@
                                 this.loadData();
                             });
                         });
-                    } else {
+                    } else if (this.source === 'huggingface') {
                         controls.innerHTML = `
                         <div class="category-filter">
                             <button class="category-btn ${this.category === 'trending' ? 'active' : ''}" data-category="trending">Trending</button>
@@ -214,6 +223,41 @@
                                 e.currentTarget.classList.add('active');
                                 this.category = e.currentTarget.dataset.category;
                                 this.loadData();
+                            });
+                        });
+                    } else if (this.source === 'interest') {
+                        let html = `
+                        <div class="category-filter interest-main-filter" style="margin-bottom: 12px;">
+                            <button class="category-btn ${this.interestCat === 'voice' ? 'active' : ''}" data-cat="voice">语音</button>
+                            <button class="category-btn ${this.interestCat === 'multimodal' ? 'active' : ''}" data-cat="multimodal">多模态</button>
+                            <button class="category-btn ${this.interestCat === 'vision' ? 'active' : ''}" data-cat="vision">视觉</button>
+                        </div>
+                        <div class="category-filter interest-sub-filter" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
+                        `;
+                        const subs = this.subCategories[this.interestCat] || [];
+                        subs.forEach(sub => {
+                            html += `<button class="category-btn sub-btn ${this.interestSubCat === sub ? 'active' : ''}" data-subcat="${sub}" style="font-size: 0.85rem; padding: 6px 14px; border-radius: 20px;">${sub.replace(/-/g, ' ')}</button>`;
+                        });
+                        html += `</div>`;
+                        controls.innerHTML = html;
+
+                        controls.querySelectorAll('.interest-main-filter .category-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                controls.querySelectorAll('.interest-main-filter .category-btn').forEach(b => b.classList.remove('active'));
+                                e.currentTarget.classList.add('active');
+                                this.interestCat = e.currentTarget.dataset.cat;
+                                this.interestSubCat = this.subCategories[this.interestCat][0];
+                                this.renderControls();
+                                this.loadData();
+                            });
+                        });
+
+                        controls.querySelectorAll('.interest-sub-filter .sub-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                controls.querySelectorAll('.interest-sub-filter .sub-btn').forEach(b => b.classList.remove('active'));
+                                e.currentTarget.classList.add('active');
+                                this.interestSubCat = e.currentTarget.dataset.subcat;
+                                this.renderInterest();
                             });
                         });
                     }
@@ -235,7 +279,7 @@
                             }
                             this.githubData = list;
                             this.renderGithub();
-                        } else {
+                        } else if (this.source === 'huggingface') {
                             const res = await fetch('feeds/huggingface-data.json', { cache: 'no-store' });
                             if (res.ok) {
                                 rawJson = await res.json();
@@ -243,6 +287,14 @@
                             }
                             this.hfData = list;
                             this.renderHuggingface();
+                        } else if (this.source === 'interest') {
+                            const res = await fetch('feeds/huggingface-interest-data.json', { cache: 'no-store' });
+                            if (res.ok) {
+                                rawJson = await res.json();
+                                list = rawJson[this.interestCat] || {};
+                            }
+                            this.interestData = list;
+                            this.renderInterest();
                         }
 
                         if (timeEl && rawJson && rawJson.lastUpdated) {
@@ -292,6 +344,27 @@
                     grid.className = 'trending-grid';
                     this.hfData.forEach(model => grid.appendChild(this.hfCard(model)));
                     container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                renderInterest() {
+                    const container = document.getElementById('trending-content');
+                    if (!this.interestData || Object.keys(this.interestData).length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    container.innerHTML = '';
+                    
+                    const models = this.interestData[this.interestSubCat] || [];
+                    if (models.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    models.forEach(model => grid.appendChild(this.hfCard(model)));
                     container.appendChild(grid);
                     window.animateCards(grid);
                 }
@@ -382,12 +455,21 @@
                         if (this.source === 'github') {
                             const btns = Array.from(document.querySelectorAll('.time-filter .time-btn'));
                             const active = document.querySelector('.time-filter .time-btn.active');
+                            if (!active) return;
                             const idx = btns.indexOf(active);
                             if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
                             else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
-                        } else {
+                        } else if (this.source === 'huggingface') {
                             const btns = Array.from(document.querySelectorAll('.category-filter .category-btn'));
                             const active = document.querySelector('.category-filter .category-btn.active');
+                            if (!active) return;
+                            const idx = btns.indexOf(active);
+                            if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
+                            else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
+                        } else if (this.source === 'interest') {
+                            const btns = Array.from(document.querySelectorAll('.interest-sub-filter .sub-btn'));
+                            const active = document.querySelector('.interest-sub-filter .sub-btn.active');
+                            if (!active) return;
                             const idx = btns.indexOf(active);
                             if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
                             else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();

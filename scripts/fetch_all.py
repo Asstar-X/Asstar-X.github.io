@@ -146,6 +146,58 @@ class HuggingFaceScraper(BaseScraper):
                 json.dump(output, f, indent=2, ensure_ascii=False)
         print(f"Saved HuggingFace Models data. Total: {output['totalModels']}")
 
+# --- HuggingFace Interest Scraper ---
+
+class HuggingFaceInterestScraper(BaseScraper):
+    def run(self):
+        api_base = 'https://huggingface.co/api/models'
+        categories = {
+            'voice': ['text-to-speech', 'automatic-speech-recognition', 'text-to-audio', 'voice-activity-detection', 'audio-to-audio', 'audio-classification'],
+            'multimodal': ['audio-text-to-text', 'image-text-to-video', 'image-text-to-image', 'image-text-to-text', 'visual-question-answering', 'document-question-answering'],
+            'vision': ['image-classification', 'object-detection', 'image-segmentation', 'zero-shot-image-classification', 'zero-shot-object-detection', 'image-feature-extraction']
+        }
+        all_data = {}
+        total_models = 0
+        for cat_name, tags in categories.items():
+            print(f"Fetching HuggingFace Interest ({cat_name})...")
+            cat_data = {}
+            for tag in tags:
+                url = f"{api_base}?{urlencode({'pipeline_tag': tag, 'trending': 'true', 'limit': 30})}"
+                tag_models = []
+                try:
+                    resp = self.get(url)
+                    items = json.loads(resp) if isinstance(resp, str) else []
+                    
+                    for item in items:
+                        model_id = item.get('modelId') or item.get('id') or ''
+                        if not model_id: continue
+                        
+                        tag_models.append({
+                            'name': model_id,
+                            'description': item.get('description') or item.get('cardData', {}).get('description') or 'No description available',
+                            'task': item.get('pipeline_tag') or tag,
+                            'parameters': item.get('cardData', {}).get('parameters') or 'Unknown',
+                            'likes': f"{int(item.get('likes') or 0):,}",
+                            'downloads': f"{int(item.get('downloads') or 0):,}",
+                            'url': f"https://huggingface.co/{model_id}",
+                            'tags': (item.get('tags') or item.get('cardData', {}).get('tags') or [])[:5]
+                        })
+                except Exception as e:
+                    print(f"  Error fetching {tag}: {e}")
+                time.sleep(1)
+            
+                cat_data[tag] = tag_models
+                total_models += len(tag_models)
+
+            all_data[cat_name] = cat_data
+
+        output = {**all_data, 'lastUpdated': datetime.now(timezone.utc).isoformat(), 'totalModels': total_models}
+        dest = get_output_path('huggingface-interest-data.json')
+        if total_models > 0 or not os.path.exists(dest):
+            with open(dest, 'w', encoding='utf-8') as f:
+                json.dump(output, f, indent=2, ensure_ascii=False)
+        print(f"Saved HuggingFace Interest data. Total: {total_models}")
+
 # --- HuggingFace Papers Scraper ---
 
 class HFPapersScraper(BaseScraper):
@@ -293,14 +345,15 @@ class TophubScraper(BaseScraper):
 
 def main():
     parser = argparse.ArgumentParser(description="Asstar Data Fetcher")
-    parser.add_argument('target', choices=['github', 'huggingface', 'papers', 'focus', 'all'], help="Target data to fetch")
+    parser.add_argument('target', choices=['github', 'huggingface', 'papers', 'focus', 'interest', 'all'], help="Target data to fetch")
     args = parser.parse_args()
 
     scrapers = {
         'github': GitHubTrendingScraper(),
         'huggingface': HuggingFaceScraper(),
         'papers': HFPapersScraper(),
-        'focus': TophubScraper()
+        'focus': TophubScraper(),
+        'interest': HuggingFaceInterestScraper()
     }
 
     if args.target == 'all':
