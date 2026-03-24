@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="../js/utils.js"></script>
+    <script>window.initGA();</script>
+    
+    <title>Prompt优化器</title>
+    <link rel="icon" type="image/jpeg" href="../assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap"
+        rel="stylesheet">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Sprite Chat Styles -->
+    <link rel="stylesheet" href="../css/sprite-chat.css">
+    
+    <style>
+        :root {
+            --primary-accent: #6d5dfc;
+            --secondary-accent: #a196ff;
+            --bg-dark: #08080c;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-glow: 0 0 20px rgba(109, 93, 252, 0.3);
+            --font-display: 'Orbitron', sans-serif;
+            --font-primary: 'Space Grotesk', sans-serif;
+        }
+
+        body {
+            background: var(--bg-dark) !important;
+            color: #ffffff;
+            font-family: var(--font-primary);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(109, 93, 252, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(161, 150, 255, 0.05) 0%, transparent 40%);
+        }
+
+        .prompt-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .prompt-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prompt-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, var(--secondary-accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            filter: drop-shadow(var(--text-glow));
+        }
+
+        .prompt-subtitle {
+            font-family: var(--font-primary);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .chat-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            backdrop-filter: blur(40px);
+            overflow: hidden;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chat-header {
+            background: rgba(255, 255, 255, 0.01);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(109, 93, 252, 0.4);
+            animation: glowPulse 3s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from { box-shadow: 0 0 10px rgba(109, 93, 252, 0.3); }
+            to { box-shadow: 0 0 30px rgba(109, 93, 252, 0.6); }
+        }
+
+        .chat-info h3 { 
+            color: #ffffff; 
+            font-family: var(--font-display); 
+            margin: 0; 
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+        
+        .chat-info p { 
+            color: rgba(255, 255, 255, 0.4); 
+            margin: 4px 0 0 0; 
+            font-size: 0.85rem; 
+        }
+
+        .chat-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--secondary-accent);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(109, 93, 252, 0.2);
+        }
+
+        .render-mode-options {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            margin-right: 1.5rem;
+        }
+
+        .render-mode-options label {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .render-mode-options input { display: none; }
+        .render-mode-options label:has(input:checked) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-messages {
+            height: 600px;
+            overflow-y: auto;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--glass-border) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        .message {
+            display: flex;
+            gap: 1.5rem;
+            max-width: 85%;
+            animation: messageEntry 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes messageEntry {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            color: #ffffff;
+        }
+
+        .message-content {
+            padding: 1.2rem 1.8rem;
+            border-radius: 20px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #08080c;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 10px 30px rgba(109, 93, 252, 0.1);
+        }
+
+        .message.assistant .message-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 0.6rem;
+        }
+
+        .chat-input-container {
+            border-top: 1px solid var(--glass-border);
+            padding: 2rem 3rem;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.8rem;
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 20px rgba(109, 93, 252, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.6rem 0.8rem;
+            color: #ffffff;
+            font-family: var(--font-primary);
+            font-size: 1.1rem;
+            resize: none;
+            min-height: 28px;
+            max-height: 150px;
+        }
+
+        .chat-input:focus { outline: none; }
+
+        .send-button {
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.05) rotate(-5deg);
+            box-shadow: 0 5px 20px rgba(109, 93, 252, 0.4);
+        }
+
+        .send-button:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+
+        /* Modals */
+        .model-modal, .template-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(15px);
+            padding: 20px;
+        }
+
+        .model-modal.show, .template-modal.show { 
+            display: flex;
+            animation: modalFadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; backdrop-filter: blur(0px); }
+            to { opacity: 1; backdrop-filter: blur(15px); }
+        }
+
+        .modal-content {
+            background: #0f0f14;
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+            transform: scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .show .modal-content { transform: scale(1); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, rgba(255,255,255,0.5));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Items (Models & Templates) */
+        .list-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        .item-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255, 255, 255, 0.04); transform: translateY(-3px); }
+        .item-card.selected { border-color: var(--primary-accent); background: rgba(109, 93, 252, 0.1); }
+        .item-card.selected::before { opacity: 0.05; }
+
+        .item-card > * { position: relative; z-index: 1; }
+
+        .item-card h4 { margin: 0 0 0.5rem 0; font-family: var(--font-display); font-size: 1.1rem; }
+        .item-card p { margin: 0; font-size: 0.85rem; color: rgba(255, 255, 255, 0.5); line-height: 1.4; }
+
+        .modal-footer {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-ghost { background: transparent; color: rgba(255, 255, 255, 0.6); }
+        .btn-ghost:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent)); 
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(109, 93, 252, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(109, 93, 252, 0.5); }
+    </style>
+</head>
+
+<body>
+    <!-- Components injected by js/components.js -->
+    <script src="../js/components.js"></script>
+
+    <div class="prompt-container">
+        <header class="prompt-header">
+            <h1 class="prompt-title">Prompt 优化器</h1>
+        </header>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-avatar">✦</div>
+                <div class="chat-info">
+                    <h3>AI 助手</h3>
+                </div>
+                <div class="chat-actions">
+                    <div class="render-mode-options">
+                        <label title="纯文本模式">
+                            <input type="radio" name="render-mode" id="render-text" checked> 
+                            <span>文本</span>
+                        </label>
+                        <label title="Markdown 渲染模式">
+                            <input type="radio" name="render-mode" id="render-markdown"> 
+                            <span>Markdown</span>
+                        </label>
+                    </div>
+                    <button class="action-btn" id="toggle-templates" title="提示词模板库">📚</button>
+                    <button class="action-btn" id="select-model" title="模型配置">⚙️</button>
+                    <button class="action-btn" id="clear-chat" title="清除对话">🗑️</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be here -->
+            </div>
+
+            <div class="chat-input-container">
+                <div class="typing-indicator" id="typing-indicator">
+                    <span>处理神经信号中</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+                <div class="chat-input-wrapper">
+                    <textarea class="chat-input" id="user-input" placeholder="请在此处注入您的 Prompt 或指令..." rows="1"></textarea>
+                    <button class="send-button" id="send-button">
+                        <span class="send-icon">🚀</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Selection Modal -->
+    <div class="model-modal" id="model-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">大模型切换</h3>
+                <button class="action-btn" id="close-model-modal">&times;</button>
+            </div>
+            
+            <div class="list-grid" id="model-list">
+                <!-- Model items will be here -->
+            </div>
+            
+            <div class="api-key-settings" style="margin-top: 2.5rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 20px; border: 1px solid var(--glass-border);">
+                <h4 style="color: #fff; margin-bottom: 1.5rem; font-family: var(--font-display); font-size: 1rem; letter-spacing: 1px;">访问协议 Access Protocol</h4>
+                
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.6);">
+                        <input type="radio" name="key-source" id="use-default-key"> 
+                        <span>默认密钥</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255,255,255,0.6);">
+                        <input type="radio" name="key-source" id="use-custom-key" checked> 
+                        <span>自定义密钥</span>
+                    </label>
+                </div>
+
+                <div id="custom-settings">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: rgba(255,255,255,0.4); margin-bottom: 0.6rem; font-size: 0.8rem; text-transform: uppercase;">API 秘钥 (API Key)</label>
+                        <input type="password" id="custom-api-key" placeholder="在此输入您的加密密钥..." style="width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 12px; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: rgba(255,255,255,0.4); margin-bottom: 0.6rem; font-size: 0.8rem; text-transform: uppercase;">节点 URL 重写 (Endpoint Override)</label>
+                        <input type="text" id="custom-api-url" placeholder="https://api.your-node.com/v1" style="width: 100%; box-sizing: border-box; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 12px; font-family: inherit;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancel-model-select">返回</button>
+                <button class="btn btn-primary" id="save-model-settings">初始化同步</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="template-modal" id="template-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">逻辑模板 Logic Templates</h3>
+                <button class="action-btn" id="close-template-modal">&times;</button>
+            </div>
+            
+            <div class="list-grid" id="template-list">
+                <div class="item-card" data-template="system">
+                    <h4>核心架构模板</h4>
+                    <p>对原始指令进行结构化提炼，生成高精准度的系统级提示词。</p>
+                </div>
+                <div class="item-card" data-template="user">
+                    <h4>意图锐化模板</h4>
+                    <p>将模糊的人机交互输入转换为极具针对性的任务描述语言。</p>
+                </div>
+                <div class="item-card" data-template="expand">
+                    <h4>思维链框架 (CoT)</h4>
+                    <p>利用思维链模式构建逻辑严密的步骤化思维模型，提升推理能力。</p>
+                </div>
+                <div class="item-card" data-template="iterate">
+                    <h4>递归反馈循环</h4>
+                    <p>通过多轮递归分析与自我反思机制，持续进化提示词质量。</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="cancel-template-select">撤销取消</button>
+                <button class="btn btn-primary" id="confirm-template-select">应用逻辑框架</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(10px);">
+        <div class="loader" style="width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: white; border-radius: 50%; animation: spin 1s infinite linear;"></div>
+        <p id="loading-text" style="color: white; margin-top: 1rem; font-family: var(--font-primary);">Processing...</p>
+    </div>
+
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .template-item { padding: 1.5rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; position: relative; margin-bottom: 1rem; }
+        .template-item:hover { background: rgba(255, 255, 255, 0.05); border-color: #ffffff; transform: translateY(-2px); }
+        .template-item.selected { border-color: #ffffff; background: #000000; }
+        .template-item h4 { color: var(--text-primary); margin: 0 0 0.5rem 0; font-family: var(--font-display); }
+        .template-item p { color: var(--text-secondary); margin: 0; font-size: 0.9rem; }
+    </style>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/sprite-chat.js"></script>
+    <script src="config.js"></script>
+    <script src="prompt-optimizer.js" type="module"></script>
+    <script>
+        // Initialize sprite chat
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager();
+            }
+        });
+    </script>
+</body>
+
+</html>

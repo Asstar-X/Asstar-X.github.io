@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="js/utils.js"></script>
+    <script>window.initGA();</script>
+    
+    <title>HuggingFace Papers - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <link rel="stylesheet" href="css/sprite-chat.css">
+    <style>
+        .paper-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .paper-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .paper-abstract {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #ffffff;
+        }
+    </style>
+    <!-- Sprite Chat Styles -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
+</head>
+
+<body class="reading-mode">
+    <!-- Components injected by js/components.js -->
+    <script src="js/components.js"></script>
+
+    <main>
+        <section class="trending-container">
+            <div class="container">
+                <div class="trending-header">
+                    <h1 class="trending-title">Trending Papers</h1>
+                    <p class="trending-subtitle" id="last-updated">Synchronizing Quantum Data...</p>
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="daily">Daily</button>
+                        <button class="category-btn" data-category="weekly">Weekly</button>
+                        <button class="category-btn" data-category="monthly">Monthly</button>
+                        <button class="category-btn" data-category="trending">Trending</button>
+                    </div>
+                </div>
+                <div id="papers-content">
+                    <!-- skeleton will be injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script src="lab/config.js"></script>
+    <script src="js/sprite-chat.js"></script>
+    <script>
+        // Initialize sprite chat with custom options for huggingface papers page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager();
+            }
+        });
+    </script>
+    <script>
+        class HuggingFacePapers {
+            constructor() {
+                this.currentCategory = 'daily';
+                this.papersData = [];
+                this.init();
+            }
+
+            init() {
+                window.initEntranceAnimation();
+                this.bindEvents();
+                this.loadPapersData();
+                this.startAutoRefresh();
+            }
+
+            bindEvents() {
+                const categoryButtons = document.querySelectorAll('.category-btn');
+                categoryButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        categoryButtons.forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentCategory = e.target.dataset.category;
+                        this.loadPapersData();
+                    });
+                });
+            }
+
+            async loadPapersData() {
+                const container = document.getElementById('papers-content');
+                const timeEl = document.getElementById('last-updated');
+                container.innerHTML = window.generateSkeleton(4);
+
+                try {
+                    const res = await fetch('feeds/huggingface-papers-data.json', { cache: 'no-store' });
+                    if (res.ok) {
+                        const all = await res.json();
+                        
+                        if (timeEl && all.lastUpdated) {
+                            const date = new Date(all.lastUpdated);
+                            const opts = {
+                                timeZone: 'Asia/Shanghai',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: false
+                            };
+                            const parts = new Intl.DateTimeFormat('zh-CN', opts).formatToParts(date);
+                            const m = {};
+                            parts.forEach(p => m[p.type] = p.value);
+                            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
+                        }
+
+                        this.papersData = all[this.currentCategory] || [];
+                        this.renderPapers();
+                    } else {
+                        throw new Error('Fetch failed');
+                    }
+                } catch (error) {
+                    console.error('加载论文失败:', error);
+                    this.showError();
+                }
+            }
+
+            renderPapers() {
+                const container = document.getElementById('papers-content');
+                if (!this.papersData || this.papersData.length === 0) {
+                    container.innerHTML = `
+                    <div class="error-message">
+                        <p>暂无数据</p>
+                        <button class="refresh-btn" onclick="huggingfacePapersApp.loadPapersData()">重新加载</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.className = 'trending-grid';
+
+                this.papersData.forEach((paper) => {
+                    const card = document.createElement('div');
+                    card.className = 'trending-card';
+                    const tags = Array.isArray(paper.tags) ? paper.tags : [];
+                    card.innerHTML = `
+                    <div class="trending-card-content">
+                        <div class="paper-title">${paper.title}</div>
+                        <div class="paper-meta">${paper.authors || 'Unknown authors'}</div>
+                        <p class="paper-abstract">${paper.abstract || 'No abstract available.'}</p>
+                        ${tags.length ? `<div class="model-tags">${tags.map(t => `<span class=\"tag\">${t}</span>`).join('')}</div>` : ''}
+                        <a href="${paper.url}" target="_blank" class="model-link">查看论文 <span>→</span></a>
+                    </div>
+                `;
+                    grid.appendChild(card);
+                });
+
+                container.innerHTML = '';
+                container.appendChild(grid);
+                window.animateCards(grid);
+            }
+
+            showError() {
+                const container = document.getElementById('papers-content');
+                container.innerHTML = `
+                <div class="error-message">
+                    <p>加载数据时出现错误</p>
+                    <button class="refresh-btn" onclick="huggingfacePapersApp.loadPapersData()">重新加载</button>
+                </div>
+            `;
+            }
+
+            startAutoRefresh() {
+                setInterval(() => this.loadPapersData(), 6 * 60 * 60 * 1000);
+            }
+        }
+
+    </script>
+    <script src="js/sprite-chat.js"></script>
+    <script>
+        let huggingfacePapersApp;
+        function initHuggingfacePapers() { 
+            huggingfacePapersApp = new HuggingFacePapers(); 
+            // Initialize sprite chat
+            if (window.SpriteChatManager) {
+                window.spriteChatManager = new window.SpriteChatManager();
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHuggingfacePapers);
+        } else {
+            initHuggingfacePapers();
+        }
+    </script>
+</body>
+
+</html>

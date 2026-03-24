@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Shared Utils & Components -->
+  <script src="js/utils.js"></script>
+  <script>window.initGA();</script>
+  
+  <title>实时焦点 | Asstar</title>
+  <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/common.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap"
+    rel="stylesheet">
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <!-- Sprite Chat Styles -->
+  <link rel="stylesheet" href="css/sprite-chat.css">
+</head>
+
+<body class="reading-mode">
+  <!-- Components injected by js/components.js -->
+  <script src="js/components.js"></script>
+
+  <main>
+    <section class="trending-container">
+      <div class="container">
+        <div class="trending-header">
+          <h1 class="trending-title">Live Focus</h1>
+          <p class="trending-subtitle" id="last-updated">数据同步中...</p>
+          <div class="source-tabs" id="focus-tabs">
+            <button class="source-tab active" data-category="finance">财经</button>
+            <button class="source-tab" data-category="tech">科技</button>
+            <button class="source-tab" data-category="ai">AI</button>
+          </div>
+          <div id="controls"></div>
+        </div>
+        <div id="focus-content">
+          <!-- skeleton will be injected by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const state = {
+        category: 'finance',
+        subSource: null,
+        data: null
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        window.initEntranceAnimation();
+        bindFocusTabs();
+        loadFocus();
+        addExtras();
+        // Auto refresh every 6 hours
+        setInterval(loadFocus, 6 * 60 * 60 * 1000);
+      });
+
+      function bindFocusTabs() {
+        const tabs = document.querySelectorAll('#focus-tabs .source-tab');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            tabs.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            state.category = e.currentTarget.dataset.category;
+            state.subSource = null;
+            renderControls();
+            renderFocus();
+          });
+        });
+      }
+
+      async function loadFocus() {
+        const container = document.getElementById('focus-content');
+        const timeEl = document.getElementById('last-updated');
+        if (!container) return;
+        container.innerHTML = window.generateSkeleton(6);
+        try {
+          const res = await fetch('feeds/realtime-focus.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('无法加载 feeds/realtime-focus.json');
+          state.data = await res.json();
+          
+          if (timeEl && state.data.savedAt) {
+            const date = new Date(state.data.savedAt);
+            const options = {
+              timeZone: 'Asia/Shanghai',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            };
+            const parts = new Intl.DateTimeFormat('zh-CN', options).formatToParts(date);
+            const m = {};
+            parts.forEach(p => m[p.type] = p.value);
+            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
+          }
+
+          renderControls();
+          renderFocus();
+        } catch (err) {
+          console.error('加载实时焦点失败', err);
+          container.innerHTML = `
+              <div class="error-message">
+                <p>加载数据时出现错误</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+          const btn = document.getElementById('focus-refresh');
+          if (btn) btn.addEventListener('click', loadFocus);
+        }
+      }
+
+      function renderControls() {
+        const controls = document.getElementById('controls');
+        if (!controls) return;
+        const all = state.data && state.data.categories ? state.data.categories : {};
+        const cat = all[state.category] || {};
+        const sections = cat.sections || {};
+        let sources = Object.keys(sections);
+
+        // 自定义排序顺序
+        if (state.category === 'finance') {
+          const financeOrder = ['东方财富网', '同花顺财经', '第一财经', '雪球', '英为财情', '金融界', '华尔街见闻', '证券日报网', '格隆汇', '集思录', '慧博投研资讯', '美股市值'];
+          sources.sort((a, b) => {
+            const idxA = financeOrder.indexOf(a);
+            const idxB = financeOrder.indexOf(b);
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+          });
+        }
+
+        if (!state.subSource || !sources.includes(state.subSource)) {
+          state.subSource = sources[0] || '';
+        }
+        controls.innerHTML = `
+            <div class="category-filter">
+              ${sources.map(name => `<button class="category-btn ${name === state.subSource ? 'active' : ''}" data-src="${name}">${name}</button>`).join('')}
+            </div>
+          `;
+        controls.querySelectorAll('.category-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            controls.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            state.subSource = e.currentTarget.dataset.src;
+            renderFocus();
+          });
+        });
+      }
+
+      function renderFocus() {
+        const container = document.getElementById('focus-content');
+        if (!container) return;
+        const all = state.data && state.data.categories ? state.data.categories : {};
+        const cat = all[state.category] || {};
+        const sections = cat.sections || {};
+
+        const cards = [];
+        const entries = Object.entries(sections).filter(([sourceName]) => sourceName === state.subSource);
+        entries.forEach(([sourceName, sectionArr]) => {
+          if (!Array.isArray(sectionArr)) return;
+          sectionArr.forEach(sec => {
+            const secName = sec.section || '';
+            (sec.items || []).slice(0, 12).forEach(item => {
+              cards.push({
+                title: item.title || '',
+                url: item.url || '#',
+                source: sourceName,
+                section: secName
+              });
+            });
+          });
+        });
+
+        if (cards.length === 0) {
+          container.innerHTML = `
+              <div class="error-message">
+                <p>暂无数据</p>
+                <button class="refresh-btn" id="focus-refresh">重新加载</button>
+              </div>
+            `;
+          const btn = document.getElementById('focus-refresh');
+          if (btn) btn.addEventListener('click', loadFocus);
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'trending-grid';
+        cards.slice(0, 90).forEach(item => grid.appendChild(focusCard(item)));
+        container.innerHTML = '';
+        container.appendChild(grid);
+        window.animateCards(grid);
+      }
+
+      function focusCard(item) {
+        const card = document.createElement('div');
+        card.className = 'trending-card';
+        card.innerHTML = `
+            <div class="trending-card-content">
+              <div class="model-header">
+                <div class="model-icon">📰</div>
+                <div class="model-info">
+                  <h3>${window.escapeHtml(item.title)}</h3>
+                  <p>${window.escapeHtml(item.source)}${item.section ? ` • ${window.escapeHtml(item.section)}` : ''}</p>
+                </div>
+              </div>
+              <a href="${item.url}" target="_blank" class="model-link">查看详情 <span>→</span></a>
+            </div>
+          `;
+        return card;
+      }
+
+      function addExtras() {
+        document.addEventListener('mouseover', (e) => {
+          const target = e.target.closest('.trending-card');
+          if (target) target.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        document.addEventListener('mouseout', (e) => {
+          const target = e.target.closest('.trending-card');
+          if (target) target.style.transform = 'translateY(0) scale(1)';
+        });
+        document.addEventListener('keydown', (e) => {
+          const btns = Array.from(document.querySelectorAll('#focus-controls .category-tab'));
+          const active = document.querySelector('#focus-controls .category-tab.active');
+          const idx = btns.indexOf(active);
+          if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
+          else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
+        });
+      }
+    })();
+  </script>
+
+  <script src="js/script.js"></script>
+  <script src="lab/config.js"></script>
+  <script src="js/sprite-chat.js"></script>
+  <script>
+    // Initialize sprite chat with custom options for focus page
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.SpriteChatManager) {
+        window.spriteChatManager = new window.SpriteChatManager();
+      }
+    });
+  </script>
+</body>
+
+</html>
