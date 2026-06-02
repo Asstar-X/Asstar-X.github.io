@@ -104,15 +104,80 @@ window.animateCards = function(gridElement) {
     });
 };
 
-// Google Analytics Loader
+// Google Analytics Loader - Optimized to run deferred to prevent render blocking
 window.initGA = function(id = 'G-RBTWR9QNMQ') {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
-    document.head.appendChild(script);
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+            document.head.appendChild(script);
 
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', id);
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', id);
+        }, 1500); // 1.5s delay to prioritize critical rendering paths
+    });
+};
+
+// Global Stale-While-Revalidate (SWR) fetching helper for instant loading
+window.fetchWithSWR = async function(url, storageKey, renderCallback, timeEl, timePropName) {
+    const cachedData = localStorage.getItem(storageKey);
+    let hasRendered = false;
+
+    // Helper to format Shanghai timezone date for timestamp element
+    const updateTimeUI = (dateStr) => {
+        if (!timeEl || !dateStr) return;
+        const date = new Date(dateStr);
+        const opts = {
+            timeZone: 'Asia/Shanghai',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        };
+        try {
+            const parts = new Intl.DateTimeFormat('zh-CN', opts).formatToParts(date);
+            const m = {};
+            parts.forEach(p => m[p.type] = p.value);
+            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
+        } catch(e) {
+            timeEl.innerText = dateStr;
+        }
+    };
+
+    // Render cache immediately if present
+    if (cachedData) {
+        try {
+            const data = JSON.parse(cachedData);
+            renderCallback(data);
+            updateTimeUI(data[timePropName] || data.lastUpdated || data.savedAt);
+            hasRendered = true;
+        } catch (e) {
+            console.error('Parsing stored SWR cache failure: ', e);
+        }
+    }
+
+    // Quietly fetch fresh data in background
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            const freshData = await res.json();
+            const freshDataStr = JSON.stringify(freshData);
+            
+            // If data is different from cache or we haven't rendered anything yet, update
+            if (freshDataStr !== cachedData || !hasRendered) {
+                localStorage.setItem(storageKey, freshDataStr);
+                renderCallback(freshData);
+                updateTimeUI(freshData[timePropName] || freshData.lastUpdated || freshData.savedAt);
+            }
+        } else {
+            throw new Error('Network response code not OK');
+        }
+    } catch (err) {
+        console.error('SWR background validation failure: ', err);
+        if (!hasRendered) {
+            throw err; // bubble up error to display UI error status
+        }
+    }
 };

@@ -24,129 +24,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // 视差滚动效果
-// Canvas Background Implementation
-class AntigravityBackground {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        if (!this.canvas) return;
 
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.mouse = { x: null, y: null, radius: 150 };
-        this.particleCount = window.innerWidth < 768 ? 60 : 100;
-        this.connectionDistance = 150;
-
-        this.init();
-        this.animate();
-        this.handleResize();
-        this.handleMouse();
-    }
-
-    init() {
-        this.resize();
-        this.createParticles();
-    }
-
-    resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-
-    createParticles() {
-        this.particles = [];
-        for (let i = 0; i < this.particleCount; i++) {
-            this.particles.push({
-                x: Math.random() * this.canvas.width,
-                y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                size: Math.random() * 2 + 1,
-                color: Math.random() > 0.5 ? '#ffffff' : '#ffffff'
-            });
-        }
-    }
-
-    handleResize() {
-        window.addEventListener('resize', () => {
-            this.resize();
-            this.createParticles();
-        });
-    }
-
-    handleMouse() {
-        window.addEventListener('mousemove', (e) => {
-            this.mouse.x = e.x;
-            this.mouse.y = e.y;
-        });
-
-        window.addEventListener('mouseleave', () => {
-            this.mouse.x = null;
-            this.mouse.y = null;
-        });
-    }
-
-    drawParticles() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        for (let i = 0; i < this.particles.length; i++) {
-            let p = this.particles[i];
-
-            // Movement
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Bounce off edges
-            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
-            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
-
-            // Mouse interaction
-            if (this.mouse.x != null) {
-                let dx = this.mouse.x - p.x;
-                let dy = this.mouse.y - p.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < this.mouse.radius) {
-                    const forceDirectionX = dx / distance;
-                    const forceDirectionY = dy / distance;
-                    const force = (this.mouse.radius - distance) / this.mouse.radius;
-                    const directionX = forceDirectionX * force * 3;
-                    const directionY = forceDirectionY * force * 3;
-
-                    p.x -= directionX;
-                    p.y -= directionY;
-                }
-            }
-
-            // Draw particle
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            this.ctx.fillStyle = p.color;
-            this.ctx.fill();
-
-            // Connect particles
-            for (let j = i; j < this.particles.length; j++) {
-                let p2 = this.particles[j];
-                let dx = p.x - p2.x;
-                let dy = p.y - p2.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < this.connectionDistance) {
-                    this.ctx.beginPath();
-                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / this.connectionDistance})`;
-                    this.ctx.lineWidth = 0.5;
-                    this.ctx.moveTo(p.x, p.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.stroke();
-                }
-            }
-        }
-    }
-
-    animate() {
-        this.drawParticles();
-        requestAnimationFrame(this.animate.bind(this));
-    }
-}
 
 // 移除旧的导航栏滚动背景逻辑，以保持透明垂直导航栏的一致性
 // window.addEventListener('scroll', () => { ... });
@@ -296,9 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 添加粒子效果
-    // Init Canvas Background
-    new AntigravityBackground('canvas-background');
     loadProjects();
     
     // 监听窗口大小变化以适配星系布局
@@ -843,17 +718,5 @@ class CosmicUniverse {
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('canvas-container')) {
         new CosmicUniverse('canvas-container');
-    } else if (document.getElementById('canvas-background')) {
-        // Some pages use 'canvas-background' ID
-        const container = document.getElementById('canvas-background').parentElement;
-        // In case 'canvas-background' is a container not a canvas
-        const bgEl = document.getElementById('canvas-background');
-        if (bgEl.tagName !== 'CANVAS') {
-            new CosmicUniverse('canvas-background');
-        } else {
-            // If it IS a canvas, we might need a container or replace it.
-            // For simplicity, let's assume it's a wrapper ID in most of our pages.
-            new CosmicUniverse('canvas-background');
-        }
     }
 });

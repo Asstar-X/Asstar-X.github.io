@@ -16,8 +16,8 @@
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap"
         rel="stylesheet">
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
     <link rel="stylesheet" href="css/sprite-chat.css">
     <style>
         .paper-title {
@@ -77,9 +77,9 @@
         </section>
     </main>
 
-    <script src="js/script.js"></script>
-    <script src="lab/config.js"></script>
-    <script src="js/sprite-chat.js"></script>
+    <script src="js/script.js" defer></script>
+    <script src="lab/config.js" defer></script>
+    <script src="js/sprite-chat.js" defer></script>
     <script>
         // Initialize sprite chat with custom options for huggingface papers page
         document.addEventListener('DOMContentLoaded', () => {
@@ -118,36 +118,23 @@
             async loadPapersData() {
                 const container = document.getElementById('papers-content');
                 const timeEl = document.getElementById('last-updated');
-                container.innerHTML = window.generateSkeleton(4);
+                
+                // Only show skeleton on cold load (no cache present)
+                if (!localStorage.getItem('asstar_cache_papers')) {
+                    container.innerHTML = window.generateSkeleton(4);
+                }
 
                 try {
-                    const res = await fetch('feeds/huggingface-papers-data.json', { cache: 'no-store' });
-                    if (res.ok) {
-                        const all = await res.json();
-                        
-                        if (timeEl && all.lastUpdated) {
-                            const date = new Date(all.lastUpdated);
-                            const opts = {
-                                timeZone: 'Asia/Shanghai',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit',
-                                hour12: false
-                            };
-                            const parts = new Intl.DateTimeFormat('zh-CN', opts).formatToParts(date);
-                            const m = {};
-                            parts.forEach(p => m[p.type] = p.value);
-                            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
-                        }
-
-                        this.papersData = all[this.currentCategory] || [];
-                        this.renderPapers();
-                    } else {
-                        throw new Error('Fetch failed');
-                    }
+                    await window.fetchWithSWR(
+                        'feeds/huggingface-papers-data.json',
+                        'asstar_cache_papers',
+                        (data) => {
+                            this.papersData = data[this.currentCategory] || [];
+                            this.renderPapers();
+                        },
+                        timeEl,
+                        'lastUpdated'
+                    );
                 } catch (error) {
                     console.error('加载论文失败:', error);
                     this.showError();

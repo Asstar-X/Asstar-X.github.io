@@ -1,5 +1,124 @@
 /* ===== Common Component Styles ===== */
 
+/* Page Smooth Transitions */
+.page-transition-curtain {
+    position: fixed;
+    inset: 0;
+    background: #020205;
+    z-index: 99999;
+    pointer-events: none;
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 1;
+    transition: clip-path 0.3s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.25s ease-in-out;
+}
+
+.page-ready .page-transition-curtain {
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 0;
+}
+
+/* Staring Eyes Transition Curtain Extensions */
+.transition-eyes-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 520px;
+    height: 200px;
+    opacity: 0;
+    scale: 0.9;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out, scale 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Eyes fade in with a slow, dark, breathing pulse when page is NOT ready */
+body:not(.page-ready) .transition-eyes-container {
+    opacity: 0.38; /* faint, ghostly and ambient */
+    scale: 1.0;
+    animation: void-breath 3.5s infinite ease-in-out alternate;
+    transition-delay: 0.05s;
+}
+
+.page-ready .transition-eyes-container {
+    opacity: 0;
+    scale: 0.9;
+    transition: opacity 0.15s ease-in, scale 0.15s ease-in;
+}
+
+.staring-eyes-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Eyelids and Pupil blink animation */
+.blink-group {
+    transform-origin: 0px 0px;
+    animation: eye-blink 5s infinite ease-in-out; /* slower, more organic blinking */
+}
+
+/* Pupil translate driven by JS variables */
+.iris-group {
+    transform: translate3d(var(--eye-tx, 0px), var(--eye-ty, 0px), 0);
+    transition: transform 0.08s ease-out; /* slightly delayed for a heavier void gaze feeling */
+}
+
+.einstein-ring {
+    transform-origin: 0px 0px;
+    animation: rotate-hud-clockwise 30s linear infinite;
+}
+
+@keyframes void-breath {
+    0% {
+        opacity: 0.28;
+    }
+    100% {
+        opacity: 0.48;
+    }
+}
+
+@keyframes eye-blink {
+    0%, 93%, 97%, 100% {
+        transform: scaleY(1);
+    }
+    95% {
+        transform: scaleY(0.02); /* collapses to a flat gravitational plane */
+    }
+}
+
+@keyframes rotate-hud-clockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Global Ambient Space Background */
+body {
+    background: #020205 !important;
+}
+
+.slide-bg {
+    position: fixed;
+    inset: -50px;
+    background: radial-gradient(circle at 30% 30%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(0, 210, 255, 0.08) 0%, transparent 60%);
+    z-index: -2;
+    transition: transform 0.15s ease-out;
+    pointer-events: none;
+}
+
+.slide-stars {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
+    background-size: 550px 550px;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
 /* Glassmorphism Panel */
 .glass-panel {
     background: rgba(10, 15, 30, 0.65);

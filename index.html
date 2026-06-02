@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="css/time-rift.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
     <!-- Sprite Chat Styles -->
     <link rel="stylesheet" href="css/sprite-chat.css">
     
@@ -171,15 +171,15 @@
                             <p>GitscYee</p>
                         </div>
                     </div>
-                    <a class="contact-node node--explore" href="voice-denoise.html">
+                    <a class="contact-node node--explore" href="voice-interaction.html">
                         <div class="node-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
                                 <path d="M12 2L3 20h18L12 2z" /><path d="M12 2v18" /><path d="M7.5 11h9" />
                             </svg>
                         </div>
                         <div class="node-content">
-                            <h3>探索</h3>
-                            <p>SE</p>
+                            <h3>语音交互</h3>
+                            <p>Voice Interaction</p>
                         </div>
                     </a>
                 </div>
@@ -187,22 +187,21 @@
         </section>
     </main>
 
-    <script src="js/script.js"></script>
-    <script src="js/time-rift.js"></script>
-    <script src="js/sprite-chat.js"></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/time-rift.js" defer></script>
+    <script src="js/sprite-chat.js" defer></script>
     <script>
-        loadProjects('galactic-timeline');
-
-        // Initialize sprite chat
         document.addEventListener('DOMContentLoaded', () => {
+            loadProjects('galactic-timeline');
+
+            // Initialize sprite chat
             if (window.SpriteChatManager) {
                 window.spriteChatManager = new window.SpriteChatManager();
             }
-        });
 
-        // --- Hero "Voice" 3D Particle Sphere ---
-        (function() {
-            const heroContainer = document.getElementById('hero-3d-container');
+            // --- Hero "Voice" 3D Particle Sphere ---
+            (function() {
+                const heroContainer = document.getElementById('hero-3d-container');
             if (!heroContainer) return;
 
             const containerWidth = heroContainer.offsetWidth || 500;
@@ -318,7 +317,8 @@
             const resizeObserver = new ResizeObserver(() => { const newWidth = heroContainer.offsetWidth, newHeight = heroContainer.offsetHeight; heroCamera.aspect = newWidth / newHeight; heroCamera.updateProjectionMatrix(); heroRenderer.setSize(newWidth, newHeight); });
             resizeObserver.observe(heroContainer);
         })();
-    </script>
+    });
+</script>
 </body>
 
 </html>

@@ -16,8 +16,8 @@
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
         rel="stylesheet">
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
     <link rel="stylesheet" href="css/sprite-chat.css">
     <style>
         /* Project-specific styles */
@@ -138,9 +138,9 @@
             </div>
         </section>
     </main>
-    <script src="js/script.js"></script>
-    <script src="lab/config.js"></script>
-    <script src="js/sprite-chat.js"></script>
+    <script src="js/script.js" defer></script>
+    <script src="lab/config.js" defer></script>
+    <script src="js/sprite-chat.js" defer></script>
     <script>
         // Initialize sprite chat with custom options for trending projects page
         document.addEventListener('DOMContentLoaded', () => {
@@ -267,55 +267,38 @@
                     const container = document.getElementById('trending-content');
                     const timeEl = document.getElementById('last-updated');
                     if (!container) return;
-                    container.innerHTML = window.generateSkeleton(6);
-                    try {
-                        let list = [];
-                        let rawJson = null;
-                        if (this.source === 'github') {
-                            const res = await fetch('feeds/trending-data.json', { cache: 'no-store' });
-                            if (res.ok) {
-                                rawJson = await res.json();
-                                list = rawJson[this.period] || [];
-                            }
-                            this.githubData = list;
-                            this.renderGithub();
-                        } else if (this.source === 'huggingface') {
-                            const res = await fetch('feeds/huggingface-data.json', { cache: 'no-store' });
-                            if (res.ok) {
-                                rawJson = await res.json();
-                                list = rawJson[this.category] || [];
-                            }
-                            this.hfData = list;
-                            this.renderHuggingface();
-                        } else if (this.source === 'interest') {
-                            const res = await fetch('feeds/huggingface-interest-data.json', { cache: 'no-store' });
-                            if (res.ok) {
-                                rawJson = await res.json();
-                                list = rawJson[this.interestCat] || {};
-                            }
-                            this.interestData = list;
-                            this.renderInterest();
-                        }
+                    
+                    const cacheKey = `asstar_cache_project_${this.source}`;
+                    if (!localStorage.getItem(cacheKey)) {
+                        container.innerHTML = window.generateSkeleton(6);
+                    }
 
-                        if (timeEl && rawJson && rawJson.lastUpdated) {
-                            const date = new Date(rawJson.lastUpdated);
-                            const opts = {
-                                timeZone: 'Asia/Shanghai',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit',
-                                hour12: false
-                            };
-                            const parts = new Intl.DateTimeFormat('zh-CN', opts).formatToParts(date);
-                            const m = {};
-                            parts.forEach(p => m[p.type] = p.value);
-                            timeEl.innerText = `${m.year}.${m.month}.${m.day} ${m.hour}:${m.minute}:${m.second}`;
-                        }
+                    try {
+                        let url = '';
+                        if (this.source === 'github') url = 'feeds/trending-data.json';
+                        else if (this.source === 'huggingface') url = 'feeds/huggingface-data.json';
+                        else if (this.source === 'interest') url = 'feeds/huggingface-interest-data.json';
+
+                        await window.fetchWithSWR(
+                            url,
+                            cacheKey,
+                            (data) => {
+                                if (this.source === 'github') {
+                                    this.githubData = data[this.period] || [];
+                                    this.renderGithub();
+                                } else if (this.source === 'huggingface') {
+                                    this.hfData = data[this.category] || [];
+                                    this.renderHuggingface();
+                                } else if (this.source === 'interest') {
+                                    this.interestData = data[this.interestCat] || {};
+                                    this.renderInterest();
+                                }
+                            },
+                            timeEl,
+                            'lastUpdated'
+                        );
                     } catch (err) {
-                        console.error('加载失败', err);
+                        console.error('加载项目数据失败', err);
                         this.showError();
                     }
                 }
