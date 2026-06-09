@@ -407,8 +407,8 @@ window.SpriteChatManager = class SpriteChatManager {
             useProxy = this.configManager.shouldUseProxy();
             proxyUrl = this.configManager.getProxyUrl();
 
-            // 仿照 prompt-optimizer.html 自动配置逻辑：
-            // 如果没配置 Key 且没开启代理，则自动强制切换到 Qwen 代理模式，确保“点进去就能用”
+            // 自动配置逻辑：
+            // 如果没配置 Key 且没开启代理，则自动强制切换到 Qwen 代理模式，确保“能直接使用”
             if (!currentApiKey && !useProxy) {
                 const qwen = this.configManager.getAllModels().qwen;
                 if (qwen) {

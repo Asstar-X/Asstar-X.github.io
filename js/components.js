@@ -12,90 +12,149 @@ window.injectSharedComponents = function() {
                 <svg class="staring-eyes-svg" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Accretion/Nebula Glow filter -->
-                        <filter id="cosmic-glow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
+                        <filter id="cosmic-glow" x="-100%" y="-100%" width="300%" height="300%">
+                            <feGaussianBlur stdDeviation="5" result="blur" />
                             <feMerge>
                                 <feMergeNode in="blur" />
                                 <feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
-                        <!-- Cosmic dust radial gradient -->
+                        <!-- Intense pupil glow for accretion disk -->
+                        <filter id="intense-glow" x="-200%" y="-200%" width="500%" height="500%">
+                            <feGaussianBlur stdDeviation="2" result="blur1" />
+                            <feGaussianBlur stdDeviation="6" result="blur2" />
+                            <feMerge>
+                                <feMergeNode in="blur2" />
+                                <feMergeNode in="blur1" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <!-- Monochrome nebula dust radial gradient -->
                         <radialGradient id="nebula-dust-left" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3" />
-                            <stop offset="45%" stop-color="#8a2be2" stop-opacity="0.08" />
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                            <stop offset="40%" stop-color="#888888" stop-opacity="0.15" />
+                            <stop offset="75%" stop-color="#222222" stop-opacity="0.05" />
                             <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                         </radialGradient>
                         <radialGradient id="nebula-dust-right" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3" />
-                            <stop offset="45%" stop-color="#8a2be2" stop-opacity="0.08" />
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                            <stop offset="40%" stop-color="#888888" stop-opacity="0.15" />
+                            <stop offset="75%" stop-color="#222222" stop-opacity="0.05" />
                             <stop offset="100%" stop-color="#000000" stop-opacity="0" />
                         </radialGradient>
                     </defs>
                     
+                    <!-- Background nebular clouds to blend the two eyes -->
+                    <g opacity="0.45" filter="url(#cosmic-glow)">
+                        <ellipse cx="260" cy="100" rx="250" ry="90" fill="url(#nebula-dust-left)" />
+                    </g>
+                    
                     <!-- Left Cosmic Gravity Well (X=110) -->
-                    <g class="eye eye-left" transform="translate(110, 100)">
+                    <g class="eye eye-left" transform="translate(80, 100) scale(1.5)">
                         <!-- Outer Nebular Fog -->
-                        <circle cx="0" cy="0" r="45" fill="url(#nebula-dust-left)" />
+                        <circle cx="0" cy="0" r="50" fill="url(#nebula-dust-left)" />
                         
-                        <!-- Gravitational Wave ripples (Acting as static outer boundary) -->
+                        <!-- Gravitational Wave ripples (Monochrome) -->
                         <g class="gravitational-waves" opacity="0.6">
-                            <path d="M -50 -20 Q -65 0, -50 20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                            <path d="M 50 -20 Q 65 0, 50 20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                            <path d="M -65 -30 Q -85 0, -65 30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" />
-                            <path d="M 65 -30 Q 85 0, 65 30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" />
+                            <path d="M -55 -25 Q -70 0, -55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
+                            <path d="M 55 -25 Q 70 0, 55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
+                            <path d="M -70 -35 Q -90 0, -70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
+                            <path d="M 70 -35 Q 90 0, 70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
                         </g>
                         
                         <!-- Gyroscopic Orbital Rings - Spin Animations on groups -->
                         <g class="ring-spin-clockwise-fast">
-                            <ellipse cx="0" cy="0" rx="42" ry="16" fill="none" stroke="rgba(255, 255, 255, 0.16)" stroke-width="0.8" transform="rotate(-30)" />
+                            <ellipse cx="0" cy="0" rx="46" ry="18" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.0" transform="rotate(-30)" />
                         </g>
                         <g class="ring-spin-counter-medium">
-                            <ellipse cx="0" cy="0" rx="36" ry="12" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.6" transform="rotate(45)" />
+                            <ellipse cx="0" cy="0" rx="40" ry="14" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" transform="rotate(45)" />
                         </g>
                         <g class="ring-spin-clockwise-slow">
-                            <ellipse cx="0" cy="0" rx="8" ry="32" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="0.8" transform="rotate(15)" />
+                            <ellipse cx="0" cy="0" rx="10" ry="36" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.0" transform="rotate(15)" />
                         </g>
 
+                        <!-- Swirling Stardust Particles (Monochrome) -->
+                        <g class="stardust" opacity="0.85">
+                            <circle cx="-25" cy="-15" r="1.2" fill="#ffffff" opacity="0.9" />
+                            <circle cx="-15" cy="25" r="1.5" fill="#cccccc" opacity="0.85" />
+                            <circle cx="28" cy="18" r="0.9" fill="#999999" opacity="0.8" />
+                            <circle cx="20" cy="-24" r="1.3" fill="#ffffff" opacity="0.75" />
+                            <circle cx="5" cy="-30" r="1.8" fill="#dddddd" opacity="0.6" filter="url(#cosmic-glow)" />
+                            <circle cx="-32" cy="5" r="1.0" fill="#888888" opacity="0.9" />
+                            <circle cx="35" cy="-12" r="1.4" fill="#ffffff" opacity="0.85" />
+                            <circle cx="-8" cy="-28" r="1.2" fill="#eeeeee" opacity="0.75" />
+                            <circle cx="15" cy="32" r="1.0" fill="#777777" opacity="0.8" />
+                            <circle cx="-22" cy="-28" r="0.8" fill="#ffffff" opacity="0.95" />
+                        </g>
+ 
                         <!-- Blink group (Collapses during gravitational fluctuation) -->
                         <g class="blink-group">
                             <!-- Singularity Core (Translates with mouse) -->
                             <g class="iris-group">
+                                <!-- Black Hole Accretion Disk (monochrome swirling glow) -->
+                                <g filter="url(#intense-glow)">
+                                    <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" transform="rotate(-20)" opacity="0.7" />
+                                    <ellipse cx="0" cy="0" rx="18" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" transform="rotate(-20)" opacity="0.9" />
+                                    <ellipse cx="0" cy="0" rx="16" ry="4.5" fill="none" stroke="#ffffff" stroke-width="1.5" transform="rotate(-20)" opacity="0.95" />
+                                </g>
                                 <!-- Singularity Horizon -->
-                                <circle class="singularity" cx="0" cy="0" r="12" fill="#000000" stroke="rgba(255, 255, 255, 0.2)" stroke-width="0.8" filter="url(#cosmic-glow)" />
+                                <circle class="singularity" cx="0" cy="0" r="11" fill="#000000" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" filter="url(#cosmic-glow)" />
                                 <!-- Inner core spark -->
-                                <circle cx="0" cy="0" r="3" fill="#ffffff" opacity="0.4" filter="url(#cosmic-glow)" />
+                                <circle cx="-2" cy="-2" r="2.5" fill="#ffffff" opacity="0.8" filter="url(#cosmic-glow)" />
                             </g>
                         </g>
                     </g>
                     
                     <!-- Right Cosmic Gravity Well (X=410) -->
-                    <g class="eye eye-right" transform="translate(410, 100)">
+                    <g class="eye eye-right" transform="translate(440, 100) scale(1.5)">
                         <!-- Outer Nebular Fog -->
-                        <circle cx="0" cy="0" r="45" fill="url(#nebula-dust-right)" />
+                        <circle cx="0" cy="0" r="50" fill="url(#nebula-dust-right)" />
                         
-                        <!-- Gravitational Wave ripples -->
+                        <!-- Gravitational Wave ripples (Monochrome) -->
                         <g class="gravitational-waves" opacity="0.6">
-                            <path d="M -50 -20 Q -65 0, -50 20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                            <path d="M 50 -20 Q 65 0, 50 20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" />
-                            <path d="M -65 -30 Q -85 0, -65 30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" />
-                            <path d="M 65 -30 Q 85 0, 65 30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" />
+                            <path d="M -55 -25 Q -70 0, -55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
+                            <path d="M 55 -25 Q 70 0, 55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
+                            <path d="M -70 -35 Q -90 0, -70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
+                            <path d="M 70 -35 Q 90 0, 70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
                         </g>
                         
                         <g class="ring-spin-clockwise-fast">
-                            <ellipse cx="0" cy="0" rx="42" ry="16" fill="none" stroke="rgba(255, 255, 255, 0.16)" stroke-width="0.8" transform="rotate(-30)" />
+                            <ellipse cx="0" cy="0" rx="46" ry="18" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.0" transform="rotate(-30)" />
                         </g>
                         <g class="ring-spin-counter-medium">
-                            <ellipse cx="0" cy="0" rx="36" ry="12" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.6" transform="rotate(45)" />
+                            <ellipse cx="0" cy="0" rx="40" ry="14" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" transform="rotate(45)" />
                         </g>
                         <g class="ring-spin-clockwise-slow">
-                            <ellipse cx="0" cy="0" rx="8" ry="32" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="0.8" transform="rotate(15)" />
+                            <ellipse cx="0" cy="0" rx="10" ry="36" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.0" transform="rotate(15)" />
+                        </g>
+
+                        <!-- Swirling Stardust Particles (Monochrome) -->
+                        <g class="stardust" opacity="0.85">
+                            <circle cx="-25" cy="-15" r="1.2" fill="#ffffff" opacity="0.9" />
+                            <circle cx="-15" cy="25" r="1.5" fill="#cccccc" opacity="0.85" />
+                            <circle cx="28" cy="18" r="0.9" fill="#999999" opacity="0.8" />
+                            <circle cx="20" cy="-24" r="1.3" fill="#ffffff" opacity="0.75" />
+                            <circle cx="5" cy="-30" r="1.8" fill="#dddddd" opacity="0.6" filter="url(#cosmic-glow)" />
+                            <circle cx="-32" cy="5" r="1.0" fill="#888888" opacity="0.9" />
+                            <circle cx="35" cy="-12" r="1.4" fill="#ffffff" opacity="0.85" />
+                            <circle cx="-8" cy="-28" r="1.2" fill="#eeeeee" opacity="0.75" />
+                            <circle cx="15" cy="32" r="1.0" fill="#777777" opacity="0.8" />
+                            <circle cx="-22" cy="-28" r="0.8" fill="#ffffff" opacity="0.95" />
                         </g>
 
                         <!-- Blink group -->
                         <g class="blink-group">
                             <g class="iris-group">
-                                <circle class="singularity" cx="0" cy="0" r="12" fill="#000000" stroke="rgba(255, 255, 255, 0.2)" stroke-width="0.8" filter="url(#cosmic-glow)" />
-                                <circle cx="0" cy="0" r="3" fill="#ffffff" opacity="0.4" filter="url(#cosmic-glow)" />
+                                <!-- Black Hole Accretion Disk (monochrome swirling glow) -->
+                                <g filter="url(#intense-glow)">
+                                    <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" transform="rotate(-20)" opacity="0.7" />
+                                    <ellipse cx="0" cy="0" rx="18" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" transform="rotate(-20)" opacity="0.9" />
+                                    <ellipse cx="0" cy="0" rx="16" ry="4.5" fill="none" stroke="#ffffff" stroke-width="1.5" transform="rotate(-20)" opacity="0.95" />
+                                </g>
+                                <!-- Singularity Horizon -->
+                                <circle class="singularity" cx="0" cy="0" r="11" fill="#000000" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" filter="url(#cosmic-glow)" />
+                                <!-- Inner core spark -->
+                                <circle cx="-2" cy="-2" r="2.5" fill="#ffffff" opacity="0.8" filter="url(#cosmic-glow)" />
                             </g>
                         </g>
                     </g>
@@ -215,10 +274,10 @@ window.injectSharedComponents = function() {
     };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(triggerPageReady, 25);
+        setTimeout(triggerPageReady, 350);
     } else {
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(triggerPageReady, 25);
+            setTimeout(triggerPageReady, 350);
         });
     }
 
@@ -285,7 +344,7 @@ window.injectSharedComponents = function() {
                 document.body.classList.remove('page-ready');
                 setTimeout(() => {
                     window.location.href = link.href;
-                }, 260); // match transition duration in CSS (0.3s)
+                }, 650); // match transition duration in CSS (0.7s)
             }
         }
     });

@@ -9,7 +9,7 @@
     pointer-events: none;
     clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
     opacity: 1;
-    transition: clip-path 0.3s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.25s ease-in-out;
+    transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.5s ease-in-out;
 }
 
 .page-ready .page-transition-curtain {
@@ -28,7 +28,7 @@
     opacity: 0;
     scale: 0.9;
     pointer-events: none;
-    transition: opacity 0.2s ease-out, scale 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: opacity 0.45s ease-out, scale 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Eyes fade in with a slow, dark, breathing pulse when page is NOT ready */
@@ -42,7 +42,7 @@ body:not(.page-ready) .transition-eyes-container {
 .page-ready .transition-eyes-container {
     opacity: 0;
     scale: 0.9;
-    transition: opacity 0.15s ease-in, scale 0.15s ease-in;
+    transition: opacity 0.45s ease-in, scale 0.45s ease-in;
 }
 
 .staring-eyes-svg {
@@ -92,6 +92,35 @@ body:not(.page-ready) .transition-eyes-container {
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.ring-spin-clockwise-fast {
+    transform-origin: 0px 0px;
+    animation: rotate-hud-clockwise 6s linear infinite;
+}
+
+.ring-spin-counter-medium {
+    transform-origin: 0px 0px;
+    animation: rotate-hud-counter 12s linear infinite;
+}
+
+.ring-spin-clockwise-slow {
+    transform-origin: 0px 0px;
+    animation: rotate-hud-clockwise 25s linear infinite;
+}
+
+.stardust {
+    transform-origin: 0px 0px;
+    animation: rotate-hud-counter 20s linear infinite;
+}
+
+@keyframes rotate-hud-counter {
+    0% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(0deg);
     }
 }
 

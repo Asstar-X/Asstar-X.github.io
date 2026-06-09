@@ -206,7 +206,7 @@ class ConfigManager {
     }
 }
 
-// 作为全局暴露（供 prompt-optimizer 页面脚本使用）
+// 作为全局暴露（供页面脚本使用）
 window.ConfigManager = ConfigManager;
 
 
