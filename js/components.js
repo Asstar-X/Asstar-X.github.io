@@ -6,7 +6,7 @@ window.injectSharedComponents = function() {
     // Inject transition curtain
     if (!document.querySelector('.page-transition-curtain')) {
         const curtain = document.createElement('div');
-        curtain.className = 'page-transition-curtain';
+        curtain.className = 'page-transition-curtain init-hidden';
         curtain.innerHTML = `
             <div class="transition-eyes-container">
                 <svg class="staring-eyes-svg" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg">
@@ -162,6 +162,13 @@ window.injectSharedComponents = function() {
             </div>
         `;
         document.body.appendChild(curtain);
+        
+        // Show loading screen only if page load takes longer than 350ms
+        setTimeout(() => {
+            if (!document.body.classList.contains('page-ready')) {
+                curtain.classList.remove('init-hidden');
+            }
+        }, 350);
     }
     // Inject Back Button if not on index.html
     const isIndex = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '';
@@ -274,10 +281,10 @@ window.injectSharedComponents = function() {
     };
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(triggerPageReady, 350);
+        setTimeout(triggerPageReady, 20);
     } else {
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(triggerPageReady, 350);
+            setTimeout(triggerPageReady, 20);
         });
     }
 
@@ -335,16 +342,20 @@ window.injectSharedComponents = function() {
         if (link && link.href && link.target !== '_blank') {
             const isPlainClick = e.button === 0 && !e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey;
             if (isPlainClick && link.host === window.location.host && !link.hash && !link.href.startsWith('javascript:')) {
-                e.preventDefault();
+                // Do NOT preventDefault! Let browser navigate naturally at normal speed.
                 
                 // Track spatial click coordinates to center the portal shrink transition
                 document.documentElement.style.setProperty('--click-x', `${e.clientX}px`);
                 document.documentElement.style.setProperty('--click-y', `${e.clientY}px`);
                 
-                document.body.classList.remove('page-ready');
+                // Show loading screen only if page navigation takes longer than 350ms
                 setTimeout(() => {
-                    window.location.href = link.href;
-                }, 650); // match transition duration in CSS (0.7s)
+                    const curtain = document.querySelector('.page-transition-curtain');
+                    if (curtain) {
+                        document.body.classList.remove('page-ready');
+                        curtain.classList.remove('init-hidden');
+                    }
+                }, 350);
             }
         }
     });

@@ -17,6 +17,12 @@
     opacity: 0;
 }
 
+.page-transition-curtain.init-hidden {
+    opacity: 0 !important;
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%)) !important;
+    visibility: hidden;
+}
+
 /* Staring Eyes Transition Curtain Extensions */
 .transition-eyes-container {
     position: absolute;
