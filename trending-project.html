@@ -113,8 +113,6 @@
             text-decoration: underline;
         }
     </style>
-    <!-- Sprite Chat Styles -->
-    <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body>
@@ -141,16 +139,7 @@
         </section>
     </main>
     <script src="js/script.js" defer></script>
-    <script src="lab/config.js" defer></script>
     <script src="js/sprite-chat.js" defer></script>
-    <script>
-        // Initialize sprite chat with custom options for trending projects page
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager();
-            }
-        });
-    </script>
     <script>
         (function () {
             class TrendingProject {
@@ -477,7 +466,6 @@
             }
         })();
     </script>
-    <script src="js/sprite-chat.js"></script>
 </body>
 
 </html>

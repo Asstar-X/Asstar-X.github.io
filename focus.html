@@ -225,8 +225,8 @@
           if (target) target.style.transform = 'translateY(0) scale(1)';
         });
         document.addEventListener('keydown', (e) => {
-          const btns = Array.from(document.querySelectorAll('#focus-controls .category-tab'));
-          const active = document.querySelector('#focus-controls .category-tab.active');
+          const btns = Array.from(document.querySelectorAll('#controls .category-btn'));
+          const active = document.querySelector('#controls .category-btn.active');
           const idx = btns.indexOf(active);
           if (e.key === 'ArrowLeft' && idx > 0) btns[idx - 1].click();
           else if (e.key === 'ArrowRight' && idx < btns.length - 1) btns[idx + 1].click();
@@ -236,7 +236,6 @@
   </script>
 
   <script src="js/script.js" defer></script>
-  <script src="lab/config.js" defer></script>
   <script src="js/sprite-chat.js" defer></script>
   <script>
     // Initialize sprite chat with custom options for focus page

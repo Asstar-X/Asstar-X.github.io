@@ -1,5 +1,16 @@
 /* ===== Common Component Styles ===== */
 
+:root {
+    --sprite-glow-color: rgba(255, 255, 255, 0.95);
+    --sprite-ambient-glow: rgba(147, 51, 234, 0.25);
+    --sprite-blush-opacity: 0;
+    --ear-height-scale: 1.5;
+    --eye-aperture: 1.0;
+    --particle-density: 0.85;
+    --eye-tx: 0px;
+    --eye-ty: 0px;
+}
+
 /* Page Smooth Transitions */
 .page-transition-curtain {
     position: fixed;
@@ -29,25 +40,25 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 520px;
-    height: 200px;
+    width: 680px;
+    height: 240px;
     opacity: 0;
-    scale: 0.9;
+    scale: 0.93;
     pointer-events: none;
     transition: opacity 0.45s ease-out, scale 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Eyes fade in with a slow, dark, breathing pulse when page is NOT ready */
 body:not(.page-ready) .transition-eyes-container {
-    opacity: 0.38; /* faint, ghostly and ambient */
+    opacity: 0.85; /* faint, ghostly and ambient */
     scale: 1.0;
-    animation: void-breath 3.5s infinite ease-in-out alternate;
     transition-delay: 0.05s;
+    animation: sprite-levitate 5s infinite ease-in-out alternate;
 }
 
 .page-ready .transition-eyes-container {
     opacity: 0;
-    scale: 0.9;
+    scale: 0.93;
     transition: opacity 0.45s ease-in, scale 0.45s ease-in;
 }
 
@@ -57,77 +68,21 @@ body:not(.page-ready) .transition-eyes-container {
     overflow: visible;
 }
 
-/* Eyelids and Pupil blink animation */
-.blink-group {
-    transform-origin: 0px 0px;
-    animation: eye-blink 5s infinite ease-in-out; /* slower, more organic blinking */
+/* 小精灵轻微漂浮呼吸律动 */
+@keyframes sprite-levitate {
+    0% { transform: translate(-50%, -52%) scale(0.99); }
+    100% { transform: translate(-50%, -48%) scale(1.01); }
 }
 
-/* Pupil translate driven by JS variables */
-.iris-group {
+/* 视差位移容器 */
+.sprite-parallax-mesh {
     transform: translate3d(var(--eye-tx, 0px), var(--eye-ty, 0px), 0);
-    transition: transform 0.08s ease-out; /* slightly delayed for a heavier void gaze feeling */
+    transition: transform 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.einstein-ring {
-    transform-origin: 0px 0px;
-    animation: rotate-hud-clockwise 30s linear infinite;
-}
-
-@keyframes void-breath {
-    0% {
-        opacity: 0.28;
-    }
-    100% {
-        opacity: 0.48;
-    }
-}
-
-@keyframes eye-blink {
-    0%, 93%, 97%, 100% {
-        transform: scaleY(1);
-    }
-    95% {
-        transform: scaleY(0.02); /* collapses to a flat gravitational plane */
-    }
-}
-
-@keyframes rotate-hud-clockwise {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.ring-spin-clockwise-fast {
-    transform-origin: 0px 0px;
-    animation: rotate-hud-clockwise 6s linear infinite;
-}
-
-.ring-spin-counter-medium {
-    transform-origin: 0px 0px;
-    animation: rotate-hud-counter 12s linear infinite;
-}
-
-.ring-spin-clockwise-slow {
-    transform-origin: 0px 0px;
-    animation: rotate-hud-clockwise 25s linear infinite;
-}
-
-.stardust {
-    transform-origin: 0px 0px;
-    animation: rotate-hud-counter 20s linear infinite;
-}
-
-@keyframes rotate-hud-counter {
-    0% {
-        transform: rotate(360deg);
-    }
-    100% {
-        transform: rotate(0deg);
-    }
+/* 柔性发光滤镜 (模拟 WebGL Additive Blending) */
+.additive-glow {
+    filter: drop-shadow(0 0 15px var(--sprite-glow-color)) drop-shadow(0 0 35px var(--sprite-ambient-glow));
 }
 
 /* Global Ambient Space Background */

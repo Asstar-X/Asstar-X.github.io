@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Shared UI Components
  */
 
@@ -9,153 +9,86 @@ window.injectSharedComponents = function() {
         curtain.className = 'page-transition-curtain init-hidden';
         curtain.innerHTML = `
             <div class="transition-eyes-container">
-                <svg class="staring-eyes-svg" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg">
+                <svg class="staring-eyes-svg" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <!-- Accretion/Nebula Glow filter -->
-                        <filter id="cosmic-glow" x="-100%" y="-100%" width="300%" height="300%">
-                            <feGaussianBlur stdDeviation="5" result="blur" />
-                            <feMerge>
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
+                        <!-- 粒子云团融合滤镜 -->
+                        <filter id="points-blur-filter" x="-100%" y="-100%" width="300%" height="300%">
+                            <feGaussianBlur id="blur-node" stdDeviation="5.5" result="blur" />
+                            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+                            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
                         </filter>
-                        <!-- Intense pupil glow for accretion disk -->
-                        <filter id="intense-glow" x="-200%" y="-200%" width="500%" height="500%">
-                            <feGaussianBlur stdDeviation="2" result="blur1" />
-                            <feGaussianBlur stdDeviation="6" result="blur2" />
-                            <feMerge>
-                                <feMergeNode in="blur2" />
-                                <feMergeNode in="blur1" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                        <!-- Monochrome nebula dust radial gradient -->
-                        <radialGradient id="nebula-dust-left" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
-                            <stop offset="40%" stop-color="#888888" stop-opacity="0.15" />
-                            <stop offset="75%" stop-color="#222222" stop-opacity="0.05" />
-                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-                        </radialGradient>
-                        <radialGradient id="nebula-dust-right" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
-                            <stop offset="40%" stop-color="#888888" stop-opacity="0.15" />
-                            <stop offset="75%" stop-color="#222222" stop-opacity="0.05" />
-                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+
+                        <!-- 腮红星云径向渐变 -->
+                        <radialGradient id="blush-grad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ff1493" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#ff1493" stop-opacity="0" />
                         </radialGradient>
                     </defs>
-                    
-                    <!-- Background nebular clouds to blend the two eyes -->
-                    <g opacity="0.45" filter="url(#cosmic-glow)">
-                        <ellipse cx="260" cy="100" rx="250" ry="90" fill="url(#nebula-dust-left)" />
-                    </g>
-                    
-                    <!-- Left Cosmic Gravity Well (X=110) -->
-                    <g class="eye eye-left" transform="translate(80, 100) scale(1.5)">
-                        <!-- Outer Nebular Fog -->
-                        <circle cx="0" cy="0" r="50" fill="url(#nebula-dust-left)" />
-                        
-                        <!-- Gravitational Wave ripples (Monochrome) -->
-                        <g class="gravitational-waves" opacity="0.6">
-                            <path d="M -55 -25 Q -70 0, -55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
-                            <path d="M 55 -25 Q 70 0, 55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
-                            <path d="M -70 -35 Q -90 0, -70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
-                            <path d="M 70 -35 Q 90 0, 70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
+
+                    <!-- 小精灵高保真粒子投影网格 -->
+                    <g class="sprite-parallax-mesh additive-glow" filter="url(#points-blur-filter)">
+
+                        <!-- 1. 小精灵发光猫耳轮廓 (Cat Ears Path Outline) -->
+                        <g fill="none" stroke="rgba(255,255,255, 0.45)" stroke-width="1.5">
+                            <!-- 左耳 (X=230, Y=110) -->
+                            <path id="sprite-ear-left" d="M 230 110 L 210 20 Q 240 10, 260 70 Z" class="eyelid-path" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 230px 110px;" />
+                            <!-- 右耳 (X=450, Y=110) -->
+                            <path id="sprite-ear-right" d="M 450 110 L 470 20 Q 440 10, 420 70 Z" class="eyelid-path" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 450px 110px;" />
                         </g>
-                        
-                        <!-- Gyroscopic Orbital Rings - Spin Animations on groups -->
-                        <g class="ring-spin-clockwise-fast">
-                            <ellipse cx="0" cy="0" rx="46" ry="18" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.0" transform="rotate(-30)" />
-                        </g>
-                        <g class="ring-spin-counter-medium">
-                            <ellipse cx="0" cy="0" rx="40" ry="14" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" transform="rotate(45)" />
-                        </g>
-                        <g class="ring-spin-clockwise-slow">
-                            <ellipse cx="0" cy="0" rx="10" ry="36" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.0" transform="rotate(15)" />
+                        <!-- 可调节的发光半透明耳朵内部填充 -->
+                        <g fill="rgba(255,255,255,0.06)">
+                            <path d="M 230 110 L 210 20 Q 240 10, 260 70 Z" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 230px 110px;" />
+                            <path d="M 450 110 L 470 20 Q 440 10, 420 70 Z" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 450px 110px;" />
                         </g>
 
-                        <!-- Swirling Stardust Particles (Monochrome) -->
-                        <g class="stardust" opacity="0.85">
-                            <circle cx="-25" cy="-15" r="1.2" fill="#ffffff" opacity="0.9" />
-                            <circle cx="-15" cy="25" r="1.5" fill="#cccccc" opacity="0.85" />
-                            <circle cx="28" cy="18" r="0.9" fill="#999999" opacity="0.8" />
-                            <circle cx="20" cy="-24" r="1.3" fill="#ffffff" opacity="0.75" />
-                            <circle cx="5" cy="-30" r="1.8" fill="#dddddd" opacity="0.6" filter="url(#cosmic-glow)" />
-                            <circle cx="-32" cy="5" r="1.0" fill="#888888" opacity="0.9" />
-                            <circle cx="35" cy="-12" r="1.4" fill="#ffffff" opacity="0.85" />
-                            <circle cx="-8" cy="-28" r="1.2" fill="#eeeeee" opacity="0.75" />
-                            <circle cx="15" cy="32" r="1.0" fill="#777777" opacity="0.8" />
-                            <circle cx="-22" cy="-28" r="0.8" fill="#ffffff" opacity="0.95" />
+                        <!-- 2. 面颊软萌腮红粒子 (Blush gradient triggered by mood) -->
+                        <g id="sprite-blush" opacity="0.0">
+                            <ellipse cx="270" cy="155" rx="35" ry="12" fill="url(#blush-grad)" />
+                            <ellipse cx="410" cy="155" rx="35" ry="12" fill="url(#blush-grad)" />
                         </g>
- 
-                        <!-- Blink group (Collapses during gravitational fluctuation) -->
-                        <g class="blink-group">
-                            <!-- Singularity Core (Translates with mouse) -->
-                            <g class="iris-group">
-                                <!-- Black Hole Accretion Disk (monochrome swirling glow) -->
-                                <g filter="url(#intense-glow)">
-                                    <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" transform="rotate(-20)" opacity="0.7" />
-                                    <ellipse cx="0" cy="0" rx="18" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" transform="rotate(-20)" opacity="0.9" />
-                                    <ellipse cx="0" cy="0" rx="16" ry="4.5" fill="none" stroke="#ffffff" stroke-width="1.5" transform="rotate(-20)" opacity="0.95" />
-                                </g>
-                                <!-- Singularity Horizon -->
-                                <circle class="singularity" cx="0" cy="0" r="11" fill="#000000" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" filter="url(#cosmic-glow)" />
-                                <!-- Inner core spark -->
-                                <circle cx="-2" cy="-2" r="2.5" fill="#ffffff" opacity="0.8" filter="url(#cosmic-glow)" />
+
+                        <!-- 3. 背景星轨微粒布局 (Sprite Particle Shell Geometry) -->
+                        <g fill="rgba(255, 255, 255, 0.22)" id="ambient-shell-particles" opacity="var(--particle-density, 0.85)">
+                            <!-- 绘制小精灵球体的伪3D星尘圆弧 -->
+                            <circle cx="340" cy="120" r="1.5" />
+                            <circle cx="280" cy="100" r="1.2" />
+                            <circle cx="400" cy="100" r="1.2" />
+                            <circle cx="250" cy="140" r="1.8" />
+                            <circle cx="430" cy="140" r="1.8" />
+                            <circle cx="300" cy="160" r="1.0" />
+                            <circle cx="380" cy="160" r="1.0" />
+                            <circle cx="340" cy="180" r="1.5" />
+                            <circle cx="220" cy="115" r="1.3" />
+                            <circle cx="460" cy="115" r="1.3" />
+                            <!-- 耳朵顶端的闪烁微光 -->
+                            <circle cx="210" cy="20" r="2.0" fill="#ffffff" />
+                            <circle cx="470" cy="20" r="2.0" fill="#ffffff" />
+                        </g>
+
+                        <!-- 4. 小精灵双瞳（大眼萌）核心 -->
+                        <!-- 左眼结构 (X=280) -->
+                        <g id="left-eye-group" transform="translate(280, 125)">
+                            <ellipse cx="0" cy="0" rx="16" ry="16" fill="rgba(255, 255, 255, 0.05)" />
+                            <g id="left-eyes-shape">
+                                <circle class="pupil-iris" cx="0" cy="0" r="7.5" fill="#ffffff" />
+                                <path class="pupil-iris-arc" d="M -10 3 A 10 10 0 0 1 10 3" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" display="none" />
                             </g>
-                        </g>
-                    </g>
-                    
-                    <!-- Right Cosmic Gravity Well (X=410) -->
-                    <g class="eye eye-right" transform="translate(440, 100) scale(1.5)">
-                        <!-- Outer Nebular Fog -->
-                        <circle cx="0" cy="0" r="50" fill="url(#nebula-dust-right)" />
-                        
-                        <!-- Gravitational Wave ripples (Monochrome) -->
-                        <g class="gravitational-waves" opacity="0.6">
-                            <path d="M -55 -25 Q -70 0, -55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
-                            <path d="M 55 -25 Q 70 0, 55 25" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" />
-                            <path d="M -70 -35 Q -90 0, -70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
-                            <path d="M 70 -35 Q 90 0, 70 35" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="0.6" />
-                        </g>
-                        
-                        <g class="ring-spin-clockwise-fast">
-                            <ellipse cx="0" cy="0" rx="46" ry="18" fill="none" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.0" transform="rotate(-30)" />
-                        </g>
-                        <g class="ring-spin-counter-medium">
-                            <ellipse cx="0" cy="0" rx="40" ry="14" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="0.8" transform="rotate(45)" />
-                        </g>
-                        <g class="ring-spin-clockwise-slow">
-                            <ellipse cx="0" cy="0" rx="10" ry="36" fill="none" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.0" transform="rotate(15)" />
+                            <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" id="pupil-highlight-left"/>
                         </g>
 
-                        <!-- Swirling Stardust Particles (Monochrome) -->
-                        <g class="stardust" opacity="0.85">
-                            <circle cx="-25" cy="-15" r="1.2" fill="#ffffff" opacity="0.9" />
-                            <circle cx="-15" cy="25" r="1.5" fill="#cccccc" opacity="0.85" />
-                            <circle cx="28" cy="18" r="0.9" fill="#999999" opacity="0.8" />
-                            <circle cx="20" cy="-24" r="1.3" fill="#ffffff" opacity="0.75" />
-                            <circle cx="5" cy="-30" r="1.8" fill="#dddddd" opacity="0.6" filter="url(#cosmic-glow)" />
-                            <circle cx="-32" cy="5" r="1.0" fill="#888888" opacity="0.9" />
-                            <circle cx="35" cy="-12" r="1.4" fill="#ffffff" opacity="0.85" />
-                            <circle cx="-8" cy="-28" r="1.2" fill="#eeeeee" opacity="0.75" />
-                            <circle cx="15" cy="32" r="1.0" fill="#777777" opacity="0.8" />
-                            <circle cx="-22" cy="-28" r="0.8" fill="#ffffff" opacity="0.95" />
-                        </g>
-
-                        <!-- Blink group -->
-                        <g class="blink-group">
-                            <g class="iris-group">
-                                <!-- Black Hole Accretion Disk (monochrome swirling glow) -->
-                                <g filter="url(#intense-glow)">
-                                    <ellipse cx="0" cy="0" rx="22" ry="7" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" transform="rotate(-20)" opacity="0.7" />
-                                    <ellipse cx="0" cy="0" rx="18" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" transform="rotate(-20)" opacity="0.9" />
-                                    <ellipse cx="0" cy="0" rx="16" ry="4.5" fill="none" stroke="#ffffff" stroke-width="1.5" transform="rotate(-20)" opacity="0.95" />
-                                </g>
-                                <!-- Singularity Horizon -->
-                                <circle class="singularity" cx="0" cy="0" r="11" fill="#000000" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" filter="url(#cosmic-glow)" />
-                                <!-- Inner core spark -->
-                                <circle cx="-2" cy="-2" r="2.5" fill="#ffffff" opacity="0.8" filter="url(#cosmic-glow)" />
+                        <!-- 右眼结构 (X=400) -->
+                        <g id="right-eye-group" transform="translate(400, 125)">
+                            <ellipse cx="0" cy="0" rx="16" ry="16" fill="rgba(255, 255, 255, 0.05)" />
+                            <g id="right-eyes-shape">
+                                <circle class="pupil-iris" cx="0" cy="0" r="7.5" fill="#ffffff" />
+                                <path class="pupil-iris-arc" d="M -10 3 A 10 10 0 0 1 10 3" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" display="none" />
                             </g>
+                            <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" id="pupil-highlight-right"/>
+                        </g>
+
+                        <!-- 拱形小巧嘴部 -->
+                        <g transform="translate(340, 142)">
+                            <path d="M -5 -2 Q 0 4, 5 -2" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" id="sprite-mouth" />
                         </g>
                     </g>
                 </svg>
@@ -331,7 +264,17 @@ window.injectSharedComponents = function() {
 
         document.documentElement.style.setProperty('--eye-tx', `${currentTx.toFixed(2)}px`);
         document.documentElement.style.setProperty('--eye-ty', `${currentTy.toFixed(2)}px`);
-        
+
+        // 联动左反光和右反光微动，实现立体眼球聚焦
+        const hlL = document.getElementById('pupil-highlight-left');
+        const hlR = document.getElementById('pupil-highlight-right');
+        if (hlL && hlR) {
+            hlL.setAttribute('cx', (-2.5 + currentTx * 0.12).toFixed(2));
+            hlL.setAttribute('cy', (-2.5 + currentTy * 0.12).toFixed(2));
+            hlR.setAttribute('cx', (-2.5 + currentTx * 0.12).toFixed(2));
+            hlR.setAttribute('cy', (-2.5 + currentTy * 0.12).toFixed(2));
+        }
+
         requestAnimationFrame(updateEyes);
     }
     requestAnimationFrame(updateEyes);

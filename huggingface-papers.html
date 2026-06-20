@@ -51,8 +51,6 @@
             color: #ffffff;
         }
     </style>
-    <!-- Sprite Chat Styles -->
-    <link rel="stylesheet" href="css/sprite-chat.css">
 </head>
 
 <body class="reading-mode">
@@ -80,16 +78,7 @@
     </main>
 
     <script src="js/script.js" defer></script>
-    <script src="lab/config.js" defer></script>
     <script src="js/sprite-chat.js" defer></script>
-    <script>
-        // Initialize sprite chat with custom options for huggingface papers page
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager();
-            }
-        });
-    </script>
     <script>
         class HuggingFacePapers {
             constructor() {
@@ -195,7 +184,6 @@
         }
 
     </script>
-    <script src="js/sprite-chat.js"></script>
     <script>
         let huggingfacePapersApp;
         function initHuggingfacePapers() { 

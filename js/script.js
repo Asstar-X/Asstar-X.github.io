@@ -1,14 +1,3 @@
-// 平滑滚动到指定部分
-function scrollToSection(sectionId) {
-    const target = document.getElementById(sectionId);
-    if (target) {
-        target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
-}
-
 // 平滑滚动
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -22,12 +11,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
-
-// 视差滚动效果
-
-
-// 移除旧的导航栏滚动背景逻辑，以保持透明垂直导航栏的一致性
-// window.addEventListener('scroll', () => { ... });
 
 // 元素进入视口时的动画
 const observerOptions = {
@@ -96,86 +79,15 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 按钮点击效果
-document.querySelectorAll('.btn').forEach(button => {
-    button.addEventListener('click', function (e) {
-        const ripple = document.createElement('span');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-
-        ripple.style.cssText = `
-            position: absolute;
-            width: ${size}px;
-            height: ${size}px;
-            left: ${x}px;
-            top: ${y}px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple 0.6s ease-out;
-            pointer-events: none;
-        `;
-
-        this.appendChild(ripple);
-
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    });
-});
-
-// 添加涟漪动画CSS
-const rippleStyle = document.createElement('style');
-rippleStyle.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(rippleStyle);
-
-// 打字机效果
-function typeWriter(element, text, speed = 100) {
-    let i = 0;
-    element.innerHTML = '';
-    text = text.trim(); // 去除首尾空白
-
-    function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
-        }
-    }
-
-    if (text.length > 0) {
-        type();
-    }
-}
-
-// generateSkeleton moved to utils.js
-
 // 页面加载完成后的初始化
 document.addEventListener('DOMContentLoaded', () => {
-    // 为标题添加打字机效果
-    const heroTitle = document.querySelector('.hero-title');
-    if (heroTitle) {
-        let titleWord = heroTitle.querySelector('.title-word');
-        if (titleWord) {
-            const originalText = titleWord.textContent.trim();
-            typeWriter(titleWord, originalText, 100);
-        } else {
-            const originalText = heroTitle.textContent.trim();
-            typeWriter(heroTitle, originalText, 100);
-        }
+    // 自动判断当前是否在时间轴的页面（非首页不加载）
+    const timeline = document.getElementById('galactic-timeline');
+    if (timeline) {
+        // 如果是 index.html 且有时间轴，由 index.html 的内联脚本专门按需加载，此处对其他可能的子页做兜底或在此跳过，避免重复拉取
+        // index.html 已内联调用 loadProjects('galactic-timeline');
     }
 
-    loadProjects();
-    
     // 监听窗口大小变化以适配星系布局
     let resizeTimer;
     window.addEventListener('resize', () => {
