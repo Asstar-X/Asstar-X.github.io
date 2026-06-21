@@ -62,64 +62,72 @@ window.injectSharedComponents = function() {
     }
 
     // Inject Sprite Chat Dialog if container is present in HTML (Opt-in Component Pattern)
-    const spriteContainer = document.getElementById('sprite-container');
-    if (spriteContainer && !document.getElementById('chat-dialog')) {
-        // Determine page context for initial message from container's data-context attribute
-        const contextAttr = spriteContainer.getAttribute('data-context');
-        let pageContext = '这些信息';
-        if (contextAttr === 'focus') pageContext = '这些焦点新闻';
-        else if (contextAttr === 'papers') pageContext = '这些论文';
-        else if (contextAttr === 'trending') pageContext = '这些热门项目';
-        else if (contextAttr === 'atlas') pageContext = 'Atlas 的提效工具';
-        else if (contextAttr === 'nova') pageContext = 'Nova的前沿项目、论文 and 焦点新闻';
-        else if (contextAttr === 'orbit') pageContext = 'Orbit的项目时间轴';
-        else if (contextAttr === 'voice') pageContext = '智能语音交互服务';
-        else {
-            // Fallback to URL matching if no data-context attribute is present
-            if (window.location.pathname.includes('focus')) pageContext = '这些焦点新闻';
-            else if (window.location.pathname.includes('papers')) pageContext = '这些论文';
-            else if (window.location.pathname.includes('trending')) pageContext = '这些热门项目';
-            else if (window.location.pathname.includes('atlas')) pageContext = 'Atlas 的提效工具';
-            else if (window.location.pathname.includes('nova')) pageContext = 'Nova的前沿项目、论文 and 焦点新闻';
-            else if (window.location.pathname.includes('orbit')) pageContext = 'Orbit的项目时间轴';
-            else if (window.location.pathname.includes('voice')) pageContext = '智能语音交互服务';
-        }
+    const injectSpriteChatDialog = () => {
+        const spriteContainer = document.getElementById('sprite-container');
+        if (spriteContainer && !document.getElementById('chat-dialog')) {
+            // Determine page context for initial message from container's data-context attribute
+            const contextAttr = spriteContainer.getAttribute('data-context');
+            let pageContext = '这些信息';
+            if (contextAttr === 'focus') pageContext = '这些焦点新闻';
+            else if (contextAttr === 'papers') pageContext = '这些论文';
+            else if (contextAttr === 'trending') pageContext = '这些热门项目';
+            else if (contextAttr === 'atlas') pageContext = 'Atlas 的提效工具';
+            else if (contextAttr === 'nova') pageContext = 'Nova的前沿项目、论文 and 焦点新闻';
+            else if (contextAttr === 'orbit') pageContext = 'Orbit的项目时间轴';
+            else if (contextAttr === 'voice') pageContext = '智能语音交互服务';
+            else {
+                // Fallback to URL matching if no data-context attribute is present
+                if (window.location.pathname.includes('focus')) pageContext = '这些焦点新闻';
+                else if (window.location.pathname.includes('papers')) pageContext = '这些论文';
+                else if (window.location.pathname.includes('trending')) pageContext = '这些热门项目';
+                else if (window.location.pathname.includes('atlas')) pageContext = 'Atlas 的提效工具';
+                else if (window.location.pathname.includes('nova')) pageContext = 'Nova的前沿项目、论文 and 焦点新闻';
+                else if (window.location.pathname.includes('orbit')) pageContext = 'Orbit的项目时间轴';
+                else if (window.location.pathname.includes('voice')) pageContext = '智能语音交互服务';
+            }
 
-        const chatDialog = document.createElement('div');
-        chatDialog.className = 'chat-dialog';
-        chatDialog.id = 'chat-dialog';
-        chatDialog.innerHTML = `
-            <div class="chat-dialog-header">
-                <div class="chat-dialog-title">
-                    <span>✨</span>
-                    <span>As</span>
+            const chatDialog = document.createElement('div');
+            chatDialog.className = 'chat-dialog';
+            chatDialog.id = 'chat-dialog';
+            chatDialog.innerHTML = `
+                <div class="chat-dialog-header">
+                    <div class="chat-dialog-title">
+                        <span>✨</span>
+                        <span>As</span>
+                    </div>
+                    <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
                 </div>
-                <button class="chat-dialog-close" id="chat-dialog-close">&times;</button>
-            </div>
-            <div class="chat-dialog-messages" id="chat-dialog-messages">
-                <div class="chat-message assistant">
-                    <div class="chat-message-avatar">✨</div>
-                    <div class="chat-message-content">
-                        你好！我是As，可以帮你了解${pageContext}的信息。有什么想知道的吗？
+                <div class="chat-dialog-messages" id="chat-dialog-messages">
+                    <div class="chat-message assistant">
+                        <div class="chat-message-avatar">✨</div>
+                        <div class="chat-message-content">
+                            你好！我是As，可以帮你了解${pageContext}的信息。有什么想知道的吗？
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="chat-dialog-input-container">
-                <div class="chat-dialog-input-wrapper">
-                    <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
-                    <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
-                </div>
-                <div class="typing-indicator" id="chat-typing-indicator">
-                    <span>As 正在思考</span>
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
+                <div class="chat-dialog-input-container">
+                    <div class="chat-dialog-input-wrapper">
+                        <textarea class="chat-dialog-input" id="chat-dialog-input" placeholder="输入消息..." rows="1"></textarea>
+                        <button class="chat-dialog-send" id="chat-dialog-send">发送</button>
+                    </div>
+                    <div class="typing-indicator" id="chat-typing-indicator">
+                        <span>As 正在思考</span>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        document.body.appendChild(chatDialog);
+            `;
+            document.body.appendChild(chatDialog);
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectSpriteChatDialog);
+    } else {
+        injectSpriteChatDialog();
     }
 
     // Inject Ambient Space Background & Stars
