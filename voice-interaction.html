@@ -39,13 +39,7 @@
             transition: background-color 0.8s ease;
         }
 
-        /* Force remove sprite chat widget */
-        #sprite-container, .chat-dialog, #sprite-container * {
-            display: none !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
+
 
         body.light-theme {
             background: #f4f5f7 !important;
@@ -593,7 +587,6 @@
     </section>
 
     <script src="js/script.js"></script>
-    <script src="js/sprite-chat.js"></script>
     <script>
         // DOM Elements
         const micBtn = document.getElementById('mic-btn');

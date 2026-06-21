@@ -1798,223 +1798,6 @@ section {
         font-size: 2rem;
     }
 }
-/* ===== Galactic Horizontal Timeline (Improved Centering & Wave) ===== */
-.galactic-timeline-container {
-    width: 100%;
-    margin: 2rem 0;
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 60px 0; /* Reduced vertical padding for wave */
-    scrollbar-width: none; 
-    -ms-overflow-style: none;
-    position: relative;
-    /* Edge mask for premium scrolling feel */
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-}
-
-.galactic-timeline-container::-webkit-scrollbar {
-    display: none;
-}
-
-.galactic-timeline {
-    position: relative;
-    height: 400px;
-    margin: 0 auto; /* Essential for centering */
-}
-
-.galactic-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.galactic-path {
-    fill: none;
-    stroke: url(#pathGradient);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    pointer-events: none;
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-}
-
-.path-core {
-    stroke-width: 0.8;
-    opacity: 0.4;
-}
-
-.path-aura-1, .path-aura-2 {
-    stroke-width: 0.4;
-    opacity: 0.15;
-    filter: blur(1px);
-}
-
-/* 光子微粒流 */
-.galactic-photon {
-    fill: #fff;
-    filter: blur(0.5px) drop-shadow(0 0 5px #fff);
-    opacity: 0;
-    animation: photonFade 4s infinite linear;
-}
-
-@keyframes photonFade {
-    0% { opacity: 0; transform: scale(0.3); }
-    15% { opacity: 0.8; transform: scale(1); }
-    85% { opacity: 0.8; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.3); }
-}
-
-/* Decoration Dust */
-.galactic-dust {
-    fill: #fff;
-    opacity: 0;
-    animation: dustTwinkle 4s infinite alternate ease-in-out;
-}
-
-@keyframes dustTwinkle {
-    0% { opacity: 0.05; transform: scale(0.8); }
-    100% { opacity: 0.3; transform: scale(1.2); }
-}
-
-@keyframes galacticPathReveal {
-    from { stroke-dasharray: 0, 2000; opacity: 0; }
-    to { stroke-dasharray: 2000, 0; opacity: 0.4; }
-}
-
-.galactic-nodes {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-}
-
-.planet-node {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.planet-visual {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.planet-body {
-    width: 12px;
-    height: 12px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 15px #fff;
-    z-index: 3;
-    transition: all 0.4s ease;
-}
-
-.planet-glow {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: 1;
-    animation: glowPulse 4s infinite alternate;
-}
-
-@keyframes glowPulse {
-    from { transform: scale(0.8); opacity: 0.3; }
-    to { transform: scale(1.4); opacity: 0.7; }
-}
-
-.planet-ring {
-    position: absolute;
-    width: 140%;
-    height: 40%;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    transform: rotateX(75deg) rotateZ(-15deg);
-    transition: all 0.6s ease;
-    z-index: 2;
-}
-
-.planet-node:hover {
-    transform: translate(-50%, -60%) scale(1.1); /* Slight vertical lift on hover */
-}
-
-.planet-node:hover .planet-body {
-    transform: scale(1.5);
-    box-shadow: 0 0 30px #fff, 0 0 60px rgba(255,255,255,0.4);
-}
-
-.planet-node:hover .planet-ring {
-    width: 220%;
-    height: 60%;
-    border-color: rgba(255,255,255,0.5);
-    transform: rotateX(65deg) rotateZ(25deg);
-}
-
-.planet-label {
-    position: absolute;
-    font-family: var(--font-display);
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.25);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    transition: all 0.5s ease;
-    text-align: center;
-    white-space: nowrap;
-    pointer-events: none;
-}
-
-/* Adaptive Label Positioning */
-.label-top {
-    bottom: 50px;
-}
-
-.label-bottom {
-    top: 50px;
-}
-
-.planet-node:hover .planet-label {
-    color: #fff;
-    letter-spacing: 5px;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
-}
-
-/* Planet Size Variations */
-.planet-sm .planet-body { width: 8px; height: 8px; }
-.planet-sm .planet-visual { width: 40px; height: 40px; }
-
-.planet-md .planet-body { width: 12px; height: 12px; }
-.planet-md .planet-visual { width: 60px; height: 60px; }
-
-.planet-lg .planet-body { width: 18px; height: 18px; }
-.planet-lg .planet-visual { width: 80px; height: 80px; }
-
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-    .galactic-timeline-container {
-        mask-image: none;
-        -webkit-mask-image: none;
-        padding: 60px 0;
-    }
-    .planet-label {
-        letter-spacing: 1px;
-        font-size: 0.6rem;
-    }
-    /* Scale down large planets on mobile */
-    .planet-lg .planet-body { width: 14px; height: 14px; }
-}
 
 /* ===== 导航栏对称展开按钮与外星生命归档数据库 (Alien Specimens Card Overlay) ===== */
 
@@ -2069,9 +1852,9 @@ body.light-theme .nav-expand-btn:hover {
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 30%, rgba(2, 6, 4, 0.9) 100%);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.45) 30%, rgba(2, 6, 4, 0.92) 100%);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2079,7 +1862,7 @@ body.light-theme .nav-expand-btn:hover {
     padding-bottom: 30px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s, backdrop-filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), -webkit-backdrop-filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
     pointer-events: none;
 }
@@ -2088,6 +1871,8 @@ body.light-theme .nav-expand-btn:hover {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 body.light-theme .alien-overlay {
@@ -2109,21 +1894,43 @@ body.light-theme .alien-overlay {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
     z-index: 2100;
+}
+
+.alien-close-btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0, 242, 255, 0);
+    transform: scale(0.8) rotate(0deg);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
 }
 
 .alien-close-btn svg {
     width: 18px;
     height: 18px;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .alien-close-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.08);
-    border-color: rgba(0, 255, 102, 0.3);
-    color: #00ff66;
+    transform: scale(1.1);
+    border-color: rgba(0, 242, 255, 0.5);
+    color: #00f2ff;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.25), inset 0 0 10px rgba(0, 242, 255, 0.1);
+}
+
+.alien-close-btn:hover::before {
+    border-color: rgba(0, 242, 255, 0.5);
+    transform: scale(1) rotate(90deg);
+}
+
+.alien-close-btn:hover svg {
+    transform: rotate(90deg);
 }
 
 body.light-theme .alien-close-btn {
@@ -2132,10 +1939,20 @@ body.light-theme .alien-close-btn {
     color: #1a1a2e;
 }
 
+body.light-theme .alien-close-btn::before {
+    border: 1px dashed rgba(0, 153, 204, 0);
+}
+
 body.light-theme .alien-close-btn:hover {
-    background: rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 153, 51, 0.3);
-    color: #009933;
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 153, 204, 0.5);
+    color: #0099cc;
+    box-shadow: 0 0 15px rgba(0, 153, 204, 0.2);
+}
+
+body.light-theme .alien-close-btn:hover::before {
+    border-color: rgba(0, 153, 204, 0.5);
+    transform: scale(1) rotate(90deg);
 }
 
 
@@ -2224,8 +2041,8 @@ body.light-theme .alien-card.active-center {
     left: 0;
     width: 100%;
     height: 2.5px;
-    background: #00ff66;
-    box-shadow: 0 0 10px #00ff66, 0 0 20px rgba(0, 255, 102, 0.5);
+    background: #00f2ff;
+    box-shadow: 0 0 10px #00f2ff, 0 0 20px rgba(0, 242, 255, 0.5);
     animation: alienScanFull 4.5s linear infinite;
     pointer-events: none;
     z-index: 3;
@@ -2242,8 +2059,8 @@ body.light-theme .alien-card.active-center {
 }
 
 body.light-theme .card-scan-line {
-    background: #009933;
-    box-shadow: 0 0 8px #009933;
+    background: #0099cc;
+    box-shadow: 0 0 8px #0099cc;
 }
 
 
@@ -2279,8 +2096,9 @@ body.light-theme .card-scan-line {
 
 .alien-nav-arrow:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: #00ff66;
-    color: #00ff66;
+    border-color: #00f2ff;
+    color: #00f2ff;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.15);
 }
 
 body.light-theme .alien-nav-arrow {
@@ -2291,8 +2109,9 @@ body.light-theme .alien-nav-arrow {
 
 body.light-theme .alien-nav-arrow:hover {
     background: rgba(0, 0, 0, 0.06);
-    border-color: #009933;
-    color: #009933;
+    border-color: #0099cc;
+    color: #0099cc;
+    box-shadow: 0 0 10px rgba(0, 153, 204, 0.15);
 }
 
 /* Dots */
@@ -2318,8 +2137,8 @@ body.light-theme .alien-nav-arrow:hover {
 .alien-dot.active {
     width: 16px;
     border-radius: 3px;
-    background: #00ff66;
-    box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+    background: #00f2ff;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
 }
 
 body.light-theme .alien-dot {
@@ -2331,8 +2150,8 @@ body.light-theme .alien-dot:hover {
 }
 
 body.light-theme .alien-dot.active {
-    background: #009933;
-    box-shadow: 0 0 10px rgba(0, 153, 51, 0.4);
+    background: #0099cc;
+    box-shadow: 0 0 10px rgba(0, 153, 204, 0.4);
 }
 
 /* Mobile responsive styles */

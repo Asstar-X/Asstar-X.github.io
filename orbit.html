@@ -110,13 +110,7 @@
             overflow: hidden;
         }
         
-        /* Force remove sprite chat widget */
-        #sprite-container, .chat-dialog, #sprite-container * {
-            display: none !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
+
         
         .orbit-stack-stage {
             width: 100%;
@@ -135,36 +129,44 @@
             height: 250px; /* Proportionate height */
             margin-left: -220px;
             margin-top: -125px;
-            border-radius: 26px; /* Soft rounded corner like iOS 18 control panels */
-            padding: 26px 28px;
             box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.35),
-                0 25px 60px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                0 15px 45px rgba(0, 0, 0, 0.4),
+                0 30px 80px rgba(0, 0, 0, 0.65);
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s, filter 0.8s;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s, filter 0.8s, background 0.4s;
             user-select: none;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             cursor: pointer;
             
-            /* Pure neutral highly transparent border */
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            
-            /* Clear Transparent Liquid Glass (Highly transparent, allowing background stars to show through clearly) */
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px); /* Lower blur so stars/background are visibly transparent */
-            -webkit-backdrop-filter: blur(12px);
+            /* Pure neutral highly transparent border via padding+bg */
+            padding: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            clip-path: polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px);
         }
 
         .project-card.active {
-            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.18);
             box-shadow: 
-                0 10px 40px rgba(0, 0, 0, 0.45),
-                0 35px 80px rgba(0, 0, 0, 0.65),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+                0 25px 60px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            clip-path: polygon(23.5px 0, 100% 0, 100% calc(100% - 23.5px), calc(100% - 23.5px) 100%, 0 100%, 0 23.5px);
+            padding: 26px 28px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: background 0.4s;
+        }
+        
+        .project-card.active .card-inner {
             background: rgba(255, 255, 255, 0.05);
         }
         
@@ -267,8 +269,13 @@
                 height: 210px;
                 margin-left: -175px;
                 margin-top: -105px;
+                padding: 1px;
+                clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            }
+            
+            .project-card .card-inner {
                 padding: 22px;
-                border-radius: 20px;
+                clip-path: polygon(19.5px 0, 100% 0, 100% calc(100% - 19.5px), calc(100% - 19.5px) 100%, 0 100%, 0 19.5px);
             }
 
             .card-vision-title {
@@ -330,20 +337,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 10;
         }
 
-        .overlay-close-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.18);
-            transform: scale(1.05);
+        .overlay-close-btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 242, 255, 0);
+            transform: scale(0.8) rotate(0deg);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
         }
 
         .overlay-close-btn svg {
             width: 14px;
             height: 14px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .overlay-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00f2ff;
+            border-color: rgba(0, 242, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.25);
+        }
+
+        .overlay-close-btn:hover::before {
+            border-color: rgba(0, 242, 255, 0.5);
+            transform: scale(1) rotate(90deg);
+        }
+
+        .overlay-close-btn:hover svg {
+            transform: rotate(90deg);
         }
 
         .overlay-header {
@@ -536,8 +565,7 @@
     <!-- Components injected by js/components.js -->
     <script src="js/components.js"></script>
 
-    <!-- Disable Sprite Chat for this page -->
-    <div id="sprite-container" style="display: none !important;"></div>
+
 
     <!-- Back Button -->
     <a href="index.html" class="back-button glass-panel">← 返回首页</a>
@@ -627,20 +655,22 @@
                 const card = document.createElement('div');
                 card.className = 'project-card';
                 
-                // Card details containing pure transparent liquid glass layout (circle logo monogram, and content)
+                // Card details containing pure transparent liquid glass layout wrapped in a card-inner div
                 card.innerHTML = `
-                    <div class="card-glare"></div>
-                    <div class="card-vision-content">
-                        <div class="card-vision-header">
-                            <span class="card-vision-date">${proj.date}</span>
-                            <div class="card-vision-logo">
-                                <svg viewBox="0 0 100 100" class="logo-svg">
-                                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="8"/>
-                                    <path d="M 38 70 L 50 30 L 62 70 M 43 56 L 57 56" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
+                    <div class="card-inner">
+                        <div class="card-glare"></div>
+                        <div class="card-vision-content">
+                            <div class="card-vision-header">
+                                <span class="card-vision-date">${proj.date}</span>
+                                <div class="card-vision-logo">
+                                    <svg viewBox="0 0 100 100" class="logo-svg">
+                                        <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="8"/>
+                                        <path d="M 38 70 L 50 30 L 62 70 M 43 56 L 57 56" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
                             </div>
+                            <div class="card-vision-title" title="${proj.title}">${proj.title}</div>
                         </div>
-                        <div class="card-vision-title" title="${proj.title}">${proj.title}</div>
                     </div>
                 `;
 
@@ -709,29 +739,35 @@
                     
                     // Reflection tilt animation on hover for the active card
                     if (diff === 0) {
+                        let activeRect = null;
+                        card.onmouseenter = () => {
+                            activeRect = card.getBoundingClientRect();
+                        };
                         card.onmousemove = (e) => {
-                            const rect = card.getBoundingClientRect();
-                            const x = e.clientX - rect.left - rect.width / 2;
-                            const y = e.clientY - rect.top - rect.height / 2;
-                            const tiltX = -(y / rect.height) * 12;
-                            const tiltY = (x / rect.width) * 12;
+                            if (!activeRect) activeRect = card.getBoundingClientRect();
+                            const x = e.clientX - activeRect.left - activeRect.width / 2;
+                            const y = e.clientY - activeRect.top - activeRect.height / 2;
+                            const tiltX = -(y / activeRect.height) * 12;
+                            const tiltY = (x / activeRect.width) * 12;
                             
                             // Glare shift
                             const glare = card.querySelector('.card-glare');
                             if (glare) {
-                                glare.style.background = `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 65%)`;
+                                glare.style.background = `radial-gradient(circle at ${e.clientX - activeRect.left}px ${e.clientY - activeRect.top}px, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 65%)`;
                             }
                             card.style.transform = `translateY(${ty}px) translateZ(${tz + 20}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale + 0.02})`;
                         };
                         
                         card.onmouseleave = () => {
+                            activeRect = null;
                             const glare = card.querySelector('.card-glare');
                             if (glare) {
-                                glare.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.03) 100%)';
+                                glare.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.04) 100%)';
                             }
                             card.style.transform = `translateY(${ty}px) translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`;
                         };
                     } else {
+                        card.onmouseenter = null;
                         card.onmousemove = null;
                         card.onmouseleave = null;
                     }
@@ -871,8 +907,50 @@
                 }
             });
 
-            // Trigger initial calculation
-            updateStack();
+            // Trigger initial calculation and cascading entrance animation
+            playEntranceAnimation();
+
+            function playEntranceAnimation() {
+                if (typeof gsap === 'undefined') {
+                    updateStack();
+                    return;
+                }
+                
+                // Disable CSS transitions temporarily so they don't clash with GSAP animation
+                cardElements.forEach(card => {
+                    card.style.transition = 'none';
+                });
+                
+                updateStack();
+                
+                cardElements.forEach((card, i) => {
+                    const targetOpacity = card.style.opacity || '1';
+                    const targetTransform = card.style.transform || 'none';
+                    
+                    card.style.transform = '';
+                    card.style.opacity = '';
+                    
+                    gsap.fromTo(card, 
+                        {
+                            opacity: 0,
+                            transform: 'translateY(280px) translateZ(-500px) rotateX(45deg) scale(0.7)'
+                        },
+                        {
+                            opacity: targetOpacity,
+                            transform: targetTransform,
+                            duration: 1.1,
+                            delay: i * 0.12,
+                            ease: 'power4.out',
+                            onComplete: () => {
+                                card.style.transition = '';
+                                if (i === cardElements.length - 1) {
+                                    updateStack();
+                                }
+                            }
+                        }
+                    );
+                });
+            }
         }
 
         // Flag to prevent overlapping overlay transitions
@@ -902,24 +980,28 @@
             document.body.classList.add('cinematic-mode');
             
             if (cardElement) {
-                // FLIP First: Get clicked card's rect in viewport coordinates
+                // Get clicked card's rect in viewport coordinates
                 const rect = cardElement.getBoundingClientRect();
                 
-                // FLIP Last: Reset transforms on the modal glass card to measure its final centered rect
+                // Reset transforms on the modal glass card to measure its final centered rect
                 glassCard.style.transition = 'none';
                 glassCard.style.transform = 'none';
+                glassCard.style.opacity = '0';
                 const finalRect = glassCard.getBoundingClientRect();
                 
-                // FLIP Invert: Calculate scale and translations
-                const scaleX = rect.width / finalRect.width;
-                const scaleY = rect.height / finalRect.height;
-                const transX = rect.left - finalRect.left;
-                const transY = rect.top - finalRect.top;
+                // Calculate centers to do uniform center-based scale transition (NO distortion!)
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                const modalCenterX = finalRect.left + finalRect.width / 2;
+                const modalCenterY = finalRect.top + finalRect.height / 2;
                 
-                // Set initial states (position matching the card, opacity 0 for content inside)
-                glassCard.style.transformOrigin = 'top left';
-                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scaleX}, ${scaleY})`;
-                glassCard.style.borderRadius = '26px';
+                const transX = cardCenterX - modalCenterX;
+                const transY = cardCenterY - modalCenterY;
+                
+                // Set initial states (centered on the card, scaled down uniformly with NO distortion)
+                glassCard.style.transformOrigin = 'center center';
+                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(0.6)`;
+                glassCard.style.borderRadius = '24px';
                 
                 const header = glassCard.querySelector('.overlay-header');
                 const closeBtn = document.getElementById('overlay-close-btn');
@@ -934,12 +1016,11 @@
                     closeBtn.style.transition = 'none';
                     closeBtn.style.opacity = '0';
                 }
-                
                 // Force layout reflow
                 glassCard.offsetHeight;
                 
-                // FLIP Play: Animate back to final layout (transform: none) and fade in elements
-                glassCard.style.transition = 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+                // Animate back to final layout (transform: none) and fade in elements
+                glassCard.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
                 if (header) {
                     header.style.transition = 'opacity 0.45s ease 0.15s';
                 }
@@ -950,6 +1031,7 @@
                 
                 requestAnimationFrame(() => {
                     glassCard.style.transform = 'none';
+                    glassCard.style.opacity = '1';
                     glassCard.style.borderRadius = '32px';
                     if (header) header.style.opacity = '1';
                     body.style.opacity = '1';
@@ -1074,37 +1156,40 @@
             const activeCard = document.querySelector('.project-card.active');
             
             if (activeCard) {
-                // FLIP target states
                 const rect = activeCard.getBoundingClientRect();
                 const finalRect = glassCard.getBoundingClientRect();
                 
-                const scaleX = rect.width / finalRect.width;
-                const scaleY = rect.height / finalRect.height;
-                const transX = rect.left - finalRect.left;
-                const transY = rect.top - finalRect.top;
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                const modalCenterX = finalRect.left + finalRect.width / 2;
+                const modalCenterY = finalRect.top + finalRect.height / 2;
                 
-                // Animate to card size and fade out content inside
-                glassCard.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                const transX = cardCenterX - modalCenterX;
+                const transY = cardCenterY - modalCenterY;
+                
+                // Animate to card center and fade out content inside (no distortion!)
+                glassCard.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
                 
                 const header = glassCard.querySelector('.overlay-header');
                 const body = document.getElementById('overlay-body');
                 const closeBtn = document.getElementById('overlay-close-btn');
                 
                 if (header) {
-                    header.style.transition = 'opacity 0.3s ease';
+                    header.style.transition = 'opacity 0.25s ease';
                     header.style.opacity = '0';
                 }
                 if (body) {
-                    body.style.transition = 'opacity 0.3s ease';
+                    body.style.transition = 'opacity 0.25s ease';
                     body.style.opacity = '0';
                 }
                 if (closeBtn) {
-                    closeBtn.style.transition = 'opacity 0.3s ease';
+                    closeBtn.style.transition = 'opacity 0.25s ease';
                     closeBtn.style.opacity = '0';
                 }
                 
-                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scaleX}, ${scaleY})`;
-                glassCard.style.borderRadius = '26px';
+                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(0.6)`;
+                glassCard.style.borderRadius = '24px';
+                glassCard.style.opacity = '0';
             } else {
                 // Fallback fade/scale out
                 glassCard.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease';

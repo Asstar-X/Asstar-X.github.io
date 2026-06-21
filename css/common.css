@@ -18,14 +18,28 @@
     background: #020205;
     z-index: 99999;
     pointer-events: none;
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 0;
+    transition: clip-path 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease-in-out;
+    will-change: clip-path, opacity;
+}
+
+.page-transition-curtain.init-covering {
     clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
     opacity: 1;
-    transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.5s ease-in-out;
 }
 
 .page-ready .page-transition-curtain {
     clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
     opacity: 0;
+}
+
+/* Force close curtain during outbound page transition */
+.page-transition-curtain.closing,
+.page-ready .page-transition-curtain.closing {
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .page-transition-curtain.init-hidden {
@@ -78,8 +92,11 @@ body:not(.page-ready) .transition-eyes-container {
     box-shadow: none;
     
     /* Radial mask gradient for soft feathered edges, blending seamlessly with background */
-    mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 80%);
-    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 80%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+    
+    /* Mix blend mode to filter out dark backgrounds and blend with curtain */
+    mix-blend-mode: screen;
     
     filter: none;
     opacity: 0.95;

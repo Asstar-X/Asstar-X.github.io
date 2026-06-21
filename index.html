@@ -126,21 +126,21 @@
 
     <script src="js/script.js" defer></script>
     <script src="js/time-rift.js" defer></script>
-    <script src="js/sprite-chat.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize sprite chat
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager();
-            }
-
             // --- Centered Video 3D Tilt Effect ---
             (function() {
                 const videoCapsule = document.getElementById('video-specimen');
                 if (!videoCapsule) return;
 
+                let rect = null;
+
+                videoCapsule.addEventListener('mouseenter', () => {
+                    rect = videoCapsule.getBoundingClientRect();
+                });
+
                 videoCapsule.addEventListener('mousemove', (event) => {
-                    const rect = videoCapsule.getBoundingClientRect();
+                    if (!rect) rect = videoCapsule.getBoundingClientRect();
                     const mouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
                     const mouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
                     const tiltX = -mouseY * 8; // Max 8 degrees tilt
@@ -149,6 +149,7 @@
                 });
 
                 videoCapsule.addEventListener('mouseleave', () => {
+                    rect = null;
                     videoCapsule.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
                 });
             })();
