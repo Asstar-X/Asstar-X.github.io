@@ -15,8 +15,6 @@
     <title>Asstar Space | Deep Universe</title>
     <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
     <link rel="stylesheet" href="css/common.css">
-    <!-- Sprite Chat Styles -->
-    <link rel="stylesheet" href="css/sprite-chat.css">
     
     <style>
         :root {
@@ -35,6 +33,14 @@
             overflow: hidden;
             background: #000;
             color: var(--text-main);
+        }
+
+        /* Force remove sprite chat widget */
+        #sprite-container, .chat-dialog, #sprite-container * {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         #canvas-container {
@@ -300,8 +306,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
     
-    <script src="js/sprite-chat.js"></script>
-
     <script>
         // --- Configuration ---
         const CONFIG = {
@@ -418,18 +422,14 @@
             renderer.domElement.addEventListener('click', onMouseClick, false);
             setupUI();
 
+            animate();
+
             setTimeout(() => {
                 const loader = document.getElementById('loading-screen');
                 loader.style.opacity = 0;
                 setTimeout(() => loader.remove(), 1000);
             }, 1500);
 
-            animate();
-            
-            // Initialize sprite chat
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager();
-            }
         }
 
         function createStarfield() {

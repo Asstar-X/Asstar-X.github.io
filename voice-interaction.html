@@ -9,7 +9,6 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
          crossorigin="anonymous"></script>
     
-    <title>Asstar Voice Protocol</title>
     <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/common.css">
@@ -38,6 +37,14 @@
             overflow-x: hidden;
             background: #020205 !important;
             transition: background-color 0.8s ease;
+        }
+
+        /* Force remove sprite chat widget */
+        #sprite-container, .chat-dialog, #sprite-container * {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         body.light-theme {
@@ -263,18 +270,18 @@
             width: 100%;
             max-width: 680px;
             height: 220px;
-            background: var(--glass-panel);
-            border: 1px solid var(--glass-border);
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             overflow: hidden;
             margin-bottom: 25px;
+        }
+        body.light-theme .dialogue-card {
+            border-color: rgba(0, 0, 0, 0.08);
         }
 
         .chat-log {
@@ -453,128 +460,22 @@
             color: rgba(0, 0, 0, 0.6);
         }
 
-        /* Scenarios Section */
-        .scenarios-3d-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            background-color: transparent;
-            color: #e0e0e0;
-            font-family: 'Noto Serif SC', serif;
-            overflow: hidden;
-            cursor: default;
-        }
-
-        body.light-theme .scenarios-3d-wrapper {
-            color: #1a1a2e;
-        }
-
-        .scenarios-3d-wrapper canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.4;
-        }
-
-        .main-container-3d {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-        }
-
-        .core-hub {
-            position: absolute;
-            text-align: center;
-            z-index: 20;
-            pointer-events: none;
-            mix-blend-mode: difference;
-            animation: float 6s ease-in-out infinite;
-            top: 35%;
-        }
-
-        .brand-name {
-            font-family: 'Noto Serif SC', serif;
-            font-size: 4rem;
-            letter-spacing: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
-            background: linear-gradient(45deg, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .zones-wrapper {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease-out;
-        }
-
-        .zone {
-            position: absolute;
-            width: 30vw;
-            height: 40vh;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            background: rgba(20, 20, 20, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-            cursor: pointer;
-            overflow: hidden;
-            transform-origin: center center;
-        }
-
-        body.light-theme .zone {
-            background: rgba(255, 255, 255, 0.7);
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-
-        .zone-corp { top: 15%; left: 10%; border-right: 2px solid rgba(0, 255, 255, 0.3); }
-        .zone-edu { top: 15%; right: 10%; border-left: 2px solid rgba(138, 43, 226, 0.3); }
-        .zone-public { bottom: 10%; left: 50%; transform: translateX(-50%); width: 40vw; height: 25vh; border-top: 2px solid rgba(46, 204, 113, 0.3); }
-        
-        .zone h2 { font-size: 1.8rem; margin-bottom: 1rem; position: relative; z-index: 2; font-weight: 300; color: #fff; }
-        body.light-theme .zone h2 { color: #1a1a2e; }
-
-        .zone p { font-size: 0.9rem; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; max-width: 80%; text-align: center; line-height: 1.6; z-index: 2; color: #aaa; }
-        body.light-theme .zone p { color: #555; }
-
-        .zone .bg-text { position: absolute; font-family: 'Syncopate', sans-serif; font-size: 5rem; opacity: 0.03; z-index: 1; pointer-events: none; white-space: nowrap; }
-        .zone .indicator { position: absolute; bottom: 20px; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.5; }
-        
-        .zone:hover { background: rgba(30, 30, 30, 0.8); box-shadow: 0 0 30px rgba(255, 255, 255, 0.05); }
-        body.light-theme .zone:hover { background: rgba(255, 255, 255, 0.95); }
-
-        .zone-corp:hover { border-color: #00f7ff; box-shadow: 0 0 30px rgba(0, 247, 255, 0.1); transform: scale(1.08); }
-        .zone-edu:hover { border-color: #8a2be2; box-shadow: 0 0 30px rgba(138, 43, 226, 0.1); transform: scale(1.08); }
-        .zone-public:hover { border-color: #2ecc71; box-shadow: 0 0 30px rgba(46, 204, 113, 0.1); transform: translateX(-50%) scale(1.08); }
-        .zone:hover p { opacity: 1; transform: translateY(0); }
-
-        .line-deco { position: absolute; background: rgba(255, 255, 255, 0.08); z-index: 5; }
-        body.light-theme .line-deco { background: rgba(0, 0, 0, 0.06); }
-
-        .line-v { width: 1px; height: 100vh; left: 50%; top: 0; }
-        .line-h { height: 1px; width: 100vw; top: 50%; left: 0; }
-
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
         /* Contact Section */
         .contact-section { position: relative; z-index: 1; padding: 80px 5% 120px; max-width: 1000px; margin: 0 auto; }
-        .contact-content { background: var(--glass-panel); border: 1px solid var(--glass-border); border-radius: 24px; padding: 60px 50px; backdrop-filter: blur(12px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); text-align: center; }
-        body.light-theme .contact-content { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); }
+        .contact-content {
+            background: transparent;
+            border: none;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        body.light-theme .contact-content {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
 
         .contact-text { font-family: 'Exo 2', sans-serif; font-size: 1.1rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; line-height: 1.8; }
         body.light-theme .contact-text { color: #333; }
@@ -584,19 +485,20 @@
         .contact-label { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: 2px; }
         body.light-theme .contact-label { color: #666; }
 
-        .contact-link { font-family: 'Exo 2', sans-serif; font-size: 1.1rem; color: var(--c-active); text-decoration: none; transition: all 0.3s ease; position: relative; }
-        .contact-link:hover { color: #fff; text-shadow: 0 0 10px var(--c-active-glow); }
-        body.light-theme .contact-link:hover { color: #1a1a2e; text-shadow: none; }
+        .contact-link { font-family: 'Exo 2', sans-serif; font-size: 1.1rem; color: #ffffff; text-decoration: none; transition: all 0.3s ease; position: relative; }
+        .contact-link:hover { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.6); }
+        body.light-theme .contact-link { color: #1a1a2e; }
+        body.light-theme .contact-link:hover { color: #000000; text-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }
 
-        .contact-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--c-active); transition: width 0.3s ease; }
+        .contact-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #ffffff; transition: width 0.3s ease; }
+        body.light-theme .contact-link::after { background: #1a1a2e; }
         .contact-link:hover::after { width: 100%; }
-        .contact-value { font-family: 'Exo 2', sans-serif; font-size: 1.1rem; color: var(--c-active); }
+        .contact-value { font-family: 'Exo 2', sans-serif; font-size: 1.1rem; color: #ffffff; }
+        body.light-theme .contact-value { color: #1a1a2e; }
 
         @media (max-width: 768px) {
             .contact-info { flex-direction: column; gap: 30px; } 
-            .contact-content { padding: 40px 30px; }
-            .zone { width: 42vw; height: 35vh; }
-            .zone-public { width: 60vw; }
+            .contact-content { padding: 20px 0; }
         }
     </style>
 </head>
@@ -607,8 +509,7 @@
 
     <div class="voice-dashboard">
         <div class="voice-header">
-            <h1 class="voice-title">Asstar Voice</h1>
-            <div class="voice-subtitle">Voice Navigation Protocol</div>
+            <h1 class="voice-title">AsLive</h1>
         </div>
 
         <div class="status-badge" id="status-badge">
@@ -672,41 +573,10 @@
         </div>
     </div>
 
-    <!-- Scenarios Section -->
-    <section class="scenarios-3d-wrapper" id="scenarios-3d-wrapper">
-        <canvas id="canvas-scenarios"></canvas>
-        <div class="line-deco line-v"></div>
-        <div class="line-deco line-h"></div>
-        <div class="main-container-3d">
-            <div class="core-hub">
-                <div class="brand-name">应用场景</div>
-            </div>
-            <div class="zones-wrapper" id="zonesWrapper">
-                <div class="zone zone-corp">
-                    <span class="bg-text">INTERACTIVE</span>
-                    <h2>实时语音交互</h2>
-                    <p>提供亚秒级流式人机双向对话与大语言模型对接服务，广泛应用于数字人、智能客服和语音助理。</p>
-                    <div class="indicator"> REALTIME VOICE AGENT</div>
-                </div>
-                <div class="zone zone-edu">
-                    <span class="bg-text">INDUSTRIAL</span>
-                    <h2>工业语音降噪</h2>
-                    <p>针对高分贝嘈杂工业车间、发电机房等环境，采用自适应声学算法和高抗噪技术，精准提取语音操控指令。</p>
-                    <div class="indicator"> INDUSTRIAL ACOUSTICS</div>
-                </div>
-                <div class="zone zone-public">
-                    <span class="bg-text">DIAGNOSTICS</span>
-                    <h2>工业声学诊断</h2>
-                    <p>利用声纹分析和深度神经网络诊断机电设备运转噪声，在故障发生前精准预测异常，保障生产安全。</p>
-                    <div class="indicator"> INDUSTRIAL FAILURE ANALYSIS</div>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Contact Section -->
     <section class="contact-section">
-        <h2 class="section-title">联系我们</h2>
         <div class="contact-content">
             <p class="contact-text">如需定制化智能语音交互系统开发或有商务合作需求，请联系我们</p>
             <div class="contact-info">
@@ -963,22 +833,36 @@
                     }, 260); // fast transition timing
                 };
             } else if (text.includes('论文') || text.includes('学术') || text.includes('papers')) {
-                responseText = '正在调起粒子引擎，前往学术论文界面。';
+                responseText = '正在调起粒子引擎，前往 Nova 学术论文板块。';
                 action = () => {
                     document.body.classList.remove('page-ready');
-                    setTimeout(() => { window.location.href = 'huggingface-papers.html'; }, 260);
+                    setTimeout(() => { window.location.href = 'nova.html?tab=papers'; }, 260);
+                };
+            } else if (text.includes('轨道') || text.includes('时间轴') || text.includes('星系') || text.includes('orbit')) {
+                responseText = '正在为您接通星系项目轨道。';
+                action = () => {
+                    document.body.classList.remove('page-ready');
+                    setTimeout(() => { window.location.href = 'orbit.html'; }, 260);
                 };
             } else if (text.includes('项目') || text.includes('雷达') || text.includes('trending')) {
-                responseText = '正在重构网格，切入开源热门项目雷达。';
+                responseText = '正在重构网格，前往 Nova 开源热门项目板块。';
                 action = () => {
                     document.body.classList.remove('page-ready');
-                    setTimeout(() => { window.location.href = 'trending-project.html'; }, 260);
+                    setTimeout(() => { window.location.href = 'nova.html?tab=projects'; }, 260);
                 };
-            } else if (text.includes('工具') || text.includes('tools')) {
-                responseText = '正在为您拉起效率面板，进入提效工具库。';
+            } else if (text.includes('新闻') || text.includes('焦点') || text.includes('资讯') || text.includes('focus') || text.includes('nova')) {
+                responseText = '正在为您接通 Nova 综合前沿资讯面板。';
                 action = () => {
                     document.body.classList.remove('page-ready');
-                    setTimeout(() => { window.location.href = 'tools.html'; }, 260);
+                    setTimeout(() => { window.location.href = 'nova.html?tab=focus'; }, 260);
+                };
+            } else if (text.includes('联系') || text.includes('邮箱') || text.includes('微信') || text.includes('contact')) {
+                responseText = '如需联系我们，请发送邮件至 asstarx7@gmail.com，或添加微信 GitscYee。';
+            } else if (text.includes('工具') || text.includes('tools') || text.includes('atlas')) {
+                responseText = '正在为您拉起效率面板，进入 Atlas 提效工具库。';
+                action = () => {
+                    document.body.classList.remove('page-ready');
+                    setTimeout(() => { window.location.href = 'atlas.html'; }, 260);
                 };
             } else if (text.includes('深色模式') || text.includes('暗黑模式')) {
                 responseText = '已为您进入低功耗宇宙黑洞深色模式。';
@@ -1152,64 +1036,9 @@
         animateOrb();
         animateWaveform();
 
-        // 3D Particles Background for application scenarios
-        (function () {
-            const canvas = document.getElementById('canvas-scenarios');
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
 
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.5;
-                    this.vy = (Math.random() - 0.5) * 0.5;
-                    this.size = Math.random() * 2;
-                }
-                update() {
-                    this.x += this.vx; this.y += this.vy;
-                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                }
-                draw() {
-                    ctx.fillStyle = 'rgba(200, 200, 200, 0.4)';
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-                }
-            }
 
-            function initParticles() {
-                particles = [];
-                const count = window.innerWidth < 768 ? 30 : 60;
-                for (let i = 0; i < count; i++) particles.push(new Particle());
-            }
 
-            function animateParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update(); particles[i].draw();
-                    for (let j = i; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 150) {
-                            ctx.strokeStyle = `rgba(150, 150, 150, ${1 - dist / 150})`;
-                            ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animateParticles);
-            }
-            initParticles(); animateParticles();
-        })();
-
-        // Initialize shared sprite chat if manager exists
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.SpriteChatManager) {
-                window.spriteChatManager = new window.SpriteChatManager();
-            }
-        });
     </script>
 </body>
 </html>

@@ -5,7 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!mainContainer) return;
 
     const sections = Array.from(document.querySelectorAll('.rift-section'));
-    if (sections.length === 0) return;
+    if (sections.length <= 1) {
+        if (sections.length === 1) {
+            sections[0].style.opacity = '1';
+            sections[0].style.visibility = 'visible';
+            sections[0].style.pointerEvents = 'auto';
+            sections[0].classList.add('is-active');
+        }
+        return;
+    }
 
     // 创建右侧导航点
     const indicatorContainer = document.createElement('div');

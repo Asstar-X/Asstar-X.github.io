@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Shared UI Components
  */
 
@@ -9,89 +9,7 @@ window.injectSharedComponents = function() {
         curtain.className = 'page-transition-curtain init-hidden';
         curtain.innerHTML = `
             <div class="transition-eyes-container">
-                <svg class="staring-eyes-svg" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <!-- 粒子云团融合滤镜 -->
-                        <filter id="points-blur-filter" x="-100%" y="-100%" width="300%" height="300%">
-                            <feGaussianBlur id="blur-node" stdDeviation="5.5" result="blur" />
-                            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
-                            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-                        </filter>
-
-                        <!-- 腮红星云径向渐变 -->
-                        <radialGradient id="blush-grad" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stop-color="#ff1493" stop-opacity="0.25" />
-                            <stop offset="100%" stop-color="#ff1493" stop-opacity="0" />
-                        </radialGradient>
-                    </defs>
-
-                    <!-- 小精灵高保真粒子投影网格 -->
-                    <g class="sprite-parallax-mesh additive-glow" filter="url(#points-blur-filter)">
-
-                        <!-- 1. 小精灵发光猫耳轮廓 (Cat Ears Path Outline) -->
-                        <g fill="none" stroke="rgba(255,255,255, 0.45)" stroke-width="1.5">
-                            <!-- 左耳 (X=230, Y=110) -->
-                            <path id="sprite-ear-left" d="M 230 110 L 210 20 Q 240 10, 260 70 Z" class="eyelid-path" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 230px 110px;" />
-                            <!-- 右耳 (X=450, Y=110) -->
-                            <path id="sprite-ear-right" d="M 450 110 L 470 20 Q 440 10, 420 70 Z" class="eyelid-path" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 450px 110px;" />
-                        </g>
-                        <!-- 可调节的发光半透明耳朵内部填充 -->
-                        <g fill="rgba(255,255,255,0.06)">
-                            <path d="M 230 110 L 210 20 Q 240 10, 260 70 Z" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 230px 110px;" />
-                            <path d="M 450 110 L 470 20 Q 440 10, 420 70 Z" style="transform: scaleY(var(--ear-height-scale, 1.5)); transform-origin: 450px 110px;" />
-                        </g>
-
-                        <!-- 2. 面颊软萌腮红粒子 (Blush gradient triggered by mood) -->
-                        <g id="sprite-blush" opacity="0.0">
-                            <ellipse cx="270" cy="155" rx="35" ry="12" fill="url(#blush-grad)" />
-                            <ellipse cx="410" cy="155" rx="35" ry="12" fill="url(#blush-grad)" />
-                        </g>
-
-                        <!-- 3. 背景星轨微粒布局 (Sprite Particle Shell Geometry) -->
-                        <g fill="rgba(255, 255, 255, 0.22)" id="ambient-shell-particles" opacity="var(--particle-density, 0.85)">
-                            <!-- 绘制小精灵球体的伪3D星尘圆弧 -->
-                            <circle cx="340" cy="120" r="1.5" />
-                            <circle cx="280" cy="100" r="1.2" />
-                            <circle cx="400" cy="100" r="1.2" />
-                            <circle cx="250" cy="140" r="1.8" />
-                            <circle cx="430" cy="140" r="1.8" />
-                            <circle cx="300" cy="160" r="1.0" />
-                            <circle cx="380" cy="160" r="1.0" />
-                            <circle cx="340" cy="180" r="1.5" />
-                            <circle cx="220" cy="115" r="1.3" />
-                            <circle cx="460" cy="115" r="1.3" />
-                            <!-- 耳朵顶端的闪烁微光 -->
-                            <circle cx="210" cy="20" r="2.0" fill="#ffffff" />
-                            <circle cx="470" cy="20" r="2.0" fill="#ffffff" />
-                        </g>
-
-                        <!-- 4. 小精灵双瞳（大眼萌）核心 -->
-                        <!-- 左眼结构 (X=280) -->
-                        <g id="left-eye-group" transform="translate(280, 125)">
-                            <ellipse cx="0" cy="0" rx="16" ry="16" fill="rgba(255, 255, 255, 0.05)" />
-                            <g id="left-eyes-shape">
-                                <circle class="pupil-iris" cx="0" cy="0" r="7.5" fill="#ffffff" />
-                                <path class="pupil-iris-arc" d="M -10 3 A 10 10 0 0 1 10 3" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" display="none" />
-                            </g>
-                            <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" id="pupil-highlight-left"/>
-                        </g>
-
-                        <!-- 右眼结构 (X=400) -->
-                        <g id="right-eye-group" transform="translate(400, 125)">
-                            <ellipse cx="0" cy="0" rx="16" ry="16" fill="rgba(255, 255, 255, 0.05)" />
-                            <g id="right-eyes-shape">
-                                <circle class="pupil-iris" cx="0" cy="0" r="7.5" fill="#ffffff" />
-                                <path class="pupil-iris-arc" d="M -10 3 A 10 10 0 0 1 10 3" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" display="none" />
-                            </g>
-                            <circle cx="-2.5" cy="-2.5" r="2.2" fill="#ffffff" id="pupil-highlight-right"/>
-                        </g>
-
-                        <!-- 拱形小巧嘴部 -->
-                        <g transform="translate(340, 142)">
-                            <path d="M -5 -2 Q 0 4, 5 -2" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" id="sprite-mouth" />
-                        </g>
-                    </g>
-                </svg>
+                <img src="assets/images/Alien22.jpg" class="transition-alien-img" alt="Loading...">
             </div>
         `;
         document.body.appendChild(curtain);
@@ -140,7 +58,10 @@ window.injectSharedComponents = function() {
             if (window.location.pathname.includes('focus')) pageContext = '这些焦点新闻';
             else if (window.location.pathname.includes('papers')) pageContext = '这些论文';
             else if (window.location.pathname.includes('trending')) pageContext = '这些热门项目';
-            else if (window.location.pathname.includes('tools')) pageContext = '这些提效工具';
+            else if (window.location.pathname.includes('atlas')) pageContext = 'Atlas 的提效工具';
+            else if (window.location.pathname.includes('nova')) pageContext = 'Nova的前沿项目、论文和焦点新闻';
+            else if (window.location.pathname.includes('orbit')) pageContext = 'Orbit的项目时间轴';
+            else if (window.location.pathname.includes('voice')) pageContext = '智能语音交互服务';
 
             chatDialog.innerHTML = `
                 <div class="chat-dialog-header">

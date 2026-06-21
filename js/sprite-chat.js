@@ -419,7 +419,7 @@ window.SpriteChatManager = class SpriteChatManager {
             }
         } else {
             // 极端情况下的硬编码降级方案
-            currentModel = { name: 'Qwen 3.5 Flash', model: 'qwen3.5-flash', requestFormat: 'openai', headers: { 'Content-Type': 'application/json' } };
+            currentModel = { name: 'Qwen 3.7 Plus', model: 'qwen3.7-plus', requestFormat: 'openai', headers: { 'Content-Type': 'application/json' } };
             currentApiKey = '';
             currentApiUrl = '';
             useProxy = true;
@@ -444,7 +444,7 @@ window.SpriteChatManager = class SpriteChatManager {
                 };
             }
             requestBody = {
-                model: currentModel.model || 'qwen3.5-flash',
+                model: currentModel.model || 'qwen3.7-plus',
                 messages: [
                     { role: 'system', content: combinedSystemPrompt },
                     ...this.messages.slice(0, -1).map(msg => ({ role: msg.role, content: msg.content })),

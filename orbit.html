@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="js/utils.js"></script>
+    <script>window.initGA();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
+         crossorigin="anonymous"></script>
+    
+    <title>Orbit - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/common.css">
+    <!-- Sprite Chat Styles -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
+    <!-- Fonts: Caveat/Ma Shan Zheng for cursive/handwriting titles, Space Grotesk for sleek text -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Ma+Shan+Zheng&family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <script src="js/script.js" defer></script>
+    
+    <!-- Preconnect to Utterances -->
+    <link rel="preconnect" href="https://utteranc.es" crossorigin>
+    <link rel="dns-prefetch" href="https://utteranc.es">
+    
+    <style>
+        /* CSS reset & baseline */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            width: 100vw;
+            height: 100vh;
+            background: #000000;
+        }
+
+        /* Two-column layout */
+        .orbit-layout {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            z-index: 10;
+        }
+        
+        .orbit-left-col {
+            width: 40%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 30px 0 260px; /* Shifted further right to balance layout and spacing */
+            position: relative;
+            z-index: 12;
+            pointer-events: none;
+        }
+        
+        .orbit-left-col * {
+            pointer-events: auto;
+        }
+        
+        /* Cursive style titles (Pure White) - Increased sizing and shifted right for harmony */
+        .get-more {
+            font-family: 'Caveat', 'Ma Shan Zheng', cursive;
+            font-size: 4.8rem; /* Enhanced size for visual strength */
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            margin-bottom: 4px;
+            display: inline-block;
+            transform: rotate(-3.5deg) translateX(20px);
+            letter-spacing: 0.5px;
+        }
+
+        .growth-track {
+            font-size: 3.3rem; /* Enhanced size for visual strength */
+            transform: rotate(-1.5deg) translateX(35px);
+            margin-top: 24px;
+        }
+
+        /* Right column: Vertical 3D card stack */
+        .orbit-right-col {
+            width: 60%; /* Wider width for cards column */
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 12;
+            overflow: hidden;
+        }
+        
+        /* Force remove sprite chat widget */
+        #sprite-container, .chat-dialog, #sprite-container * {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+        
+        .orbit-stack-stage {
+            width: 100%;
+            height: 520px;
+            position: relative;
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+
+        /* Apple Vision / iOS 18 Style Liquid Glass Card Styling */
+        .project-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 440px; /* Wider card */
+            height: 250px; /* Proportionate height */
+            margin-left: -220px;
+            margin-top: -125px;
+            border-radius: 26px; /* Soft rounded corner like iOS 18 control panels */
+            padding: 26px 28px;
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.35),
+                0 25px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s, filter 0.8s;
+            user-select: none;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            
+            /* Pure neutral highly transparent border */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* Clear Transparent Liquid Glass (Highly transparent, allowing background stars to show through clearly) */
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px); /* Lower blur so stars/background are visibly transparent */
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .project-card.active {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.45),
+                0 35px 80px rgba(0, 0, 0, 0.65),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.03) 100%);
+            z-index: 5;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .card-vision-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            z-index: 6;
+            pointer-events: none;
+            transform: translateZ(30px); /* Pull forward in 3D space */
+        }
+
+        .card-vision-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .card-vision-date {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .card-vision-logo {
+            width: 34px;
+            height: 34px;
+            opacity: 0.85;
+        }
+
+        .card-vision-logo .logo-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-vision-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.65rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            margin-top: auto;
+        }
+
+        /* Tablet & Mobile Layout Adaptations */
+        @media (max-width: 900px) {
+            body {
+                overflow-y: auto;
+            }
+            
+            .orbit-layout {
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 90px;
+                height: auto;
+            }
+            
+            .orbit-left-col {
+                width: 100%;
+                height: auto;
+                padding: 30px 40px 10px 40px;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .get-more {
+                font-size: 2.5rem;
+                transform: rotate(-2.5deg) translateX(0);
+            }
+
+            .growth-track {
+                font-size: 2.0rem;
+                transform: rotate(-1.5deg) translateX(0);
+                margin-top: 8px;
+            }
+            
+            .orbit-right-col {
+                width: 100%;
+                height: 480px;
+                padding-bottom: 40px;
+            }
+            
+            .project-card {
+                width: 350px; /* Slightly wider mobile card */
+                height: 210px;
+                margin-left: -175px;
+                margin-top: -105px;
+                padding: 22px;
+                border-radius: 20px;
+            }
+
+            .card-vision-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Cinematic Article Overlay Styles */
+        .project-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.85) 100%);
+            pointer-events: none;
+        }
+
+        .project-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .overlay-glass-card {
+            width: 780px;
+            height: 80vh;
+            max-width: 90vw;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 32px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 40px 100px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(35px) saturate(130%);
+            -webkit-backdrop-filter: blur(35px) saturate(130%);
+        }
+
+        .overlay-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 28px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+            z-index: 10;
+        }
+
+        .overlay-close-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: scale(1.05);
+        }
+
+        .overlay-close-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .overlay-header {
+            padding: 36px 36px 20px 36px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .overlay-meta {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 8px;
+        }
+
+        .overlay-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.25;
+            letter-spacing: -0.6px;
+        }
+
+        .overlay-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 36px 36px 36px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Scrollbar styles inside overlay */
+        .overlay-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .overlay-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .overlay-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .overlay-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Markdown elements rendering inside overlay */
+        .overlay-body h1, .overlay-body h2, .overlay-body h3,
+        .overlay-body h4 {
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .overlay-body h1 { font-size: 1.8rem; }
+        .overlay-body h2 { font-size: 1.5rem; }
+        .overlay-body h3 { font-size: 1.25rem; }
+
+        .overlay-body p {
+            margin-bottom: 1rem;
+        }
+
+        .overlay-body code {
+            background: rgba(0, 255, 170, 0.08);
+            color: #00ffaa;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .overlay-body pre {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.2rem;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+        }
+
+        .overlay-body pre code {
+            background: none;
+            color: #ffffff;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        .overlay-body blockquote {
+            border-left: 3px solid #00ffaa;
+            padding-left: 1.2rem;
+            margin: 1.5rem 0;
+            color: rgba(255, 255, 255, 0.55);
+            font-style: italic;
+        }
+
+        .overlay-body ul, .overlay-body ol {
+            margin: 1.2rem 0;
+            padding-left: 1.8rem;
+        }
+
+        .overlay-body li {
+            margin-bottom: 0.6rem;
+        }
+
+        .overlay-body a {
+            color: #00ffaa;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 255, 170, 0.3);
+            transition: all 0.2s;
+        }
+
+        .overlay-body a:hover {
+            border-bottom-color: #00ffaa;
+            text-shadow: 0 0 8px rgba(0, 255, 170, 0.4);
+        }
+
+        /* Transition blur classes for background elements (Cinematic mode) */
+        .orbit-layout, #canvas-container, .back-button {
+            transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+        }
+
+        body.cinematic-mode {
+            overflow: hidden !important;
+        }
+
+        body.cinematic-mode .orbit-layout {
+            filter: blur(20px);
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        body.cinematic-mode #canvas-container {
+            filter: blur(12px) saturate(80%);
+            opacity: 0.6;
+        }
+
+        body.cinematic-mode .back-button {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Divider inside overlay */
+        .overlay-body hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0));
+            margin: 2rem 0;
+        }
+
+        /* Comments container inside overlay */
+        .utterances-container {
+            margin-top: 3.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 2rem;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .overlay-glass-card {
+                width: 92vw;
+                height: 85vh;
+                border-radius: 24px;
+            }
+            .overlay-header {
+                padding: 24px 24px 14px 24px;
+            }
+            .overlay-title {
+                font-size: 1.6rem;
+            }
+            .overlay-body {
+                padding: 12px 24px 24px 24px;
+                font-size: 0.95rem;
+            }
+            .overlay-close-btn {
+                top: 16px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="reading-mode">
+    <!-- Components injected by js/components.js -->
+    <script src="js/components.js"></script>
+
+    <!-- Disable Sprite Chat for this page -->
+    <div id="sprite-container" style="display: none !important;"></div>
+
+    <!-- Back Button -->
+    <a href="index.html" class="back-button glass-panel">← 返回首页</a>
+
+    <!-- Main Content Layout -->
+    <main class="orbit-layout">
+        <!-- Left Side: Copywriting -->
+        <div class="orbit-left-col">
+            <div class="get-more">Get More</div>
+            <div class="get-more growth-track">记录成长轨迹</div>
+        </div>
+
+        <!-- Right Side: Vertical 3D Coverflow Slider -->
+        <div class="orbit-right-col">
+            <div class="orbit-stack-stage" id="orbit-stack-stage">
+                <!-- Project cards will be dynamically generated by JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Cinematic Article Detail Overlay -->
+    <div class="project-overlay" id="project-overlay">
+        <div class="overlay-glass-card">
+            <!-- Close Button -->
+            <button class="overlay-close-btn" id="overlay-close-btn" aria-label="关闭">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <!-- Sticky Title & Metadata -->
+            <div class="overlay-header">
+                <div class="overlay-meta" id="overlay-meta">2026.06</div>
+                <h1 class="overlay-title" id="overlay-title">随笔标题</h1>
+            </div>
+            
+            <!-- Scrollable Content Area -->
+            <div class="overlay-body" id="overlay-body">
+                <!-- Content injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Fetch dynamic projects from list.json
+            fetch('projects/list.json')
+                .then(res => res.json())
+                .then(projectFiles => {
+                    const stage = document.getElementById('orbit-stack-stage');
+                    if (!stage) return;
+                    
+                    // Fetch title & date metadata from the first line of each markdown file
+                    const promises = projectFiles.map((file, idx) => {
+                        return fetch(`projects/${file}`)
+                            .then(res => res.text())
+                            .then(text => {
+                                const lines = text.split('\n');
+                                const firstLine = lines[0] || '';
+                                const parts = firstLine.replace('# ', '').split('|');
+                                const title = parts[0] ? parts[0].trim() : file.replace('.md', '');
+                                const date = parts[1] ? parts[1].trim() : '2026.06';
+                                return { file, title, date, idx };
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                return { file, title: file.replace('.md', ''), date: '2026.06', idx };
+                            });
+                    });
+
+                    Promise.all(promises).then(projects => {
+                        renderCardStack(stage, projects);
+                    });
+                })
+                .catch(err => console.error('Error loading projects list:', err));
+        });
+
+        // 3D Stack Slider Renderer
+        function renderCardStack(stage, projects) {
+            stage.innerHTML = '';
+            let activeIndex = 0; // start with first card active
+            const cardElements = [];
+
+            projects.forEach((proj, i) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                
+                // Card details containing pure transparent liquid glass layout (circle logo monogram, and content)
+                card.innerHTML = `
+                    <div class="card-glare"></div>
+                    <div class="card-vision-content">
+                        <div class="card-vision-header">
+                            <span class="card-vision-date">${proj.date}</span>
+                            <div class="card-vision-logo">
+                                <svg viewBox="0 0 100 100" class="logo-svg">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="8"/>
+                                    <path d="M 38 70 L 50 30 L 62 70 M 43 56 L 57 56" fill="none" stroke="rgba(255, 255, 255, 0.8)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-vision-title" title="${proj.title}">${proj.title}</div>
+                    </div>
+                `;
+
+                // Single Click Handler: switches card or views project if already active
+                card.addEventListener('click', (e) => {
+                    if (dragMoved) {
+                        dragMoved = false;
+                        return;
+                    }
+                    if (activeIndex !== i) {
+                        e.stopPropagation();
+                        activeIndex = i;
+                        updateStack();
+                    } else {
+                        // Open cinematic overlay in-place
+                        openArticleOverlay(proj, card);
+                    }
+                });
+
+                stage.appendChild(card);
+                cardElements.push(card);
+            });
+
+            // Update stack transforms dynamically based on activeIndex
+            function updateStack() {
+                const isMobile = window.innerWidth <= 900;
+                cardElements.forEach((card, i) => {
+                    const diff = i - activeIndex;
+                    const absDiff = Math.abs(diff);
+                    
+                    let ty = 0;
+                    let tz = 0;
+                    let rx = 0;
+                    let ry = 0;
+                    let scale = 1;
+                    let opacity = 1;
+                    let zIndex = 100 - absDiff;
+
+                    const spacing = isMobile ? 100 : 165; /* Increased spacing distance between cards */
+
+                    if (diff === 0) {
+                        // Selected Card: flat, popped forward
+                        ty = 0;
+                        tz = 80;
+                        rx = 0;
+                        ry = 0;
+                        scale = 1.06;
+                        opacity = 1;
+                        card.classList.add('active');
+                    } else {
+                        // Stacked Inactive Cards (3D vertical roll/tumble rotation)
+                        card.classList.remove('active');
+                        ty = diff * spacing;
+                        tz = -120 * absDiff;
+                        rx = diff * 28; // Dynamic top-to-bottom tumbling rotation
+                        ry = 0; // Pure vertical rolling
+                        scale = Math.max(1 - absDiff * 0.08, 0.7);
+                        
+                        // Fade out distant cards
+                        opacity = Math.max(1 - absDiff * 0.25, 0);
+                    }
+
+                    card.style.transform = `translateY(${ty}px) translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`;
+                    card.style.opacity = opacity;
+                    card.style.zIndex = zIndex;
+                    
+                    // Reflection tilt animation on hover for the active card
+                    if (diff === 0) {
+                        card.onmousemove = (e) => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left - rect.width / 2;
+                            const y = e.clientY - rect.top - rect.height / 2;
+                            const tiltX = -(y / rect.height) * 12;
+                            const tiltY = (x / rect.width) * 12;
+                            
+                            // Glare shift
+                            const glare = card.querySelector('.card-glare');
+                            if (glare) {
+                                glare.style.background = `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 65%)`;
+                            }
+                            card.style.transform = `translateY(${ty}px) translateZ(${tz + 20}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${scale + 0.02})`;
+                        };
+                        
+                        card.onmouseleave = () => {
+                            const glare = card.querySelector('.card-glare');
+                            if (glare) {
+                                glare.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.03) 100%)';
+                            }
+                            card.style.transform = `translateY(${ty}px) translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`;
+                        };
+                    } else {
+                        card.onmousemove = null;
+                        card.onmouseleave = null;
+                    }
+                });
+            }
+
+            // Keyboard navigation (ArrowUp / ArrowDown)
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp') {
+                    if (activeIndex > 0) {
+                        activeIndex--;
+                        updateStack();
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    if (activeIndex < cardElements.length - 1) {
+                        activeIndex++;
+                        updateStack();
+                    }
+                }
+            });
+
+            // Wheel navigation with rate limit (debounce)
+            let lastScrollTime = 0;
+            window.addEventListener('wheel', (e) => {
+                const now = Date.now();
+                if (now - lastScrollTime < 450) return;
+                
+                if (e.deltaY > 0) {
+                    if (activeIndex < cardElements.length - 1) {
+                        activeIndex++;
+                        updateStack();
+                        lastScrollTime = now;
+                    }
+                } else if (e.deltaY < 0) {
+                    if (activeIndex > 0) {
+                        activeIndex--;
+                        updateStack();
+                        lastScrollTime = now;
+                    }
+                }
+            });
+
+            // Mouse drag & mobile touch swipe gesture
+            let startY = 0;
+            let isDragging = false;
+            let dragMoved = false;
+
+            stage.addEventListener('mousedown', (e) => {
+                startY = e.clientY;
+                isDragging = true;
+                dragMoved = false;
+            });
+
+            stage.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const diffY = e.clientY - startY;
+                if (Math.abs(diffY) > 8) {
+                    dragMoved = true;
+                }
+                if (Math.abs(diffY) > 50) {
+                    if (diffY > 0) {
+                        if (activeIndex > 0) {
+                            activeIndex--;
+                            updateStack();
+                        }
+                    } else {
+                        if (activeIndex < cardElements.length - 1) {
+                            activeIndex++;
+                            updateStack();
+                        }
+                    }
+                    startY = e.clientY;
+                    isDragging = false;
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            stage.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                isDragging = true;
+                dragMoved = false;
+            }, { passive: true });
+
+            stage.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const diffY = e.touches[0].clientY - startY;
+                if (Math.abs(diffY) > 8) {
+                    dragMoved = true;
+                }
+                if (Math.abs(diffY) > 40) {
+                    if (diffY > 0) {
+                        if (activeIndex > 0) {
+                            activeIndex--;
+                            updateStack();
+                        }
+                    } else {
+                        if (activeIndex < cardElements.length - 1) {
+                            activeIndex++;
+                            updateStack();
+                        }
+                    }
+                    startY = e.touches[0].clientY;
+                    isDragging = false;
+                }
+            }, { passive: true });
+
+            stage.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            // Window resize adjustment
+            window.addEventListener('resize', updateStack);
+
+            // Close button listener
+            const closeBtn = document.getElementById('overlay-close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeArticleOverlay);
+            }
+            
+            // Backdrop click listener
+            const overlay = document.getElementById('project-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        closeArticleOverlay();
+                    }
+                });
+            }
+            
+            // Escape key listener
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeArticleOverlay();
+                }
+            });
+
+            // Trigger initial calculation
+            updateStack();
+        }
+
+        // Flag to prevent overlapping overlay transitions
+        let isOverlayAnimating = false;
+
+        // Open Cinematic Article Overlay with smooth FLIP transition from the card
+        function openArticleOverlay(proj, cardElement) {
+            if (isOverlayAnimating) return;
+            
+            const overlay = document.getElementById('project-overlay');
+            const meta = document.getElementById('overlay-meta');
+            const title = document.getElementById('overlay-title');
+            const body = document.getElementById('overlay-body');
+            const glassCard = overlay ? overlay.querySelector('.overlay-glass-card') : null;
+            
+            if (!overlay || !body || !glassCard) return;
+            
+            isOverlayAnimating = true;
+            
+            // Set temporary loading state
+            meta.textContent = proj.date;
+            title.textContent = proj.title;
+            body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:150px; color:rgba(255,255,255,0.4);">加载内容中...</div>';
+            
+            // Show overlay backdrop immediately to measure final layout
+            overlay.classList.add('active');
+            document.body.classList.add('cinematic-mode');
+            
+            if (cardElement) {
+                // FLIP First: Get clicked card's rect in viewport coordinates
+                const rect = cardElement.getBoundingClientRect();
+                
+                // FLIP Last: Reset transforms on the modal glass card to measure its final centered rect
+                glassCard.style.transition = 'none';
+                glassCard.style.transform = 'none';
+                const finalRect = glassCard.getBoundingClientRect();
+                
+                // FLIP Invert: Calculate scale and translations
+                const scaleX = rect.width / finalRect.width;
+                const scaleY = rect.height / finalRect.height;
+                const transX = rect.left - finalRect.left;
+                const transY = rect.top - finalRect.top;
+                
+                // Set initial states (position matching the card, opacity 0 for content inside)
+                glassCard.style.transformOrigin = 'top left';
+                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scaleX}, ${scaleY})`;
+                glassCard.style.borderRadius = '26px';
+                
+                const header = glassCard.querySelector('.overlay-header');
+                const closeBtn = document.getElementById('overlay-close-btn');
+                
+                if (header) {
+                    header.style.transition = 'none';
+                    header.style.opacity = '0';
+                }
+                body.style.transition = 'none';
+                body.style.opacity = '0';
+                if (closeBtn) {
+                    closeBtn.style.transition = 'none';
+                    closeBtn.style.opacity = '0';
+                }
+                
+                // Force layout reflow
+                glassCard.offsetHeight;
+                
+                // FLIP Play: Animate back to final layout (transform: none) and fade in elements
+                glassCard.style.transition = 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+                if (header) {
+                    header.style.transition = 'opacity 0.45s ease 0.15s';
+                }
+                body.style.transition = 'opacity 0.45s ease 0.15s';
+                if (closeBtn) {
+                    closeBtn.style.transition = 'opacity 0.45s ease 0.3s';
+                }
+                
+                requestAnimationFrame(() => {
+                    glassCard.style.transform = 'none';
+                    glassCard.style.borderRadius = '32px';
+                    if (header) header.style.opacity = '1';
+                    body.style.opacity = '1';
+                    if (closeBtn) closeBtn.style.opacity = '1';
+                });
+            } else {
+                // Fallback fade/scale entrance if card is not specified
+                glassCard.style.transition = 'none';
+                glassCard.style.transform = 'scale(0.9) translateY(20px)';
+                glassCard.style.borderRadius = '32px';
+                glassCard.style.opacity = '0';
+                
+                glassCard.offsetHeight;
+                
+                glassCard.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease';
+                requestAnimationFrame(() => {
+                    glassCard.style.transform = 'none';
+                    glassCard.style.opacity = '1';
+                });
+            }
+            
+            // Allow actions again after animation completes
+            setTimeout(() => {
+                isOverlayAnimating = false;
+            }, 700);
+            
+            // Fetch and parse markdown
+            fetch(`projects/${proj.file}`)
+                .then(res => res.text())
+                .then(md => {
+                    // Simple Regex Markdown Parser (skipping the first title header line)
+                    let lines = md.split('\n');
+                    if (lines[0] && lines[0].startsWith('#')) {
+                        lines.shift();
+                    }
+                    let cleanMd = lines.join('\n').trim();
+                    
+                    // Parse markdown blocks
+                    let blocks = cleanMd.split(/\n\s*\n/);
+                    let parsedBlocks = blocks.map(block => {
+                        block = block.trim();
+                        if (!block) return '';
+                        
+                        if (block === '---' || block === '***') {
+                            return '<hr>';
+                        }
+                        
+                        if (block.startsWith('### ')) {
+                            return `<h3>${inlineParse(block.substring(4))}</h3>`;
+                        }
+                        if (block.startsWith('## ')) {
+                            return `<h2>${inlineParse(block.substring(3))}</h2>`;
+                        }
+                        if (block.startsWith('# ')) {
+                            return `<h1>${inlineParse(block.substring(2))}</h1>`;
+                        }
+                        
+                        if (block.startsWith('> ')) {
+                            const lines = block.split('\n').map(l => l.replace(/^>\s?/, ''));
+                            return `<blockquote><p>${inlineParse(lines.join('<br>'))}</p></blockquote>`;
+                        }
+                        
+                        if (block.startsWith('- ') || block.startsWith('* ')) {
+                            const items = block.split('\n').map(l => {
+                                const clean = l.replace(/^[-*]\s+/, '');
+                                return `<li>${inlineParse(clean)}</li>`;
+                            });
+                            return `<ul>${items.join('')}</ul>`;
+                        }
+                        
+                        return `<p>${inlineParse(block.replace(/\n/g, '<br>'))}</p>`;
+                    });
+                    
+                    // Injected content along with the utterances comment container
+                    let mdHtml = parsedBlocks.join('');
+                    body.innerHTML = mdHtml + '<div class="utterances-container" id="utterances-container"></div>';
+                    body.scrollTop = 0; // reset scroll position
+                    
+                    // Temporarily set document title to match the project title so Utterances loads the correct comment issue
+                    document.title = `${proj.title} | Asstar`;
+                    
+                    // Load Utterances dynamically inside the container
+                    const utterancesScript = document.createElement('script');
+                    utterancesScript.src = 'https://utteranc.es/client.js';
+                    utterancesScript.setAttribute('repo', 'Asstar-X/Asstar-X.github.io');
+                    utterancesScript.setAttribute('issue-term', 'title');
+                    utterancesScript.setAttribute('theme', 'photon-dark');
+                    utterancesScript.setAttribute('crossorigin', 'anonymous');
+                    utterancesScript.async = true;
+                    
+                    const container = document.getElementById('utterances-container');
+                    if (container) {
+                        container.appendChild(utterancesScript);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading content:', err);
+                    body.innerHTML = '<p style="color:rgba(255,100,100,0.8);">内容加载失败，请重试。</p>';
+                });
+        }
+
+        // Inline markdown styles parser helper
+        function inlineParse(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+        }
+
+        // Close Cinematic Article Overlay with smooth FLIP shrink transition back to active card
+        function closeArticleOverlay() {
+            if (isOverlayAnimating) return;
+            
+            const overlay = document.getElementById('project-overlay');
+            const glassCard = overlay ? overlay.querySelector('.overlay-glass-card') : null;
+            if (!overlay || !glassCard) return;
+            
+            isOverlayAnimating = true;
+            
+            // Find active project card
+            const activeCard = document.querySelector('.project-card.active');
+            
+            if (activeCard) {
+                // FLIP target states
+                const rect = activeCard.getBoundingClientRect();
+                const finalRect = glassCard.getBoundingClientRect();
+                
+                const scaleX = rect.width / finalRect.width;
+                const scaleY = rect.height / finalRect.height;
+                const transX = rect.left - finalRect.left;
+                const transY = rect.top - finalRect.top;
+                
+                // Animate to card size and fade out content inside
+                glassCard.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                
+                const header = glassCard.querySelector('.overlay-header');
+                const body = document.getElementById('overlay-body');
+                const closeBtn = document.getElementById('overlay-close-btn');
+                
+                if (header) {
+                    header.style.transition = 'opacity 0.3s ease';
+                    header.style.opacity = '0';
+                }
+                if (body) {
+                    body.style.transition = 'opacity 0.3s ease';
+                    body.style.opacity = '0';
+                }
+                if (closeBtn) {
+                    closeBtn.style.transition = 'opacity 0.3s ease';
+                    closeBtn.style.opacity = '0';
+                }
+                
+                glassCard.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scaleX}, ${scaleY})`;
+                glassCard.style.borderRadius = '26px';
+            } else {
+                // Fallback fade/scale out
+                glassCard.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease';
+                glassCard.style.transform = 'scale(0.9) translateY(20px)';
+                glassCard.style.opacity = '0';
+            }
+            
+            // Remove active and cinematic focus classes immediately to animate backdrop & background blur
+            overlay.classList.remove('active');
+            document.body.classList.remove('cinematic-mode');
+            
+            // Restore original document title
+            document.title = 'Orbit - Asstar';
+            
+            // Wait for transitions to finish, then clean up inline styles
+            setTimeout(() => {
+                glassCard.style.transform = '';
+                glassCard.style.transformOrigin = '';
+                glassCard.style.borderRadius = '';
+                glassCard.style.transition = '';
+                glassCard.style.opacity = '';
+                
+                const header = glassCard.querySelector('.overlay-header');
+                const body = document.getElementById('overlay-body');
+                const closeBtn = document.getElementById('overlay-close-btn');
+                
+                if (header) {
+                    header.style.opacity = '';
+                    header.style.transition = '';
+                }
+                if (body) {
+                    body.style.opacity = '';
+                    body.style.transition = '';
+                }
+                if (closeBtn) {
+                    closeBtn.style.opacity = '';
+                    closeBtn.style.transition = '';
+                }
+                isOverlayAnimating = false;
+            }, 600);
+        }
+    </script>
+</body>
+
+</html>

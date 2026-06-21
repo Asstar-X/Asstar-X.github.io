@@ -23,55 +23,8 @@
     <link rel="stylesheet" href="css/sprite-chat.css">
     
     <style>
-        body { background: #050505 !important; }
-
-        /* Hero 3D Container Styles */
-        #hero-3d-container {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #hero-3d-container canvas { display: block; }
-
-        .hero-3d-hint {
-            position: absolute;
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: var(--font-display, 'Orbitron', sans-serif);
-            font-size: 0.75rem;
-            letter-spacing: 4px;
-            color: rgba(255, 255, 255, 0.6);
-            pointer-events: none;
-            opacity: 0;
-            white-space: nowrap;
-            z-index: 10;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-        }
-
-        .hero-3d-hint.show { opacity: 1; }
-        .hero-3d-hint.hide { opacity: 0; transition: opacity 1s ease; }
-        .hero-3d-hint.blinking-cursor::after {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 12px;
-            background-color: rgba(255, 255, 255, 0.8);
-            margin-left: 6px;
-            vertical-align: text-bottom;
-            animation: blinkCursor 0.75s infinite;
-        }
-
-        @keyframes blinkCursor {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
+        body, #canvas-container { background: #000000 !important; }
+        .slide-bg, .slide-stars, .noise-overlay, .glow-backlight, .about-aura { display: none !important; }
         /* Override back button for index since we are at home */
         .back-button { display: none !important; }
     </style>
@@ -84,242 +37,339 @@
     <!-- 导航栏 -->
     <header class="header">
         <nav class="nav">
-            <a href="space.html" class="logo">
-                <img src="assets/images/Asstar.jpg" alt="Asstar" class="logo-img" title="点击进入探索">
-                <span class="logo-text">ASSTAR</span>
+            <a href="space.html" class="logo" title="点击进入探索">
+                <img src="assets/images/Asstar.jpg" alt="Logo" class="logo-img">
             </a>
-            <ul class="nav-links">
-                <li><a href="trending-project.html" class="nav-link">前沿项目</a></li>
-                <li><a href="huggingface-papers.html" class="nav-link">前沿论文</a></li>
-                <li><a href="focus.html" class="nav-link">焦点新闻</a></li>
-                <li><a href="tools.html" class="nav-link">提效工具</a></li>
-            </ul>
-            <div class="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="menu">
+                <a href="nova.html" class="nav-link">Nova</a>
+                <a href="atlas.html" class="nav-link">Atlas</a>
+                <a href="voice-interaction.html" class="nav-link">Interest</a>
+                <a href="orbit.html" class="nav-link">Orbit</a>
             </div>
+            <button class="nav-expand-btn" id="nav-expand-btn" title="查看标本归档">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
         </nav>
     </header>
 
     <main id="time-rift-main">
         <!-- 英雄区域 -->
         <section id="home" class="hero rift-section">
-            <div class="hero-container">
-                <div class="hero-content">
-                    <div class="hero-badge">探索 • 专注 • 未来</div>
-                    <h1 class="hero-title">探索未知的边界</h1>
-                    <p class="hero-subtitle">欢迎来到Asstar，让意识，先于光速抵达未知。</p>
+            <div class="hero-immersive-center hero-split-layout">
+                <!-- 左侧文案展示 -->
+                <div class="hero-text-side">
+                    <h1 class="hero-merged-title">探索未知的边界</h1>
+                    <div class="text-divider"></div>
+                    <div class="hero-merged-desc">
+                        <p class="desc-line">让思维在尚未抵达之处 先完成自我抵达</p>
+                        <p class="desc-line">让未知在尚未发生之前 先被体验</p>
+                    </div>
                 </div>
-                <div class="hero-visual">
-                    <div id="hero-3d-container"></div>
-                </div>
-            </div>
-        </section>
 
-        <!-- 关于区域 -->
-        <section id="about" class="about rift-section">
-            <div class="container">
-                <div class="about-aura"></div>
-                <div class="about-content">
-                    <div class="about-text-wrapper">
-                        <p class="about-paragraph">在这里，硅基与碳基的认知边界被折叠，范式在零维坍缩，又在高维重写。</p>
-                        <p class="about-sub-paragraph">让思维在尚未抵达之处先完成自我抵达，让未知在尚未发生之前先被体验。</p>
+                <!-- 居中无边框 9:16 视频容器 -->
+                <div class="immersive-video-container" id="video-specimen">
+                    <!-- 柔和背光阴影 (Glowing Backlight) -->
+                    <div class="glow-backlight"></div>
+
+                    <!-- 视频本体 -->
+                    <div class="immersive-video-wrapper">
+                        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
+                            <source src="assets/Asstar.mp4" type="video/mp4">
+                        </video>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="projects" class="projects rift-section">
-            <div class="galactic-timeline-container">
-                <div id="galactic-timeline" class="galactic-timeline">
-                    <svg id="galactic-svg" class="galactic-svg"></svg>
-                    <div id="galactic-nodes" class="galactic-nodes"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 联系区域 -->
-        <section id="contact" class="contact rift-section">
-            <div class="container">
-                <div class="lab-header">
-                    <div class="lab-title-bg">CONTACT</div>
-                    <div class="lab-title-wrapper">
-                        <h2 class="lab-title">联系我们</h2>
-                        <div class="lab-line-decoder"></div>
-                    </div>
-                </div>
-
-                <div class="contact-nexus">
-                    <div class="contact-node">
-                        <div class="node-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
-                                <path d="M3 4h18v16H3z" /><path d="M3 4l9 8 9-8" />
-                            </svg>
-                        </div>
-                        <div class="node-content">
-                            <h3>邮箱</h3>
-                            <p>asstarx7@gmail.com</p>
-                        </div>
-                    </div>
-                    <div class="contact-node">
-                        <div class="node-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
-                                <circle cx="17" cy="7" r="4" /><circle cx="7" cy="17" r="4" /><path d="M14.5 9.5l-5 5" /><circle cx="17" cy="17" r="1.5" /><path d="M17 11v4.5" />
-                            </svg>
-                        </div>
-                        <div class="node-content">
-                            <h3>微信</h3>
-                            <p>GitscYee</p>
-                        </div>
-                    </div>
-                    <a class="contact-node node--explore" href="voice-interaction.html">
-                        <div class="node-icon">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.8;">
-                                <path d="M12 2L3 20h18L12 2z" /><path d="M12 2v18" /><path d="M7.5 11h9" />
-                            </svg>
-                        </div>
-                        <div class="node-content">
-                            <h3>语音交互</h3>
-                            <p>Voice Interaction</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </section>
     </main>
+
+    <!-- Alien Specimen Overlay Modal -->
+    <div class="alien-overlay" id="alien-overlay">
+        <!-- Close Button -->
+        <button class="alien-close-btn" id="alien-close-btn" aria-label="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+
+
+        <!-- 3D Coverflow Slider Wrapper -->
+        <div class="alien-slider-wrapper">
+            <div class="alien-slider-stage" id="alien-slider-stage">
+                <!-- Cards will be dynamically generated by Javascript -->
+            </div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="alien-controls">
+            <button class="alien-nav-arrow prev" id="alien-prev-btn" aria-label="上一个">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </button>
+            <div class="alien-pagination" id="alien-pagination">
+                <!-- Dots will be dynamically generated by JS -->
+            </div>
+            <button class="alien-nav-arrow next" id="alien-next-btn" aria-label="下一个">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
     <script src="js/script.js" defer></script>
     <script src="js/time-rift.js" defer></script>
     <script src="js/sprite-chat.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            loadProjects('galactic-timeline');
-
             // Initialize sprite chat
             if (window.SpriteChatManager) {
                 window.spriteChatManager = new window.SpriteChatManager();
             }
 
-            // --- Hero "Voice" 3D Particle Sphere ---
+            // --- Centered Video 3D Tilt Effect ---
             (function() {
-                const heroContainer = document.getElementById('hero-3d-container');
-            if (!heroContainer) return;
+                const videoCapsule = document.getElementById('video-specimen');
+                if (!videoCapsule) return;
 
-            const containerWidth = heroContainer.offsetWidth || 500;
-            const containerHeight = heroContainer.offsetHeight || 500;
+                videoCapsule.addEventListener('mousemove', (event) => {
+                    const rect = videoCapsule.getBoundingClientRect();
+                    const mouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+                    const mouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+                    const tiltX = -mouseY * 8; // Max 8 degrees tilt
+                    const tiltY = mouseX * 8;
+                    videoCapsule.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
 
-            const heroScene = new THREE.Scene();
-            heroScene.fog = new THREE.FogExp2(0x050505, 0.015);
+                videoCapsule.addEventListener('mouseleave', () => {
+                    videoCapsule.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                });
+            })();
 
-            const heroCamera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
-            heroCamera.position.z = 25;
+            // --- Alien Specimens 3D Coverflow Carousel ---
+            (function() {
+                const specimens = Array.from({ length: 23 });
 
-            const heroRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            heroRenderer.setSize(containerWidth, containerHeight);
-            heroRenderer.setPixelRatio(window.devicePixelRatio);
-            heroContainer.appendChild(heroRenderer.domElement);
+                const stage = document.getElementById('alien-slider-stage');
+                const pagination = document.getElementById('alien-pagination');
+                const overlay = document.getElementById('alien-overlay');
+                const expandBtn = document.getElementById('nav-expand-btn');
+                const closeBtn = document.getElementById('alien-close-btn');
+                const prevBtn = document.getElementById('alien-prev-btn');
+                const nextBtn = document.getElementById('alien-next-btn');
 
-            const sphereGeometry = new THREE.SphereGeometry(8, 128, 128);
-            const sphereMaterial = new THREE.PointsMaterial({
-                size: 0.1,
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.85,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
-            });
+                if (!stage || !overlay || !expandBtn) return;
 
-            const count = sphereGeometry.attributes.position.count;
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                const mixedColor = new THREE.Color();
-                const ratio = Math.random();
-                if (ratio < 0.4) mixedColor.setHex(0x0a0a2a).lerp(new THREE.Color(0x8a2be2), ratio / 0.4);
-                else if (ratio < 0.8) mixedColor.setHex(0x8a2be2).lerp(new THREE.Color(0x00d2ff), (ratio - 0.4) / 0.4);
-                else mixedColor.setHex(0x00d2ff).lerp(new THREE.Color(0xffffff), (ratio - 0.8) / 0.2);
-                colors.push(mixedColor.r, mixedColor.g, mixedColor.b);
-            }
-            sphereGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                let activeIndex = 1; // start with 2nd card active
+                let dragMoved = false;
 
-            const particleSphere = new THREE.Points(sphereGeometry, sphereMaterial);
-            heroScene.add(particleSphere);
+                // Generate Card DOM
+                specimens.forEach((specimen, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'alien-card';
+                    card.innerHTML = `
+                        <img src="assets/images/Alien${i + 1}.jpg" alt="Alien specimen" class="card-bg-img" loading="lazy">
+                        <div class="card-scan-line"></div>
+                    `;
 
-            const awakePositions = new Float32Array(count * 3);
-            const sigma = 3.0, heightScale = 14.0, bellRadius = 12.0;
-            for (let i = 0; i < count; i++) {
-                const r = bellRadius * Math.sqrt(Math.random()), theta = Math.random() * Math.PI * 2;
-                const ax = r * Math.cos(theta), az = r * Math.sin(theta);
-                let ay = heightScale * Math.exp(-(ax*ax + az*az) / (2 * sigma * sigma)) - (heightScale / 2.5);
-                ay += (Math.random() - 0.5) * 0.3;
-                awakePositions[i * 3] = ax; awakePositions[i * 3 + 1] = ay; awakePositions[i * 3 + 2] = az;
-            }
-            const originalPositions = sphereGeometry.attributes.position.array.slice();
+                    stage.appendChild(card);
 
-            heroScene.add(new THREE.AmbientLight(0x404040, 2));
-            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-            pointLight.position.set(10, 10, 10);
-            heroScene.add(pointLight);
+                    // Pagination dot
+                    const dot = document.createElement('div');
+                    dot.className = 'alien-dot';
+                    dot.addEventListener('click', () => {
+                        activeIndex = i;
+                        updateCoverflow();
+                    });
+                    pagination.appendChild(dot);
+                });
 
-            let heroMouseX = 0, heroMouseY = 0, heroTime = 0, amplitude = 0.9, speed = 1.0, isHeroHovered = false, pulseObj = { scale: 0, progress: 0 }, isAwake = false;
-            const hintEl = document.createElement('div');
-            hintEl.className = 'hero-3d-hint';
-            heroContainer.appendChild(hintEl);
-            let hintText = "[ CLICK TO AWAKE ]", hintTimeout, typeInterval;
+                const cards = stage.querySelectorAll('.alien-card');
+                const dots = pagination.querySelectorAll('.alien-dot');
 
-            heroContainer.addEventListener('mouseenter', () => {
-                isHeroHovered = true;
-                hintEl.classList.remove('hide'); hintEl.classList.add('show', 'blinking-cursor');
-                hintEl.innerText = "";
-                let charIndex = 0;
-                clearInterval(typeInterval);
-                typeInterval = setInterval(() => {
-                    if (charIndex < hintText.length) { hintEl.innerText += hintText[charIndex]; charIndex++; }
-                    else { clearInterval(typeInterval); clearTimeout(hintTimeout); hintTimeout = setTimeout(() => { hintEl.classList.remove('show', 'blinking-cursor'); hintEl.classList.add('hide'); }, 3000); }
-                }, 40);
-            });
-            heroContainer.addEventListener('mouseleave', () => { isHeroHovered = false; heroMouseX = 0; heroMouseY = 0; clearInterval(typeInterval); hintEl.classList.remove('show', 'blinking-cursor'); hintEl.classList.add('hide'); });
-            heroContainer.addEventListener('mousemove', (event) => { const rect = heroContainer.getBoundingClientRect(); heroMouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2; heroMouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2; });
-            setInterval(() => { if (!isHeroHovered && !isAwake) gsap.to(pulseObj, { scale: 0.12, duration: 1.5, yoyo: true, repeat: 1, ease: "sine.inOut" }); }, 8000);
-            heroContainer.addEventListener('click', () => {
-                isAwake = !isAwake;
-                hintText = isAwake ? "[ STATUS: AWAKENED ]" : "[ CLICK TO AWAKE ]";
-                if (hintEl.classList.contains('show')) hintEl.innerText = hintText;
-                gsap.to(pulseObj, { progress: isAwake ? 1 : 0, duration: 2.5, ease: "power3.inOut" });
-                gsap.to(particleSphere.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.3, yoyo: true, repeat: 1, ease: "power2.out" });
-            });
+                // Click side card to switch (using event delegation with drag detection)
+                stage.addEventListener('click', (e) => {
+                    if (dragMoved) {
+                        dragMoved = false;
+                        return;
+                    }
+                    const card = e.target.closest('.alien-card');
+                    if (card) {
+                        const index = Array.from(cards).indexOf(card);
+                        if (index !== -1 && index !== activeIndex) {
+                            e.stopPropagation();
+                            activeIndex = index;
+                            updateCoverflow();
+                        }
+                    }
+                });
 
-            function animateHeroSphere() {
-                requestAnimationFrame(animateHeroSphere);
-                heroTime += 0.01 * speed;
-                const positions = sphereGeometry.attributes.position.array;
-                const p = pulseObj.progress;
-                for (let i = 0; i < count; i++) {
-                    const px = originalPositions[i * 3], py = originalPositions[i * 3 + 1], pz = originalPositions[i * 3 + 2];
-                    const noise = Math.sin(px * 0.5 + heroTime) * Math.cos(py * 0.3 + heroTime) * Math.sin(pz * 0.5 + heroTime);
-                    const displacement = 1 + (noise * 0.18 * amplitude);
-                    const chaosX = px * displacement, chaosY = py * displacement, chaosZ = pz * displacement;
-                    if (p > 0) {
-                        const ax = awakePositions[i * 3], ay = awakePositions[i * 3 + 1], az = awakePositions[i * 3 + 2];
-                        const orderRotation = heroTime * 0.3, cosR = Math.cos(orderRotation), sinR = Math.sin(orderRotation);
-                        const finalAx = ax * cosR - az * sinR, finalAz = ax * sinR + az * cosR;
-                        positions[i * 3] = chaosX + (finalAx - chaosX) * p; positions[i * 3 + 1] = chaosY + (ay - chaosY) * p; positions[i * 3 + 2] = chaosZ + (finalAz - chaosZ) * p;
-                    } else { positions[i * 3] = chaosX; positions[i * 3 + 1] = chaosY; positions[i * 3 + 2] = chaosZ; }
+                function updateCoverflow() {
+                    cards.forEach((card, i) => {
+                        const diff = i - activeIndex;
+                        const absDiff = Math.abs(diff);
+
+                        // Layout calculation
+                        const isMobile = window.innerWidth <= 768;
+                        const baseSpacing = isMobile ? 80 : 130;
+                        const activeOffset = isMobile ? 90 : 150;
+
+                        let tx = diff * baseSpacing;
+                        if (diff > 0) tx += activeOffset;
+                        else if (diff < 0) tx -= activeOffset;
+
+                        const tz = absDiff * -130; // depth position
+                        const scale = absDiff === 0 ? 1.05 : 0.85; // active scale
+                        const ry = diff < 0 ? 25 : (diff > 0 ? -25 : 0); // Y rotation
+                        const opacity = Math.max(1 - absDiff * 0.15, 0); // fade out distant
+                        const zIndex = 100 - absDiff; // active card on top
+
+                        card.style.transform = `translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`;
+                        card.style.opacity = opacity;
+                        card.style.zIndex = zIndex;
+                        card.style.pointerEvents = 'auto'; // allow clicking all cards
+
+                        if (absDiff === 0) {
+                            card.classList.add('active-center');
+                        } else {
+                            card.classList.remove('active-center');
+                        }
+                    });
+
+                    // Update dots
+                    dots.forEach((dot, i) => {
+                        if (i === activeIndex) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
                 }
-                sphereGeometry.attributes.position.needsUpdate = true;
-                const targetPosX = heroMouseX * 1.2, targetPosY = -heroMouseY * 1.2;
-                particleSphere.position.x += 0.08 * (targetPosX - particleSphere.position.x); particleSphere.position.y += 0.08 * (targetPosY - particleSphere.position.y);
-                const distToCenter = Math.sqrt(heroMouseX * heroMouseX + heroMouseY * heroMouseY);
-                const targetScale = 1 + distToCenter * 0.15 + pulseObj.scale;
-                particleSphere.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-                particleSphere.rotation.y += 0.003; particleSphere.rotation.x += 0.05 * (heroMouseY * 0.4 - particleSphere.rotation.x); particleSphere.rotation.z += 0.05 * (heroMouseX * 0.2 - particleSphere.rotation.z);
-                heroRenderer.render(heroScene, heroCamera);
-            }
-            animateHeroSphere();
-            const resizeObserver = new ResizeObserver(() => { const newWidth = heroContainer.offsetWidth, newHeight = heroContainer.offsetHeight; heroCamera.aspect = newWidth / newHeight; heroCamera.updateProjectionMatrix(); heroRenderer.setSize(newWidth, newHeight); });
-            resizeObserver.observe(heroContainer);
-        })();
-    });
+
+                // Expand Overlay Trigger
+                expandBtn.addEventListener('click', () => {
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    updateCoverflow();
+                });
+
+                // Close Overlay
+                function closeOverlay() {
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+
+                closeBtn.addEventListener('click', closeOverlay);
+
+                // Click backdrop to close
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay || e.target.classList.contains('alien-slider-wrapper')) {
+                        closeOverlay();
+                    }
+                });
+
+                // Navigation Controls
+                prevBtn.addEventListener('click', () => {
+                    if (activeIndex > 0) {
+                        activeIndex--;
+                        updateCoverflow();
+                    }
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    if (activeIndex < specimens.length - 1) {
+                        activeIndex++;
+                        updateCoverflow();
+                    }
+                });
+
+                // Keyboard controls
+                window.addEventListener('keydown', (e) => {
+                    if (!overlay.classList.contains('active')) return;
+                    if (e.key === 'ArrowLeft') {
+                        if (activeIndex > 0) { activeIndex--; updateCoverflow(); }
+                    } else if (e.key === 'ArrowRight') {
+                        if (activeIndex < specimens.length - 1) { activeIndex++; updateCoverflow(); }
+                    } else if (e.key === 'Escape') {
+                        closeOverlay();
+                    }
+                });
+
+                // Swipe/Drag gesture support
+                let startX = 0;
+                let isDragging = false;
+
+                stage.addEventListener('mousedown', (e) => {
+                    startX = e.clientX;
+                    isDragging = true;
+                    dragMoved = false;
+                });
+
+                stage.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const diffX = e.clientX - startX;
+                    if (Math.abs(diffX) > 10) {
+                        dragMoved = true;
+                    }
+                    if (Math.abs(diffX) > 60) {
+                        if (diffX > 0) {
+                            if (activeIndex > 0) { activeIndex--; updateCoverflow(); }
+                        } else {
+                            if (activeIndex < specimens.length - 1) { activeIndex++; updateCoverflow(); }
+                        }
+                        startX = e.clientX;
+                        isDragging = false;
+                    }
+                });
+
+                window.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+
+                // Mobile touch swipe gesture
+                stage.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    dragMoved = false;
+                }, { passive: true });
+
+                stage.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    const diffX = e.touches[0].clientX - startX;
+                    if (Math.abs(diffX) > 10) {
+                        dragMoved = true;
+                    }
+                    if (Math.abs(diffX) > 50) {
+                        if (diffX > 0) {
+                            if (activeIndex > 0) { activeIndex--; updateCoverflow(); }
+                        } else {
+                            if (activeIndex < specimens.length - 1) { activeIndex++; updateCoverflow(); }
+                        }
+                        startX = e.touches[0].clientX;
+                        isDragging = false;
+                    }
+                }, { passive: true });
+
+                stage.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+
+                // Handle window resize dynamically
+                window.addEventListener('resize', () => {
+                    if (overlay.classList.contains('active')) {
+                        updateCoverflow();
+                    }
+                });
+
+            })();
+        });
 </script>
 </body>
 
