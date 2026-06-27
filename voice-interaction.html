@@ -494,6 +494,186 @@
             .contact-info { flex-direction: column; gap: 30px; } 
             .contact-content { padding: 20px 0; }
         }
+
+        /* --- ASPLAYER HIGH-END TECH AESTHETIC --- */
+        #asplayer-tab-content {
+            --asplayer-bg-color: #000000;
+            --asplayer-accent-cyan: #00f2ff;
+            --asplayer-accent-purple: #bd00ff;
+            --asplayer-text-dim: rgba(255, 255, 255, 0.3);
+            --asplayer-glass-bg: rgba(255, 255, 255, 0.03);
+            --asplayer-glass-border: rgba(255, 255, 255, 0.1);
+            
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--asplayer-bg-color);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            z-index: 1;
+        }
+
+        /* --- UI LAYER --- */
+        #asplayer-ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Allows click-through to 3D scene */
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 130px 40px 40px; /* added space at top for persistent tabs */
+        }
+
+        /* --- HEADER --- */
+        .asplayer-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .asplayer-track-info {
+            text-align: right;
+        }
+
+        .asplayer-track-name {
+            font-family: 'Courier New', monospace; /* Tech vibe */
+            font-size: 0.75rem;
+            color: var(--asplayer-accent-cyan);
+            letter-spacing: 1px;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.5s;
+            text-transform: uppercase;
+        }
+
+        /* --- BOTTOM BAR (Footer) --- */
+        .asplayer-footer {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* Left, Center, Right */
+            align-items: end;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        /* Center: Controls */
+        .asplayer-footer-center {
+            display: flex;
+            justify-content: center;
+            pointer-events: auto; /* Enable clicks */
+        }
+
+        .asplayer-upload-btn {
+            background: var(--asplayer-glass-bg);
+            border: 1px solid var(--asplayer-glass-border);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 30px;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .asplayer-upload-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--asplayer-accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.15);
+            color: #fff;
+        }
+
+        /* Right: EQ Frequency Monitor */
+        .asplayer-footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+            pointer-events: auto; /* Enable hover/clicks on HUD */
+        }
+
+        .asplayer-eq-container {
+            display: flex;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 14px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .asplayer-eq-band {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30px;
+        }
+
+        .asplayer-eq-label {
+            font-family: 'Courier New', monospace;
+            font-size: 0.55rem;
+            color: var(--asplayer-text-dim);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+
+        .asplayer-eq-bar-wrapper {
+            width: 4px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .asplayer-eq-bar-fill {
+            width: 100%;
+            height: 0%; /* Dynamic */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to top, var(--asplayer-accent-purple), var(--asplayer-accent-cyan));
+            box-shadow: 0 0 8px rgba(0, 242, 255, 0.4);
+            border-radius: 1px;
+        }
+
+        .asplayer-eq-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.5rem;
+            color: var(--asplayer-accent-cyan);
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        /* Hidden Inputs */
+        #asplayer-audio-input { display: none; }
+        
+        /* --- CANVAS 3D --- */
+        #asplayer-canvas-container {
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Persistent Tab Switcher Layout */
+        .voice-tab-header {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+        }
     </style>
 </head>
 
@@ -501,90 +681,162 @@
     <!-- Shared Components Loader -->
     <script src="js/components.js"></script>
 
-    <div class="voice-dashboard">
-        <div class="voice-header">
-            <h1 class="voice-title">AsLive</h1>
-        </div>
-
-        <div class="status-badge" id="status-badge">
-            <span class="status-dot"></span>
-            <span id="status-text">系统空闲</span>
-        </div>
-
-        <!-- Wave Visualizer Orb -->
-        <div class="visualizer-container">
-            <canvas class="orb-canvas" id="orb-canvas"></canvas>
-            <div class="mic-btn-wrapper">
-                <button class="mic-btn" id="mic-btn" title="点击开始说话">
-                    <svg viewBox="0 0 24 24" id="mic-icon">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" fill="currentColor"/>
-                        <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4m-4 0h8" stroke="currentColor"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Horizontal audio stream line -->
-        <div class="waveform-line-container">
-            <canvas class="waveform-canvas" id="waveform-canvas"></canvas>
-        </div>
-
-        <!-- Chat dialogue log & text entry -->
-        <div class="dialogue-card">
-            <div class="chat-log" id="chat-log">
-                <div class="chat-bubble assistant">
-                    你好！我是 Asstar 语音助理。请授权麦克风并点击中心的麦克风按钮开始说话，或者使用键盘在下方输入命令。
-                </div>
-            </div>
-            
-            <div class="input-bar">
-                <input type="text" class="text-input" id="text-input" placeholder="输入文字命令或直接与助理沟通..." autocomplete="off">
-                <button class="send-btn" id="send-btn">SEND</button>
-            </div>
-        </div>
-
-        <!-- Command cheat sheet -->
-        <div class="commands-section">
-            <div class="commands-title">你可以这样命令我：</div>
-            <div class="commands-grid">
-                <div class="command-card" onclick="speakDemo('返回首页')">
-                    <code>"返回首页" / "返回"</code>
-                    <div class="command-desc">使用空间光圈收缩特效，平滑返回系统首页。</div>
-                </div>
-                <div class="command-card" onclick="speakDemo('最新论文')">
-                    <code>"最新论文" / "看论文"</code>
-                    <div class="command-desc">转场导航至 Hugging Face 热门每日学术论文版块。</div>
-                </div>
-                <div class="command-card" onclick="speakDemo('热门项目')">
-                    <code>"热门项目" / "去热门项目"</code>
-                    <div class="command-desc">平滑切换到全球 Github 开源热门项目雷达。</div>
-                </div>
-                <div class="command-card" onclick="speakDemo('切换深色模式')">
-                    <code>"切换深色模式" / "切换浅色模式"</code>
-                    <div class="command-desc">切换网站整体背景色调（深空暗黑与经典浅灰）。</div>
-                </div>
-            </div>
+    <!-- Tab Switcher -->
+    <div class="voice-tab-header">
+        <div class="source-tabs" id="voice-primary-tabs">
+            <button class="source-tab active" data-tab="aslive">AsLive</button>
+            <button class="source-tab" data-tab="asplayer">AsPlayer</button>
         </div>
     </div>
 
+    <!-- Tab 1: AsLive -->
+    <div id="aslive-tab-content">
+        <div class="voice-dashboard">
+            <div class="voice-header">
+                <h1 class="voice-title">AsLive</h1>
+            </div>
 
+            <div class="status-badge" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">系统空闲</span>
+            </div>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
-        <div class="contact-content">
-            <p class="contact-text">如需定制化智能语音交互系统开发或有商务合作需求，请联系我们</p>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <span class="contact-label">邮箱:</span>
-                    <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+            <!-- Wave Visualizer Orb -->
+            <div class="visualizer-container">
+                <canvas class="orb-canvas" id="orb-canvas"></canvas>
+                <div class="mic-btn-wrapper">
+                    <button class="mic-btn" id="mic-btn" title="点击开始说话">
+                        <svg viewBox="0 0 24 24" id="mic-icon">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" fill="currentColor"/>
+                            <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4m-4 0h8" stroke="currentColor"/>
+                        </svg>
+                    </button>
                 </div>
-                <div class="contact-item">
-                    <span class="contact-label">微信:</span>
-                    <span class="contact-value">GitscYee</span>
+            </div>
+
+            <!-- Horizontal audio stream line -->
+            <div class="waveform-line-container">
+                <canvas class="waveform-canvas" id="waveform-canvas"></canvas>
+            </div>
+
+            <!-- Chat dialogue log & text entry -->
+            <div class="dialogue-card">
+                <div class="chat-log" id="chat-log">
+                    <div class="chat-bubble assistant">
+                        你好！我是 Asstar 语音助理。请授权麦克风并点击中心的麦克风按钮开始说话，或者使用键盘在下方输入命令。
+                    </div>
+                </div>
+                
+                <div class="input-bar">
+                    <input type="text" class="text-input" id="text-input" placeholder="输入文字命令或直接与助理沟通..." autocomplete="off">
+                    <button class="send-btn" id="send-btn">SEND</button>
+                </div>
+            </div>
+
+            <!-- Command cheat sheet -->
+            <div class="commands-section">
+                <div class="commands-title">你可以这样命令我：</div>
+                <div class="commands-grid">
+                    <div class="command-card" onclick="speakDemo('看实时新闻')">
+                        <code>"看实时新闻" / "实时新闻"</code>
+                        <div class="command-desc">转场导航至 Nova 综合前沿资讯面板，获取最新动态。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('最新论文')">
+                        <code>"最新论文" / "看论文"</code>
+                        <div class="command-desc">转场导航至 Hugging Face 热门每日学术论文版块。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('热门项目')">
+                        <code>"热门项目" / "去热门项目"</code>
+                        <div class="command-desc">平滑切换到全球 Github 开源热门项目雷达。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('跳转到工具')">
+                        <code>"跳转到工具" / "工具"</code>
+                        <div class="command-desc">拉起效率面板，平滑切换进入 Atlas 提效工具库。</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="contact-content">
+                <p class="contact-text">如需定制化智能语音交互系统开发或有商务合作需求，请联系我们</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-label">邮箱:</span>
+                        <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">微信:</span>
+                        <span class="contact-value">GitscYee</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab 2: Asplayer -->
+    <div id="asplayer-tab-content" style="display: none;">
+        <div id="asplayer-ui-layer">
+            <!-- TOP ROW -->
+            <header class="asplayer-header">
+                <div class="asplayer-track-info">
+                    <div class="asplayer-track-name" id="asplayer-track-name" style="opacity: 1;">大山.mp3</div>
+                </div>
+            </header>
+
+            <!-- BOTTOM ROW -->
+            <footer class="asplayer-footer">
+                <!-- Left: Empty for balance -->
+                <div class="asplayer-footer-left"></div>
+
+                <!-- Center: Controls -->
+                <div class="asplayer-footer-center">
+                    <label class="asplayer-upload-btn">
+                        Select Audio
+                        <input type="file" id="asplayer-audio-input" accept="audio/*">
+                    </label>
+                </div>
+
+                <!-- Right: EQ Frequency Monitor -->
+                <div class="asplayer-footer-right">
+                    <div class="asplayer-eq-container">
+                        <div class="asplayer-eq-band" data-band="sub">
+                            <span class="asplayer-eq-label">SUB</span>
+                            <div class="asplayer-eq-bar-wrapper">
+                                <div class="asplayer-eq-bar-fill"></div>
+                            </div>
+                            <span class="asplayer-eq-value">0%</span>
+                        </div>
+                        <div class="asplayer-eq-band" data-band="low">
+                            <span class="asplayer-eq-label">LOW</span>
+                            <div class="asplayer-eq-bar-wrapper">
+                                <div class="asplayer-eq-bar-fill"></div>
+                            </div>
+                            <span class="asplayer-eq-value">0%</span>
+                        </div>
+                        <div class="asplayer-eq-band" data-band="mid">
+                            <span class="asplayer-eq-label">MID</span>
+                            <div class="asplayer-eq-bar-wrapper">
+                                <div class="asplayer-eq-bar-fill"></div>
+                            </div>
+                            <span class="asplayer-eq-value">0%</span>
+                        </div>
+                        <div class="asplayer-eq-band" data-band="high">
+                            <span class="asplayer-eq-label">HIGH</span>
+                            <div class="asplayer-eq-bar-wrapper">
+                                <div class="asplayer-eq-bar-fill"></div>
+                            </div>
+                            <span class="asplayer-eq-value">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div id="asplayer-canvas-container"></div>
+        <audio id="asplayer-audio-element" src="assets/大山.mp3" loop></audio>
+    </div>
 
     <script src="js/script.js"></script>
     <script>
@@ -814,18 +1066,7 @@
             let action = null;
 
             // Direct route command parsing
-            if (text.includes('返回首页') || text.includes('返回') || text.includes('退出') || text.includes('主页')) {
-                responseText = '收到，为您打开传送门，正在返回首页。';
-                action = () => {
-                    const curtain = document.querySelector('.page-transition-curtain');
-                    document.documentElement.style.setProperty('--click-x', `${window.innerWidth / 2}px`);
-                    document.documentElement.style.setProperty('--click-y', `${window.innerHeight / 2}px`);
-                    document.body.classList.remove('page-ready');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 260); // fast transition timing
-                };
-            } else if (text.includes('论文') || text.includes('学术') || text.includes('papers')) {
+            if (text.includes('论文') || text.includes('学术') || text.includes('papers')) {
                 responseText = '正在调起粒子引擎，前往 Nova 学术论文板块。';
                 action = () => {
                     document.body.classList.remove('page-ready');
@@ -857,18 +1098,8 @@
                     document.body.classList.remove('page-ready');
                     setTimeout(() => { window.location.href = 'atlas.html'; }, 260);
                 };
-            } else if (text.includes('深色模式') || text.includes('暗黑模式')) {
-                responseText = '已为您进入低功耗宇宙黑洞深色模式。';
-                action = () => {
-                    document.body.classList.remove('light-theme');
-                };
-            } else if (text.includes('浅色模式') || text.includes('明亮模式')) {
-                responseText = '已为您开启高光谱明亮模式。';
-                action = () => {
-                    document.body.classList.add('light-theme');
-                };
             } else if (text.includes('你好') || text.includes('嗨') || text.includes('hello')) {
-                responseText = '你好！我是 Asstar 智能语音助理。我可以带你去导航到其它界面、切换深色浅色模式，或者为你介绍系统功能。';
+                responseText = '你好！我是 Asstar 智能语音助理。我可以带你去导航到其它界面、跳转到效率工具，或者为你介绍系统功能。';
             } else if (text.includes('你是谁') || text.includes('介绍自己')) {
                 responseText = '我是 Asstar 宇宙导航协议中的语音交互核心。我的任务是打破维度，通过声音来调度您的网页跳转以及控制页面视觉参数。';
             } else {
@@ -1029,9 +1260,325 @@
         animateOrb();
         animateWaveform();
 
+        // --- ASPLAYER TAB INITIALIZATION AND CONTROL ---
+        window.isAsplayerActive = false;
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('#voice-primary-tabs .source-tab');
+            const asliveContent = document.getElementById('aslive-tab-content');
+            const asplayerContent = document.getElementById('asplayer-tab-content');
 
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    
+                    const targetTab = e.currentTarget.dataset.tab;
+                    if (targetTab === 'aslive') {
+                        asliveContent.style.display = 'block';
+                        asplayerContent.style.display = 'none';
+                        window.isAsplayerActive = false;
+                        // Pause audio when switching away
+                        const asplayerAudio = document.getElementById('asplayer-audio-element');
+                        if (asplayerAudio) {
+                            asplayerAudio.pause();
+                        }
+                    } else if (targetTab === 'asplayer') {
+                        asliveContent.style.display = 'none';
+                        asplayerContent.style.display = 'block';
+                        window.isAsplayerActive = true;
+                        // Trigger resize event to let WebGL renderer adjust its viewport size
+                        window.dispatchEvent(new Event('resize'));
+                        
+                        // Automatically play the default track
+                        if (typeof window.playAsplayerDefault === 'function') {
+                            window.playAsplayerDefault();
+                        }
+                    }
+                });
+            });
+        });
 
+        // --- Asplayer (AsVox) Visualizer Script ---
+        (function () {
+            // --- 1. THREE.JS SCENE ---
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.002); // Pure black fog
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 35;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('asplayer-canvas-container').appendChild(renderer.domElement);
+
+            // Particle Sphere
+            const geometry = new THREE.SphereGeometry(12, 128, 128); 
+            const material = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            const count = geometry.attributes.position.count;
+            const colors = [];
+            const color1 = new THREE.Color(0x00f2ff);
+            const color2 = new THREE.Color(0xbd00ff);
+            const originalPositions = geometry.attributes.position.array.slice();
+
+            for (let i = 0; i < count; i++) {
+                const mixed = color1.clone().lerp(color2, Math.random());
+                colors.push(mixed.r, mixed.g, mixed.b);
+            }
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const sphere = new THREE.Points(geometry, material);
+            scene.add(sphere);
+
+            // --- 2. AUDIO & MONITOR SYSTEM ---
+            let audioContext, analyser, dataArray;
+            let isAudioInit = false;
+            const audioElement = document.getElementById('asplayer-audio-element');
+            const inputElement = document.getElementById('asplayer-audio-input');
+
+            // EQ UI Selectors
+            const eqSubFill = document.querySelector('[data-band="sub"] .asplayer-eq-bar-fill');
+            const eqLowFill = document.querySelector('[data-band="low"] .asplayer-eq-bar-fill');
+            const eqMidFill = document.querySelector('[data-band="mid"] .asplayer-eq-bar-fill');
+            const eqHighFill = document.querySelector('[data-band="high"] .asplayer-eq-bar-fill');
+
+            const eqSubVal = document.querySelector('[data-band="sub"] .asplayer-eq-value');
+            const eqLowVal = document.querySelector('[data-band="low"] .asplayer-eq-value');
+            const eqMidVal = document.querySelector('[data-band="mid"] .asplayer-eq-value');
+            const eqHighVal = document.querySelector('[data-band="high"] .asplayer-eq-value');
+
+            // Smoothed Values for 3D Sphere
+            let smoothedBass = 0;
+            let smoothedAvg = 0;
+
+            inputElement.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const nameDisplay = document.getElementById('asplayer-track-name');
+                nameDisplay.textContent = file.name;
+                nameDisplay.style.opacity = '1';
+
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256; // Smaller FFT size is enough for visualizer bars
+                    analyser.smoothingTimeConstant = 0.8; 
+
+                    const source = audioContext.createMediaElementSource(audioElement);
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    isAudioInit = true;
+                }
+
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                const objectUrl = URL.createObjectURL(file);
+                audioElement.src = objectUrl;
+                audioElement.play().then(() => {
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                }).catch(err => {
+                    console.warn("Audio play started, context check:", err);
+                });
+            });
+
+            // Exposed function to auto-play default track if not initialized
+            window.playAsplayerDefault = function() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256;
+                    analyser.smoothingTimeConstant = 0.8;
+
+                    const source = audioContext.createMediaElementSource(audioElement);
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                    
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    isAudioInit = true;
+                }
+                
+                if (audioElement.paused) {
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    audioElement.play().then(() => {
+                        if (audioContext.state === 'suspended') {
+                            audioContext.resume();
+                        }
+                    }).catch(err => {
+                        console.warn("Autoplay default audio failed:", err);
+                    });
+                }
+            };
+
+            // --- 3. HELPER FUNCTIONS ---
+            function lerp(start, end, amt) {
+                return (1 - amt) * start + amt * end;
+            }
+
+            function getAverage(arr, start, end) {
+                let sum = 0;
+                let count = 0;
+                for (let i = start; i <= end && i < arr.length; i++) {
+                    sum += arr[i];
+                    count++;
+                }
+                return count > 0 ? sum / count : 0;
+            }
+
+            // --- 4. ANIMATION LOOP ---
+            let time = 0;
+            let mouseX = 0, mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX - window.innerWidth / 2) * 0.0005;
+                mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Only run loop calculations/renders if Asplayer is active
+                if (!window.isAsplayerActive) return;
+
+                time += 0.005;
+
+                // Variables for audio data
+                let bassTarget = 0;
+                let avgTarget = 0;
+
+                if (isAudioInit) {
+                    analyser.getByteFrequencyData(dataArray);
+                    
+                    // 1. Process Data for 3D Sphere
+                    const overallSum = dataArray.reduce((a, b) => a + b, 0);
+                    avgTarget = overallSum / dataArray.length;
+                    bassTarget = dataArray[5] / 255; // Low frequency index
+
+                    // 2. Update Dynamic EQ Bands UI
+                    updateEQBands(dataArray);
+                } else {
+                    // Idle monitor/EQ animation
+                    updateIdleEQ(time);
+                }
+
+                // Smooth audio values for physics
+                smoothedBass = lerp(smoothedBass, bassTarget, 0.08); 
+                smoothedAvg = lerp(smoothedAvg, avgTarget / 255, 0.1);
+
+                // --- 3D SPHERE LOGIC (UNCHANGED) ---
+                const scaleTarget = 1 + (smoothedBass * 0.3); 
+                sphere.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), 0.05);
+
+                const positions = sphere.geometry.attributes.position.array;
+                const audioForce = smoothedAvg * 5.0; 
+
+                for (let i = 0; i < count; i++) {
+                    const px = originalPositions[i * 3];
+                    const py = originalPositions[i * 3 + 1];
+                    const pz = originalPositions[i * 3 + 2];
+
+                    let noise = Math.sin(px * 0.4 + time * 2) * 
+                                Math.cos(py * 0.3 + time * 1.5) * 
+                                Math.sin(pz * 0.4 + time * 2.5);
+
+                    const displacement = 1 + (noise * 0.1) + (noise * audioForce * 0.25);
+
+                    positions[i * 3]     = px * displacement;
+                    positions[i * 3 + 1] = py * displacement;
+                    positions[i * 3 + 2] = pz * displacement;
+                }
+                sphere.geometry.attributes.position.needsUpdate = true;
+                sphere.rotation.y += 0.001 + (smoothedAvg * 0.002); 
+                sphere.rotation.x += (mouseY - sphere.rotation.x) * 0.05;
+                sphere.rotation.y += (mouseX - sphere.rotation.y) * 0.05;
+
+                renderer.render(scene, camera);
+            }
+
+            // --- 5. EQ UPDATE LOGIC ---
+            function updateEQBands(data) {
+                // Get values for each band (0 - 255)
+                const subVal = getAverage(data, 1, 10);
+                const lowVal = getAverage(data, 11, 35);
+                const midVal = getAverage(data, 36, 80);
+                const highVal = getAverage(data, 81, 120);
+
+                // Convert to percentage
+                const subPct = Math.round((subVal / 255) * 100);
+                const lowPct = Math.round((lowVal / 255) * 100);
+                const midPct = Math.round((midVal / 255) * 100);
+                const highPct = Math.round((highVal / 255) * 100);
+
+                // Update UI elements
+                if (eqSubFill) eqSubFill.style.height = subPct + '%';
+                if (eqLowFill) eqLowFill.style.height = lowPct + '%';
+                if (eqMidFill) eqMidFill.style.height = midPct + '%';
+                if (eqHighFill) eqHighFill.style.height = highPct + '%';
+
+                if (eqSubVal) eqSubVal.textContent = subPct + '%';
+                if (eqLowVal) eqLowVal.textContent = lowPct + '%';
+                if (eqMidVal) eqMidVal.textContent = midPct + '%';
+                if (eqHighVal) eqHighVal.textContent = highPct + '%';
+            }
+
+            // Smoothed idle values for natural look
+            let idleSub = 0, idleLow = 0, idleMid = 0, idleHigh = 0;
+
+            function updateIdleEQ(t) {
+                // Generate targets (0 to 30%)
+                const subTarget = 10 + Math.sin(t * 3.5) * 8 + Math.cos(t * 1.2) * 4;
+                const lowTarget = 12 + Math.cos(t * 2.8) * 7 + Math.sin(t * 1.5) * 5;
+                const midTarget = 8 + Math.sin(t * 4.2) * 6 + Math.cos(t * 2.1) * 3;
+                const highTarget = 6 + Math.cos(t * 5.0) * 5 + Math.sin(t * 2.5) * 2;
+
+                // Smooth targets using lerp
+                idleSub = lerp(idleSub, subTarget, 0.1);
+                idleLow = lerp(idleLow, lowTarget, 0.1);
+                idleMid = lerp(idleMid, midTarget, 0.1);
+                idleHigh = lerp(idleHigh, highTarget, 0.1);
+
+                const subPct = Math.round(Math.max(0, idleSub));
+                const lowPct = Math.round(Math.max(0, idleLow));
+                const midPct = Math.round(Math.max(0, idleMid));
+                const highPct = Math.round(Math.max(0, idleHigh));
+
+                if (eqSubFill) eqSubFill.style.height = subPct + '%';
+                if (eqLowFill) eqLowFill.style.height = lowPct + '%';
+                if (eqMidFill) eqMidFill.style.height = midPct + '%';
+                if (eqHighFill) eqHighFill.style.height = highPct + '%';
+
+                if (eqSubVal) eqSubVal.textContent = subPct + '%';
+                if (eqLowVal) eqLowVal.textContent = lowPct + '%';
+                if (eqMidVal) eqMidVal.textContent = midPct + '%';
+                if (eqHighVal) eqHighVal.textContent = highPct + '%';
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        })();
     </script>
 </body>
 </html>
