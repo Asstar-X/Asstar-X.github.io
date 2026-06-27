@@ -24,14 +24,14 @@ window.injectSharedComponents = function() {
             if (savedAlien) {
                 alienNum = parseInt(savedAlien, 10);
             } else {
-                alienNum = Math.floor(Math.random() * 5) + 18; // fallback
+                alienNum = Math.floor(Math.random() * 8) + 18; // fallback (18-25)
             }
             sessionStorage.removeItem('transition-alien'); // Clean up
             
             curtain.className = 'page-transition-curtain init-covering';
         } else {
-            // Direct entry: select random alien image (18-22)
-            alienNum = Math.floor(Math.random() * 5) + 18;
+            // Direct entry: select random alien image (18-25)
+            alienNum = Math.floor(Math.random() * 8) + 18;
             curtain.className = 'page-transition-curtain init-covering';
         }
         
@@ -275,8 +275,8 @@ window.injectSharedComponents = function() {
                 document.documentElement.style.setProperty('--click-x', `${clickX}px`);
                 document.documentElement.style.setProperty('--click-y', `${clickY}px`);
                 
-                // Choose a random alien number (18-22) for the outbound transition
-                const randomAlien = Math.floor(Math.random() * 5) + 18;
+                // Choose a random alien number (18-25) for the outbound transition
+                const randomAlien = Math.floor(Math.random() * 8) + 18;
                 
                 // Save coordinates and chosen alien for the next page load transition
                 sessionStorage.setItem('page-transitioning', 'true');
