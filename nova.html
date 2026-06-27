@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="js/utils.js"></script>
+    <script>window.initGA();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
+         crossorigin="anonymous"></script>
+    
+    <title>Nova - Asstar</title>
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&family=PingFang+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
+    <!-- Sprite Chat Styles -->
+    <link rel="stylesheet" href="css/sprite-chat.css">
+    
+    <style>
+
+        /* Nova specific card style overrides */
+        .repo-description, .model-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .repo-stats, .model-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stat-item i {
+            color: #ffffff;
+        }
+
+        .repo-languages, .model-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .language-tag, .tag {
+            padding: 4px 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #ffffff;
+        }
+
+        .paper-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        }
+
+        .paper-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+        }
+
+        .paper-abstract {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body class="reading-mode">
+    <!-- Components injected by js/components.js -->
+    <script src="js/components.js"></script>
+
+
+
+    <main>
+        <section class="trending-container">
+            <div class="container">
+                <div class="trending-header">
+                    
+                    <!-- Primary Category Tab -->
+                    <div class="source-tabs" id="nova-primary-tabs" style="margin-bottom: 32px;">
+                        <button class="source-tab" data-tab="projects">前沿项目</button>
+                        <button class="source-tab" data-tab="papers">前沿论文</button>
+                        <button class="source-tab" data-tab="focus">焦点新闻</button>
+                    </div>
+
+                    <!-- Dynamic Controls and Filters -->
+                    <div id="nova-secondary-controls">
+                        <!-- Sub filters are dynamically injected depending on active tab -->
+                    </div>
+
+                    <p class="trending-subtitle" id="last-updated" style="margin-top: 16px; margin-bottom: 12px;">数据同步中...</p>
+                </div>
+
+                <!-- Card Grid Content -->
+                <div id="nova-content">
+                    <!-- Cards will be dynamically injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="sprite-container" data-context="nova"></div>
+    <script src="js/script.js" defer></script>
+    <script src="js/config.js" defer></script>
+    <script src="js/sprite-chat.js" defer></script>
+    <script>
+        (function () {
+            class NovaApp {
+                constructor() {
+                    this.activeTab = 'projects'; // 'projects' | 'papers' | 'focus'
+                    
+                    // Projects state
+                    this.projectSource = 'github'; // 'github' | 'huggingface' | 'interest'
+                    this.projectPeriod = 'daily'; // github: daily | weekly | monthly
+                    this.projectCategory = 'trending'; // hf: trending | likes | downloads
+                    this.projectInterestCat = 'voice'; // interest: voice | multimodal | vision
+                    this.projectInterestSubCat = 'text-to-speech';
+                    this.projectSubCategories = {
+                        voice: ['text-to-speech', 'automatic-speech-recognition', 'text-to-audio', 'voice-activity-detection', 'audio-to-audio', 'audio-classification'],
+                        multimodal: ['audio-text-to-text', 'image-text-to-video', 'image-text-to-image', 'image-text-to-text', 'visual-question-answering', 'document-question-answering'],
+                        vision: ['image-classification', 'object-detection', 'image-segmentation', 'zero-shot-image-classification', 'zero-shot-object-detection', 'image-feature-extraction']
+                    };
+
+                    // Papers state
+                    this.paperCategory = 'daily'; // daily | weekly | monthly | trending
+
+                    // Focus state
+                    this.focusCategory = 'finance'; // finance | tech | ai
+
+                    // Data caches
+                    this.githubData = [];
+                    this.hfData = [];
+                    this.interestData = {};
+                    this.papersData = [];
+                    this.focusData = [];
+
+                    this.init();
+                }
+
+                init() {
+                    window.initEntranceAnimation();
+                    this.parseUrlParams();
+                    this.bindPrimaryTabs();
+                    this.renderActiveTab();
+                    
+                    // Auto refresh every 6 hours
+                    setInterval(() => this.loadActiveTabData(true), 6 * 60 * 60 * 1000);
+                }
+
+                parseUrlParams() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const tabParam = urlParams.get('tab');
+                    if (tabParam && ['projects', 'papers', 'focus'].includes(tabParam)) {
+                        this.activeTab = tabParam;
+                    } else if (window.location.hash) {
+                        const hash = window.location.hash.substring(1);
+                        if (['projects', 'papers', 'focus'].includes(hash)) {
+                            this.activeTab = hash;
+                        }
+                    }
+                }
+
+                bindPrimaryTabs() {
+                    const tabs = document.querySelectorAll('#nova-primary-tabs .source-tab');
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', (e) => {
+                            tabs.forEach(t => t.classList.remove('active'));
+                            e.currentTarget.classList.add('active');
+                            this.activeTab = e.currentTarget.dataset.tab;
+                            
+                            // Update URL hash
+                            history.replaceState(null, '', `#${this.activeTab}`);
+                            
+                            this.renderActiveTab();
+                        });
+                    });
+
+                    // Set initial active tab
+                    tabs.forEach(tab => {
+                        if (tab.dataset.tab === this.activeTab) {
+                            tab.classList.add('active');
+                        } else {
+                            tab.classList.remove('active');
+                        }
+                    });
+                }
+
+                renderActiveTab() {
+                    this.renderSecondaryControls();
+                    this.loadActiveTabData();
+                }
+
+                renderSecondaryControls() {
+                    const controls = document.getElementById('nova-secondary-controls');
+                    if (!controls) return;
+                    controls.innerHTML = '';
+
+                    if (this.activeTab === 'projects') {
+                        // Render Project source tabs (GitHub, HuggingFace, Interest)
+                        const sourceTabsWrapper = document.createElement('div');
+                        sourceTabsWrapper.className = 'source-tabs';
+                        sourceTabsWrapper.style.marginBottom = '16px';
+                        sourceTabsWrapper.innerHTML = `
+                            <button class="source-tab ${this.projectSource === 'github' ? 'active' : ''}" data-source="github">GitHub</button>
+                            <button class="source-tab ${this.projectSource === 'huggingface' ? 'active' : ''}" data-source="huggingface">HuggingFace</button>
+                            <button class="source-tab ${this.projectSource === 'interest' ? 'active' : ''}" data-source="interest">Interest</button>
+                        `;
+                        controls.appendChild(sourceTabsWrapper);
+
+                        sourceTabsWrapper.querySelectorAll('.source-tab').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                sourceTabsWrapper.querySelectorAll('.source-tab').forEach(b => b.classList.remove('active'));
+                                e.currentTarget.classList.add('active');
+                                this.projectSource = e.currentTarget.dataset.source;
+                                this.renderActiveTab();
+                            });
+                        });
+
+                        // Render sub-filters
+                        const filterWrapper = document.createElement('div');
+                        filterWrapper.className = 'category-filter';
+                        
+                        if (this.projectSource === 'github') {
+                            filterWrapper.innerHTML = `
+                                <button class="category-btn ${this.projectPeriod === 'daily' ? 'active' : ''}" data-period="daily">今日</button>
+                                <button class="category-btn ${this.projectPeriod === 'weekly' ? 'active' : ''}" data-period="weekly">本周</button>
+                                <button class="category-btn ${this.projectPeriod === 'monthly' ? 'active' : ''}" data-period="monthly">本月</button>
+                            `;
+                            filterWrapper.querySelectorAll('.category-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    filterWrapper.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                                    e.currentTarget.classList.add('active');
+                                    this.projectPeriod = e.currentTarget.dataset.period;
+                                    this.loadActiveTabData();
+                                });
+                            });
+                            controls.appendChild(filterWrapper);
+                        } else if (this.projectSource === 'huggingface') {
+                            filterWrapper.innerHTML = `
+                                <button class="category-btn ${this.projectCategory === 'trending' ? 'active' : ''}" data-category="trending">Trending</button>
+                                <button class="category-btn ${this.projectCategory === 'likes' ? 'active' : ''}" data-category="likes">Most Likes</button>
+                                <button class="category-btn ${this.projectCategory === 'downloads' ? 'active' : ''}" data-category="downloads">Most Downloads</button>
+                            `;
+                            filterWrapper.querySelectorAll('.category-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    filterWrapper.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                                    e.currentTarget.classList.add('active');
+                                    this.projectCategory = e.currentTarget.dataset.category;
+                                    this.loadActiveTabData();
+                                });
+                            });
+                            controls.appendChild(filterWrapper);
+                        } else if (this.projectSource === 'interest') {
+                            filterWrapper.className = 'category-filter interest-main-filter';
+                            filterWrapper.style.marginBottom = '12px';
+                            filterWrapper.innerHTML = `
+                                <button class="category-btn ${this.projectInterestCat === 'voice' ? 'active' : ''}" data-cat="voice">语音</button>
+                                <button class="category-btn ${this.projectInterestCat === 'multimodal' ? 'active' : ''}" data-cat="multimodal">多模态</button>
+                                <button class="category-btn ${this.projectInterestCat === 'vision' ? 'active' : ''}" data-cat="vision">视觉</button>
+                            `;
+                            controls.appendChild(filterWrapper);
+
+                            filterWrapper.querySelectorAll('.category-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    this.projectInterestCat = e.currentTarget.dataset.cat;
+                                    this.projectInterestSubCat = this.projectSubCategories[this.projectInterestCat][0];
+                                    this.renderActiveTab();
+                                });
+                            });
+
+                            const subFilterWrapper = document.createElement('div');
+                            subFilterWrapper.className = 'category-filter interest-sub-filter';
+                            subFilterWrapper.style.display = 'flex';
+                            subFilterWrapper.style.flexWrap = 'wrap';
+                            subFilterWrapper.style.justifyContent = 'center';
+                            subFilterWrapper.style.gap = '8px';
+                            
+                            const subs = this.projectSubCategories[this.projectInterestCat] || [];
+                            subs.forEach(sub => {
+                                subFilterWrapper.innerHTML += `
+                                    <button class="category-btn sub-btn ${this.projectInterestSubCat === sub ? 'active' : ''}" 
+                                            data-subcat="${sub}" 
+                                            style="font-size: 0.85rem; padding: 6px 14px; border-radius: 20px;">
+                                        ${sub.replace(/-/g, ' ')}
+                                    </button>`;
+                            });
+                            controls.appendChild(subFilterWrapper);
+
+                            subFilterWrapper.querySelectorAll('.sub-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    subFilterWrapper.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+                                    e.currentTarget.classList.add('active');
+                                    this.projectInterestSubCat = e.currentTarget.dataset.subcat;
+                                    this.renderInterestGrid();
+                                });
+                            });
+                        }
+                    } else if (this.activeTab === 'papers') {
+                        const filterWrapper = document.createElement('div');
+                        filterWrapper.className = 'category-filter';
+                        filterWrapper.innerHTML = `
+                            <button class="category-btn ${this.paperCategory === 'daily' ? 'active' : ''}" data-category="daily">Daily</button>
+                            <button class="category-btn ${this.paperCategory === 'weekly' ? 'active' : ''}" data-category="weekly">Weekly</button>
+                            <button class="category-btn ${this.paperCategory === 'monthly' ? 'active' : ''}" data-category="monthly">Monthly</button>
+                            <button class="category-btn ${this.paperCategory === 'trending' ? 'active' : ''}" data-category="trending">Trending</button>
+                        `;
+                        filterWrapper.querySelectorAll('.category-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                filterWrapper.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                                e.currentTarget.classList.add('active');
+                                this.paperCategory = e.currentTarget.dataset.category;
+                                this.loadActiveTabData();
+                            });
+                        });
+                        controls.appendChild(filterWrapper);
+                    } else if (this.activeTab === 'focus') {
+                        const filterWrapper = document.createElement('div');
+                        filterWrapper.className = 'category-filter';
+                        filterWrapper.innerHTML = `
+                            <button class="category-btn ${this.focusCategory === 'finance' ? 'active' : ''}" data-category="finance">财经</button>
+                            <button class="category-btn ${this.focusCategory === 'tech' ? 'active' : ''}" data-category="tech">科技</button>
+                            <button class="category-btn ${this.focusCategory === 'ai' ? 'active' : ''}" data-category="ai">AI</button>
+                        `;
+                        filterWrapper.querySelectorAll('.category-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                filterWrapper.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                                e.currentTarget.classList.add('active');
+                                this.focusCategory = e.currentTarget.dataset.category;
+                                this.loadActiveTabData();
+                            });
+                        });
+                        controls.appendChild(filterWrapper);
+                    }
+                }
+
+                async loadActiveTabData(forceFetch = false) {
+                    const container = document.getElementById('nova-content');
+                    const timeEl = document.getElementById('last-updated');
+                    if (!container) return;
+
+                    let url = '';
+                    let cacheKey = '';
+                    let renderFn = () => {};
+
+                    if (this.activeTab === 'projects') {
+                        cacheKey = `asstar_cache_project_${this.projectSource}`;
+                        if (this.projectSource === 'github') {
+                            url = 'feeds/trending-data.json';
+                            renderFn = (data) => {
+                                this.githubData = data[this.projectPeriod] || [];
+                                this.renderGithubGrid();
+                            };
+                        } else if (this.projectSource === 'huggingface') {
+                            url = 'feeds/huggingface-data.json';
+                            renderFn = (data) => {
+                                this.hfData = data[this.projectCategory] || [];
+                                this.renderHuggingFaceGrid();
+                            };
+                        } else if (this.projectSource === 'interest') {
+                            url = 'feeds/huggingface-interest-data.json';
+                            renderFn = (data) => {
+                                this.interestData = data[this.projectInterestCat] || {};
+                                this.renderInterestGrid();
+                            };
+                        }
+                    } else if (this.activeTab === 'papers') {
+                        url = 'feeds/huggingface-papers-data.json';
+                        cacheKey = 'asstar_cache_papers';
+                        renderFn = (data) => {
+                            this.papersData = data[this.paperCategory] || [];
+                            this.renderPapersGrid();
+                        };
+                    } else if (this.activeTab === 'focus') {
+                        url = 'feeds/realtime-focus.json';
+                        cacheKey = 'asstar_cache_focus';
+                        renderFn = (data) => {
+                            // JSON structure: data.categories[category].sections[sourceName][{section, items[]}]
+                            const catData = (data.categories || data)[this.focusCategory];
+                            if (!catData) { this.focusData = []; this.renderFocusGrid(); return; }
+                            const sections = catData.sections || {};
+                            const flat = [];
+                            Object.entries(sections).forEach(([sourceName, sectionList]) => {
+                                (sectionList || []).forEach(sectionObj => {
+                                    (sectionObj.items || []).forEach(item => {
+                                        flat.push({
+                                            title: item.title,
+                                            url: item.url,
+                                            source: sourceName,
+                                            section: sectionObj.section || '',
+                                            extra: item.extra || '',
+                                            rank: item.rank || ''
+                                        });
+                                    });
+                                });
+                            });
+                            this.focusData = flat;
+                            this.renderFocusGrid();
+                        };
+                    }
+
+                    if (!localStorage.getItem(cacheKey) || forceFetch) {
+                        container.innerHTML = window.generateSkeleton(this.activeTab === 'papers' ? 4 : 6);
+                    }
+
+                    try {
+                        await window.fetchWithSWR(url, cacheKey, renderFn, timeEl, 'lastUpdated');
+                    } catch (err) {
+                        console.error(`Nova load data error [${this.activeTab}]:`, err);
+                        this.showErrorMsg(container);
+                    }
+                }
+
+                renderGithubGrid() {
+                    const container = document.getElementById('nova-content');
+                    if (!this.githubData || this.githubData.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    this.githubData.forEach(repo => grid.appendChild(this.createGithubCard(repo)));
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                renderHuggingFaceGrid() {
+                    const container = document.getElementById('nova-content');
+                    if (!this.hfData || this.hfData.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    this.hfData.forEach(model => grid.appendChild(this.createHuggingFaceCard(model)));
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                renderInterestGrid() {
+                    const container = document.getElementById('nova-content');
+                    if (!this.interestData || Object.keys(this.interestData).length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    
+                    const models = this.interestData[this.projectInterestSubCat] || [];
+                    if (models.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    models.forEach(model => grid.appendChild(this.createHuggingFaceCard(model)));
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                renderPapersGrid() {
+                    const container = document.getElementById('nova-content');
+                    if (!this.papersData || this.papersData.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    this.papersData.forEach(paper => grid.appendChild(this.createPaperCard(paper)));
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                renderFocusGrid() {
+                    const container = document.getElementById('nova-content');
+                    if (!this.focusData || this.focusData.length === 0) {
+                        container.innerHTML = this.emptyHtml();
+                        return;
+                    }
+                    const grid = document.createElement('div');
+                    grid.className = 'trending-grid';
+                    this.focusData.slice(0, 90).forEach(item => grid.appendChild(this.createFocusCard(item)));
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                    window.animateCards(grid);
+                }
+
+                createGithubCard(repo) {
+                    const card = document.createElement('div');
+                    card.className = 'trending-card';
+                    const languages = repo.language ? [repo.language] : [];
+                    card.innerHTML = `
+                        <div class="trending-card-content">
+                            <div class="repo-header">
+                                <div class="repo-icon">📦</div>
+                                <div class="repo-info">
+                                    <h3>${repo.name}</h3>
+                                    <p>${Array.isArray(repo.builtBy) ? `Built by ${repo.builtBy.slice(0, 3).join(', ')}${repo.builtBy.length > 3 ? ' and others' : ''}` : ''}</p>
+                                </div>
+                            </div>
+                            <p class="repo-description">${repo.description || ''}</p>
+                            <div class="repo-stats">
+                                <div class="stat-item"><i>⭐</i><span>${repo.stars || ''}</span></div>
+                                <div class="stat-item"><i>🔄</i><span>${repo.forks || ''}</span></div>
+                                <div class="stat-item"><i>🚀</i><span>${repo.starsToday ? `${repo.starsToday} today` : ''}</span></div>
+                            </div>
+                            ${languages.length ? `<div class="repo-languages">${languages.map(l => `<span class="language-tag">${l}</span>`).join('')}</div>` : ''}
+                            <a href="${repo.url}" target="_blank" class="repo-link">查看项目 <span>→</span></a>
+                        </div>
+                    `;
+                    this.addCardHoverEffect(card);
+                    return card;
+                }
+
+                createHuggingFaceCard(model) {
+                    const card = document.createElement('div');
+                    card.className = 'trending-card';
+                    const tags = model.tags || [];
+                    card.innerHTML = `
+                        <div class="trending-card-content">
+                            <div class="model-header">
+                                <div class="model-icon">🤖</div>
+                                <div class="model-info">
+                                    <h3>${model.name}</h3>
+                                    <p>${model.task || ''} • ${model.parameters || ''}</p>
+                                </div>
+                            </div>
+                            <p class="model-description">${model.description || ''}</p>
+                            <div class="model-stats">
+                                <div class="stat-item"><i>❤️</i><span>${model.likes || ''}</span></div>
+                                <div class="stat-item"><i>⬇️</i><span>${model.downloads || ''}</span></div>
+                                <div class="stat-item"><i>📊</i><span>${model.parameters || ''}</span></div>
+                            </div>
+                            ${tags.length ? `<div class="model-tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                            <a href="${model.url}" target="_blank" class="model-link">查看模型 <span>→</span></a>
+                        </div>
+                    `;
+                    this.addCardHoverEffect(card);
+                    return card;
+                }
+
+                createPaperCard(paper) {
+                    const card = document.createElement('div');
+                    card.className = 'trending-card';
+                    const tags = Array.isArray(paper.tags) ? paper.tags : [];
+                    card.innerHTML = `
+                        <div class="trending-card-content">
+                            <div class="paper-title">${paper.title}</div>
+                            <div class="paper-meta">${paper.authors || 'Unknown authors'}</div>
+                            <p class="paper-abstract">${paper.abstract || 'No abstract available.'}</p>
+                            ${tags.length ? `<div class="model-tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                            <a href="${paper.url}" target="_blank" class="model-link">查看论文 <span>→</span></a>
+                        </div>
+                    `;
+                    this.addCardHoverEffect(card);
+                    return card;
+                }
+
+                createFocusCard(item) {
+                    const card = document.createElement('div');
+                    card.className = 'trending-card';
+                    const subtitle = [item.source, item.section].filter(Boolean).join(' · ');
+                    const rankLabel = item.rank ? `#${item.rank} ` : '';
+                    card.innerHTML = `
+                        <div class="trending-card-content">
+                            <div class="model-header">
+                                <div class="model-icon">📰</div>
+                                <div class="model-info">
+                                    <h3>${rankLabel}${window.escapeHtml(item.title)}</h3>
+                                    <p>${window.escapeHtml(subtitle)}</p>
+                                </div>
+                            </div>
+                            ${item.extra ? `<p class="repo-description" style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin:6px 0;">${window.escapeHtml(item.extra)}</p>` : ''}
+                            <a href="${item.url}" target="_blank" class="model-link">查看详情 <span>→</span></a>
+                        </div>
+                    `;
+                    this.addCardHoverEffect(card);
+                    return card;
+                }
+
+                addCardHoverEffect(card) {
+                    card.addEventListener('mouseover', () => {
+                        card.style.transform = 'translateY(-5px) scale(1.02)';
+                    });
+                    card.addEventListener('mouseout', () => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                    });
+                }
+
+                showErrorMsg(container) {
+                    container.innerHTML = `
+                        <div class="error-message">
+                            <p>加载数据时出现错误</p>
+                            <button class="refresh-btn" id="nova-refresh-btn">重新加载</button>
+                        </div>
+                    `;
+                    const btn = document.getElementById('nova-refresh-btn');
+                    if (btn) btn.addEventListener('click', () => this.loadActiveTabData());
+                }
+
+                emptyHtml() {
+                    return `
+                        <div class="error-message">
+                            <p>暂无数据</p>
+                            <button class="refresh-btn" id="nova-empty-btn">重新加载</button>
+                        </div>
+                    `;
+                }
+            }
+
+            function initNova() {
+                new NovaApp();
+                if (window.SpriteChatManager) {
+                    window.spriteChatManager = new window.SpriteChatManager();
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initNova);
+            } else {
+                initNova();
+            }
+        })();
+    </script>
+</body>
+
+</html>
