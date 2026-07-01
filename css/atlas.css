@@ -41,49 +41,18 @@
     max-width: 960px;
     display: flex;
     gap: 12px;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     position: relative;
     z-index: 10;
 }
 
-.source-toggle {
-    display: inline-flex;
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.source-toggle button {
-    padding: 8px 16px;
-    background: transparent;
-    color: var(--text-secondary);
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-}
-
-.source-toggle button:hover {
-    color: #fff;
-}
-
-.source-toggle button.active {
-    background: #ffffff;
-    color: #000000;
-    font-weight: 500;
-}
-
-/* Tool Card Overrides - Removed for consistency as requested */
-/* .trending-card[data-source="local"] { ... } */
-
 /* Response for Mobile */
 @media (max-width: 768px) {
     .filters {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
     }
     
     .category-tabs {

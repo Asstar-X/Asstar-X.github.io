@@ -3,7 +3,6 @@
  * Handles filtering and search
  */
 
-let currentSource = 'all';
 let currentCategory = 'all';
 
 // --- Filtering Functions ---
@@ -18,10 +17,17 @@ function filterTools(value) {
         const cat = card.getAttribute('data-category') || 'other';
         
         const matchSearch = query ? text.includes(query) : true;
-        const matchSrc = currentSource === 'all' ? true : (src === currentSource);
-        const matchCat = currentCategory === 'all' ? true : (cat === currentCategory);
         
-        if (matchSearch && matchSrc && matchCat) {
+        let matchCat = false;
+        if (currentCategory === 'all') {
+            matchCat = true;
+        } else if (currentCategory === 'local') {
+            matchCat = (src === 'local');
+        } else {
+            matchCat = (cat === currentCategory);
+        }
+        
+        if (matchSearch && matchCat) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
@@ -38,14 +44,6 @@ function filterTools(value) {
 function setCategory(cat, el) {
     currentCategory = cat;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    if (el) el.classList.add('active');
-    const input = document.querySelector('.tools-input');
-    filterTools(input ? input.value : '');
-}
-
-function setSource(src, el) {
-    currentSource = src;
-    document.querySelectorAll('.source-toggle button').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
     const input = document.querySelector('.tools-input');
     filterTools(input ? input.value : '');

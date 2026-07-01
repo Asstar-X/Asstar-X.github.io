@@ -46,28 +46,26 @@
                     <div class="filters">
                         <div class="category-tabs" role="tablist" aria-label="类别筛选">
                             <button class="tab active" onclick="setCategory('all', this)">全部</button>
+                            <button class="tab" onclick="setCategory('local', this)">自研</button>
                             <button class="tab" onclick="setCategory('vision', this)">图像</button>
                             <button class="tab" onclick="setCategory('audio', this)">音频</button>
-                            <button class="tab" onclick="setCategory('nlp', this)">文本</button>
-                            <button class="tab" onclick="setCategory('code', this)">代码</button>
-                        </div>
-                        <div class="source-toggle" role="tablist" aria-label="来源筛选">
-                            <button class="active" onclick="setSource('all', this)">全部</button>
-                            <button onclick="setSource('local', this)">自研</button>
-                            <button onclick="setSource('external', this)">精选</button>
+                            <button class="tab" onclick="setCategory('nlp', this)">办公</button>
+                            <button class="tab" onclick="setCategory('code', this)">Token</button>
+                            <button class="tab" onclick="setCategory('design', this)">设计</button>
+                            <button class="tab" onclick="setCategory('network', this)">网络</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="tools-section">
                     <div class="trending-grid" id="tools-grid">
-                        <div class="trending-card" data-source="local" data-category="nlp">
+                        <div class="trending-card" data-source="local" data-category="code">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">🔓</div>
                                     <div class="model-info">
                                         <h3>Prompt越狱</h3>
-                                        <p>文本 • 自研</p>
+                                        <p>Token • 自研</p>
                                     </div>
                                 </div>
                                 <p class="model-description">专注于大语言模型提示词攻防与提示词越狱研究的开源项目。</p>
@@ -75,17 +73,31 @@
                             </div>
                         </div>
 
-                        <div class="trending-card" data-source="local" data-category="nlp">
+                        <div class="trending-card" data-source="local" data-category="code">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">📝</div>
                                     <div class="model-info">
                                         <h3>Paper Reviewer Skills</h3>
-                                        <p>文本 • 自研</p>
+                                        <p>Token • 自研</p>
                                     </div>
                                 </div>
                                 <p class="model-description">提取学术论文核心要义，自动生成技术博客与工程总结报告，支持图表和公式解析。</p>
                                 <a href="https://github.com/Asstar-X/paper-reviewer-skills" target="_blank" class="model-link">查看项目 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="local" data-category="code">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📜</div>
+                                    <div class="model-info">
+                                        <h3>Karpathy Coding Guidelines</h3>
+                                        <p>Token • 自研</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">灵感来源于 Andrej Karpathy 的编码规范指南，旨在减少 LLM 过度工程，提升代码正确性与可验证性。</p>
+                                <a href="https://github.com/Asstar-X/karpathy-coding-guidelines/blob/main/README_ZH.md" target="_blank" class="model-link">查看项目 <span>→</span></a>
                             </div>
                         </div>
 
@@ -263,7 +275,7 @@
                                     <div class="model-icon">📄</div>
                                     <div class="model-info">
                                         <h3>PDF转Word</h3>
-                                        <p>文本 • PDF</p>
+                                        <p>办公 • PDF</p>
                                     </div>
                                 </div>
                                 <p class="model-description">支持PDF转Word、Excel、PPT等格式文档互转。</p>
@@ -277,7 +289,7 @@
                                     <div class="model-icon">✂️</div>
                                     <div class="model-info">
                                         <h3>拆分PDF</h3>
-                                        <p>文本 • PDF</p>
+                                        <p>办公 • PDF</p>
                                     </div>
                                 </div>
                                 <p class="model-description">将PDF文件拆分为多个文件或提取特定页面。</p>
@@ -327,13 +339,13 @@
                             </div>
                         </div>
 
-                        <div class="trending-card" data-source="external" data-category="nlp">
+                        <div class="trending-card" data-source="external" data-category="code">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">🔢</div>
                                     <div class="model-info">
                                         <h3>Token计算</h3>
-                                        <p>文本 • 计算</p>
+                                        <p>Token • 计算</p>
                                     </div>
                                 </div>
                                 <p class="model-description">OpenAI 官方 Token 计算工具，精确计算文本数量。</p>
@@ -355,7 +367,7 @@
                             </div>
                         </div>
 
-                        <div class="trending-card" data-source="external" data-category="code">
+                        <div class="trending-card" data-source="external" data-category="network">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">🌐</div>
@@ -369,7 +381,7 @@
                             </div>
                         </div>
 
-                        <div class="trending-card" data-source="external" data-category="code">
+                        <div class="trending-card" data-source="external" data-category="network">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">🐦</div>
@@ -383,7 +395,7 @@
                             </div>
                         </div>
 
-                        <div class="trending-card" data-source="external" data-category="code">
+                        <div class="trending-card" data-source="external" data-category="network">
                             <div class="trending-card-content">
                                 <div class="model-header">
                                     <div class="model-icon">📡</div>
@@ -394,6 +406,34 @@
                                 </div>
                                 <p class="model-description">专业的网络与VPN质量分析工具，提供详尽的全球出口IP属性和欺诈值评估。</p>
                                 <a href="https://ping0.cc/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="design">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">🎬</div>
+                                    <div class="model-info">
+                                        <h3>Motion Sites</h3>
+                                        <p>设计 • 动效</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">汇集全球顶级动效设计与创意网页的灵感画廊。</p>
+                                <a href="https://motionsites.ai/" target="_blank" class="model-link">访问工具 <span>→</span></a>
+                            </div>
+                        </div>
+
+                        <div class="trending-card" data-source="external" data-category="design">
+                            <div class="trending-card-content">
+                                <div class="model-header">
+                                    <div class="model-icon">📌</div>
+                                    <div class="model-info">
+                                        <h3>Pinterest</h3>
+                                        <p>设计 • 创意</p>
+                                    </div>
+                                </div>
+                                <p class="model-description">全球知名的视觉创意、设计画板与设计灵感发现平台。</p>
+                                <a href="https://www.pinterest.com/" target="_blank" class="model-link">访问工具 <span>→</span></a>
                             </div>
                         </div>
                     </div>
