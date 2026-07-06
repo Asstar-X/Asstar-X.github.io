@@ -257,8 +257,8 @@ class TophubScraper(BaseScraper):
     def run(self):
         specs = {
             'finance': [
-                {'url': 'https://tophub.today/c/finance', 'targets': ['第一财经', '雪球', '华尔街见闻', '集思录']},
-                {'url': 'https://tophub.today/c/finance?&p=3', 'targets': ['格隆汇', '金融界', '慧博投研资讯', '英为财情', '证券日报网', '美股市值']},
+                {'url': 'https://tophub.today/c/finance', 'targets': ['雪球', '华尔街见闻', '集思录']},
+                {'url': 'https://tophub.today/c/finance?&p=3', 'targets': ['格隆汇', '金融界', '慧博投研资讯', '证券日报网', '美股市值']},
                 {'url': 'https://tophub.today/c/finance?&p=4', 'targets': ['同花顺财经']}
             ],
             'tech': [
@@ -268,7 +268,7 @@ class TophubScraper(BaseScraper):
             ],
             'ai': [
                 {'url': 'https://tophub.today/c/ai', 'targets': ['AIbase', 'AI工具集']},
-                {'url': 'https://tophub.today/c/ai?&p=2', 'targets': ['AIHub', 'Hugging Face']}
+                {'url': 'https://tophub.today/c/ai?&p=2', 'targets': ['AIHub']}
             ]
         }
         output = {'savedAt': datetime.now(timezone.utc).isoformat(), 'categories': {}}
@@ -336,6 +336,37 @@ class TophubScraper(BaseScraper):
                   .setdefault('sections', {})['东方财富网'] = [{'section': '焦点要闻', 'items': em_items}]
         except Exception as e:
             print(f"  Warning: EastMoney failed: {e}")
+
+        # AI精选 Integration
+        try:
+            print("Fetching AI精选 (RSS)...")
+            feed_xml = self.get('https://aihot.virxact.com/feed.xml')
+            feed_soup = BeautifulSoup(feed_xml, 'xml')
+            ai_items = []
+            for item in feed_soup.find_all('item')[:30]:
+                title = item.find('title')
+                link = item.find('link')
+                desc = item.find('description')
+                
+                title_txt = title.get_text(strip=True) if title else ''
+                link_txt = link.get_text(strip=True) if link else ''
+                desc_txt = desc.get_text(strip=True) if desc else ''
+                
+                if title_txt and link_txt:
+                    clean_desc = BeautifulSoup(desc_txt, 'lxml').get_text(strip=True) if desc_txt else ''
+                    if len(clean_desc) > 100:
+                        clean_desc = clean_desc[:97] + '...'
+                    
+                    ai_items.append({
+                        'rank': '',
+                        'title': title_txt,
+                        'extra': clean_desc,
+                        'url': link_txt
+                    })
+            output['categories'].setdefault('ai', {}) \
+                  .setdefault('sections', {})['AI精选'] = [{'section': '最新精选', 'items': ai_items}]
+        except Exception as e:
+            print(f"  Warning: AI精选 failed: {e}")
 
         with open(get_output_path('realtime-focus.json'), 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
