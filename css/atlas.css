@@ -1,0 +1,63 @@
+/* Tools Page Specific Styles */
+
+.tools-header > *:not(script) {
+    opacity: 0;
+}
+
+.tools-search {
+    margin: 30px auto 0;
+    max-width: 720px;
+    position: relative;
+    z-index: 10;
+}
+
+.tools-input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    outline: none;
+    transition: all .2s ease;
+}
+
+.tools-input:focus {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.tools-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.filters {
+    margin: 24px auto 0;
+    max-width: 960px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 10;
+}
+
+/* Response for Mobile */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .category-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+}

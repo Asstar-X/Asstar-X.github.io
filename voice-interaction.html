@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Shared Utils & Components -->
+    <script src="js/utils.js"></script>
+    <script>window.initGA();</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
+         crossorigin="anonymous"></script>
+    
+    <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@300;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <link rel="stylesheet" href="css/sprite-chat.css">
+    
+    <link rel="stylesheet" href="css/voice-interaction.css">
+</head>
+
+<body>
+    <!-- Shared Components Loader -->
+    <script src="js/components.js"></script>
+
+    <!-- Tab Switcher -->
+    <div class="voice-tab-header">
+        <div class="source-tabs" id="voice-primary-tabs">
+            <button class="source-tab active" data-tab="aslive">AsLive</button>
+            <button class="source-tab" data-tab="asplayer">AsPlayer</button>
+        </div>
+    </div>
+
+    <!-- Persistent Header Track Info (Top-Right) -->
+    <div class="asplayer-track-info" style="display: none;">
+        <div class="asplayer-track-row">
+            <div class="asplayer-track-name" id="asplayer-track-name">大山.mp3</div>
+            <button class="asplayer-play-btn" id="asplayer-play-btn" title="播放/暂停">
+                <!-- Play Icon -->
+                <svg viewBox="0 0 24 24" class="asplayer-play-icon" id="asplayer-play-icon">
+                    <path d="M8 5v14l11-7z" fill="currentColor"/>
+                </svg>
+                <!-- Pause Icon -->
+                <svg viewBox="0 0 24 24" class="asplayer-pause-icon" id="asplayer-pause-icon" style="display: none;">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+        <label class="asplayer-upload-btn">
+            Select Audio
+            <input type="file" id="asplayer-audio-input" accept="audio/*">
+        </label>
+    </div>
+
+    <!-- Tab 1: AsLive -->
+    <div id="aslive-tab-content">
+        <div class="voice-dashboard">
+            <div class="status-badge" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">系统空闲</span>
+            </div>
+
+            <!-- Wave Visualizer Orb -->
+            <div class="visualizer-container">
+                <canvas class="orb-canvas" id="orb-canvas"></canvas>
+                <div class="mic-btn-wrapper">
+                    <button class="mic-btn" id="mic-btn" title="点击开始说话">
+                        <svg viewBox="0 0 24 24" id="mic-icon">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" fill="currentColor"/>
+                            <path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4m-4 0h8" stroke="currentColor"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Horizontal audio stream line -->
+            <div class="waveform-line-container">
+                <canvas class="waveform-canvas" id="waveform-canvas"></canvas>
+            </div>
+
+            <!-- Chat dialogue log & text entry -->
+            <div class="dialogue-card">
+                <div class="chat-log" id="chat-log">
+                    <div class="chat-bubble assistant">
+                        你好！我是 Asstar 语音助理。请授权麦克风并点击中心的麦克风按钮开始说话，或者使用键盘在下方输入命令。
+                    </div>
+                </div>
+                
+                <div class="input-bar">
+                    <input type="text" class="text-input" id="text-input" placeholder="输入文字命令或直接与助理沟通..." autocomplete="off">
+                    <button class="send-btn" id="send-btn">SEND</button>
+                </div>
+            </div>
+
+            <!-- Command cheat sheet -->
+            <div class="commands-section">
+                <div class="commands-title">你可以这样命令我：</div>
+                <div class="commands-grid">
+                    <div class="command-card" onclick="speakDemo('看实时新闻')">
+                        <code>"看实时新闻" / "实时新闻"</code>
+                        <div class="command-desc">转场导航至 Nova 综合前沿资讯面板，获取最新动态。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('最新论文')">
+                        <code>"最新论文" / "看论文"</code>
+                        <div class="command-desc">转场导航至 Hugging Face 热门每日学术论文版块。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('热门项目')">
+                        <code>"热门项目" / "去热门项目"</code>
+                        <div class="command-desc">平滑切换到全球 Github 开源热门项目雷达。</div>
+                    </div>
+                    <div class="command-card" onclick="speakDemo('跳转到工具')">
+                        <code>"跳转到工具" / "工具"</code>
+                        <div class="command-desc">拉起效率面板，平滑切换进入 Atlas 提效工具库。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="contact-content">
+                <p class="contact-text">如需定制化智能语音交互系统开发或有商务合作需求，请联系我们</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-label">邮箱:</span>
+                        <a href="mailto:asstarx7@gmail.com" class="contact-link">asstarx7@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-label">微信:</span>
+                        <span class="contact-value">GitscYee</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab 2: Asplayer -->
+    <div id="asplayer-tab-content" style="display: none;">
+        <div id="asplayer-ui-layer">
+
+            <!-- Right Bottom: EQ Frequency Monitor -->
+            <div class="asplayer-footer-right">
+                <div class="asplayer-eq-container">
+                    <div class="asplayer-eq-band" data-band="sub">
+                        <span class="asplayer-eq-label">SUB</span>
+                        <div class="asplayer-eq-bar-wrapper">
+                            <div class="asplayer-eq-bar-fill"></div>
+                        </div>
+                        <span class="asplayer-eq-value">0%</span>
+                    </div>
+                    <div class="asplayer-eq-band" data-band="low">
+                        <span class="asplayer-eq-label">LOW</span>
+                        <div class="asplayer-eq-bar-wrapper">
+                            <div class="asplayer-eq-bar-fill"></div>
+                        </div>
+                        <span class="asplayer-eq-value">0%</span>
+                    </div>
+                    <div class="asplayer-eq-band" data-band="mid">
+                        <span class="asplayer-eq-label">MID</span>
+                        <div class="asplayer-eq-bar-wrapper">
+                            <div class="asplayer-eq-bar-fill"></div>
+                        </div>
+                        <span class="asplayer-eq-value">0%</span>
+                    </div>
+                    <div class="asplayer-eq-band" data-band="high">
+                        <span class="asplayer-eq-label">HIGH</span>
+                        <div class="asplayer-eq-bar-wrapper">
+                            <div class="asplayer-eq-bar-fill"></div>
+                        </div>
+                        <span class="asplayer-eq-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="asplayer-canvas-container"></div>
+        <audio id="asplayer-audio-element" src="assets/大山.mp3" loop></audio>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/voice-interaction.js"></script>
+</body>
+</html>
