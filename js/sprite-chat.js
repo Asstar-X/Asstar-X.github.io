@@ -243,14 +243,30 @@ window.SpriteChatManager = class SpriteChatManager {
             this.systemPrompt = combinedPrompt;
         }
         
+        this.bindDOMElements();
+        if (this.chatDialog) {
+            this.init();
+        } else {
+            // Fallback: If chat-dialog DOM is not injected yet, defer init until DOMContentLoaded
+            const tryInit = () => {
+                this.bindDOMElements();
+                if (this.chatDialog) this.init();
+            };
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', tryInit);
+            } else {
+                setTimeout(tryInit, 50);
+            }
+        }
+    }
+
+    bindDOMElements() {
         this.chatDialog = document.getElementById('chat-dialog');
         this.chatMessages = document.getElementById('chat-dialog-messages');
         this.chatInput = document.getElementById('chat-dialog-input');
         this.chatSend = document.getElementById('chat-dialog-send');
         this.chatClose = document.getElementById('chat-dialog-close');
         this.typingIndicator = document.getElementById('chat-typing-indicator');
-        
-        if (this.chatDialog) this.init();
     }
 
     init() {

@@ -577,16 +577,10 @@
         }
     }
 
-    function initNova() {
+    document.addEventListener('DOMContentLoaded', () => {
         new NovaApp();
         if (window.SpriteChatManager) {
             window.spriteChatManager = new window.SpriteChatManager();
         }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initNova);
-    } else {
-        initNova();
-    }
+    });
 })();
