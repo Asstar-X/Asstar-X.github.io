@@ -1,0 +1,380 @@
+/* ===== Common Component Styles ===== */
+
+:root {
+    --sprite-glow-color: rgba(255, 255, 255, 0.95);
+    --sprite-ambient-glow: rgba(147, 51, 234, 0.25);
+    --sprite-blush-opacity: 0;
+    --ear-height-scale: 1.5;
+    --eye-aperture: 1.0;
+    --particle-density: 0.85;
+    --eye-tx: 0px;
+    --eye-ty: 0px;
+}
+
+/* Page Smooth Transitions */
+.page-transition-curtain {
+    position: fixed;
+    inset: 0;
+    background: #020205;
+    z-index: 99999;
+    pointer-events: none;
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 0;
+    transition: clip-path 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease-in-out;
+    will-change: clip-path, opacity;
+}
+
+.page-transition-curtain.init-covering {
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 1;
+}
+
+.page-ready .page-transition-curtain {
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 0;
+}
+
+/* Force close curtain during outbound page transition */
+.page-transition-curtain.closing,
+.page-ready .page-transition-curtain.closing {
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%)) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.page-transition-curtain.init-hidden {
+    opacity: 0 !important;
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%)) !important;
+    visibility: hidden;
+}
+
+/* Staring Eyes Transition Curtain Extensions */
+.transition-eyes-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    height: 420px;
+    max-width: 95vw;
+    max-height: 95vw;
+    opacity: 0;
+    scale: 0.93;
+    pointer-events: none;
+    transition: opacity 0.45s ease-out, scale 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Image fades in with a slow, dark, breathing pulse when page is NOT ready */
+body:not(.page-ready) .transition-eyes-container {
+    opacity: 0.85; /* faint, ghostly and ambient */
+    scale: 1.0;
+    transition-delay: 0.05s;
+    animation: sprite-levitate 5s infinite ease-in-out alternate;
+}
+
+.page-ready .transition-eyes-container {
+    opacity: 0;
+    scale: 0.93;
+    transition: opacity 0.45s ease-in, scale 0.45s ease-in;
+}
+
+.transition-alien-img {
+    width: 380px;
+    height: 380px;
+    max-width: 90vw;
+    max-height: 90vw;
+    object-fit: cover;
+    border-radius: 50%;
+    border: none;
+    box-shadow: none;
+    
+    /* Radial mask gradient for soft feathered edges, blending seamlessly with background */
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+    
+    /* Mix blend mode to filter out dark backgrounds and blend with curtain */
+    mix-blend-mode: screen;
+    
+    filter: none;
+    opacity: 0.95;
+}
+
+/* 小精灵轻微漂浮呼吸律动 */
+@keyframes sprite-levitate {
+    0% { transform: translate(-50%, -52%) scale(0.99); }
+    100% { transform: translate(-50%, -48%) scale(1.01); }
+}
+
+/* 视差位移容器 */
+.sprite-parallax-mesh {
+    transform: translate3d(var(--eye-tx, 0px), var(--eye-ty, 0px), 0);
+    transition: transform 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 柔性发光滤镜 (模拟 WebGL Additive Blending) */
+.additive-glow {
+    filter: drop-shadow(0 0 15px var(--sprite-glow-color)) drop-shadow(0 0 35px var(--sprite-ambient-glow));
+}
+
+/* Global Ambient Space Background */
+body {
+    background: #020205 !important;
+}
+
+.slide-bg {
+    position: fixed;
+    inset: -50px;
+    background: radial-gradient(circle at 30% 30%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(0, 210, 255, 0.08) 0%, transparent 60%);
+    z-index: -2;
+    transition: transform 0.15s ease-out;
+    pointer-events: none;
+}
+
+.slide-stars {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
+    background-size: 550px 550px;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+    background: rgba(10, 15, 30, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Back Button */
+.back-button {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 300;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 100;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    text-shadow: 0 0 10px #ffffff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Page Containers */
+.trending-container, .tools-container {
+    padding: 80px 0 60px;
+    min-height: 100vh;
+}
+
+.trending-header, .tools-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.trending-title, .tools-title {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 900;
+    background: #ffffff;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.trending-subtitle, .tools-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+/* Filters and Tabs */
+.source-tabs, .time-filter, .category-filter, .category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.source-tab, .time-btn, .category-btn, .tab {
+    padding: 10px 18px;
+    border: 2px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-primary);
+    font-weight: 400;
+}
+
+.source-tab:hover, .time-btn:hover, .category-btn:hover, .tab:hover {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.source-tab.active, .time-btn.active, .category-btn.active, .tab.active {
+    border-color: #ffffff;
+    background: #ffffff;
+    color: #000000;
+}
+
+/* Grid Layout */
+.trending-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* Cards */
+.trending-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.trending-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.trending-card:hover::before {
+    opacity: 1;
+}
+
+.trending-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+}
+
+.trending-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Card Detail Styles */
+.model-header, .repo-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.model-icon, .repo-icon {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    color: #000000;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+.model-info h3, .repo-info h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+}
+
+.model-info p, .repo-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.model-link, .repo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    background: transparent;
+    padding: 8px 0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.model-link:hover, .repo-link:hover {
+    color: #ffffff;
+    transform: translateX(5px);
+    text-decoration: underline;
+}
+
+/* Error and Loading Handlers */
+.error-message {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--secondary-color);
+}
+
+.refresh-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: var(--gradient-secondary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .trending-title, .tools-title {
+        font-size: 2rem;
+    }
+
+    .trending-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .back-button {
+        top: 12px;
+        left: 12px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
