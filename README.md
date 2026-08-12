@@ -1,3 +1,5 @@
+
+
 # Asstar - 探索未知的边界
 
 ## 🌟 关于 Asstar
@@ -24,9 +26,9 @@ Asstar 是一个以探索为核心的网站，通过前沿技术、沉浸式体�
 
 ## 📸 网站预览
 
-![网站截图](./assets/images/website_photo.jpg) <!-- 替换为你的网站截图链接 -->
+![网站截图](./assets/images/website_photo.jpg)
 
-> **立即体验**: 访问 [Asstar 官网](https://asstar-x.github.io/) 开启你的探索之旅！ <!-- 替换为你的网站链接 -->
+> **立即体验**: 访问 [Asstar 官网](https://asstar-x.github.io/) 开启你的探索之旅！
 
 ---
 
