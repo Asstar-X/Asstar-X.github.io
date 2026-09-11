@@ -121,6 +121,25 @@ window.initGA = function(id = 'G-RBTWR9QNMQ') {
     });
 };
 
+// Google AdSense Loader - Deferred to post-load to prevent render blocking and network congestion
+window.initAdSense = function(client = 'ca-pub-9033198011792089') {
+    window.addEventListener('load', () => {
+        const loadScript = () => {
+            if (document.querySelector(`script[src*="adsbygoogle.js"]`)) return;
+            const script = document.createElement('script');
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+            document.head.appendChild(script);
+        };
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(loadScript, { timeout: 3000 });
+        } else {
+            setTimeout(loadScript, 2000);
+        }
+    });
+};
+
 // Global Stale-While-Revalidate (SWR) fetching helper for instant loading
 window.fetchWithSWR = async function(url, storageKey, renderCallback, timeEl, timePropName) {
     const cachedData = localStorage.getItem(storageKey);

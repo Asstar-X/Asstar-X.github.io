@@ -246,9 +246,12 @@ class CosmicUniverse {
         this.container = document.getElementById(containerId);
         if (!this.container || typeof THREE === 'undefined') return;
 
+        this.isPaused = false;
+        this.rafId = null;
         this.init();
         this.animate();
         this.handleResize();
+        this.handleVisibility();
     }
 
     init() {
@@ -260,8 +263,8 @@ class CosmicUniverse {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.z = 5;
 
-        // Renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // Renderer (capped at 2x pixel ratio for performance)
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.container.appendChild(this.renderer.domElement);
@@ -269,9 +272,9 @@ class CosmicUniverse {
         // Clock
         this.clock = new THREE.Clock();
 
-        // Particles Layer 1
+        // Particles Layer 1 (Balanced count with slightly enhanced size for visual parity)
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 3000;
+        const particlesCount = 2000;
         const posArray = new Float32Array(particlesCount * 3);
         const sizesArray = new Float32Array(particlesCount);
 
@@ -286,7 +289,7 @@ class CosmicUniverse {
         particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
 
         const material = new THREE.PointsMaterial({
-            size: 0.03,
+            size: 0.035,
             color: 0xffffff,
             transparent: true,
             opacity: 0.8,
@@ -298,7 +301,7 @@ class CosmicUniverse {
 
         // Particles Layer 2 (Blue Stars)
         const bgStarsGeometry = new THREE.BufferGeometry();
-        const bgStarsCount = 5000;
+        const bgStarsCount = 2800;
         const bgPosArray = new Float32Array(bgStarsCount * 3);
         for (let i = 0; i < bgStarsCount * 3; i++) {
             bgPosArray[i] = (Math.random() - 0.5) * 80;
@@ -306,7 +309,7 @@ class CosmicUniverse {
         bgStarsGeometry.setAttribute('position', new THREE.BufferAttribute(bgPosArray, 3));
 
         const starsMaterial = new THREE.PointsMaterial({
-            size: 0.05,
+            size: 0.055,
             color: 0x88ccff,
             transparent: true,
             opacity: 0.6,
@@ -319,10 +322,10 @@ class CosmicUniverse {
         // Mouse interaction state
         this.mouseX = 0;
         this.mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
+        window.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX - window.innerWidth / 2;
             this.mouseY = e.clientY - window.innerHeight / 2;
-        });
+        }, { passive: true });
 
         // Intro Animation
         if (typeof gsap !== 'undefined') {
@@ -339,10 +342,38 @@ class CosmicUniverse {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }, { passive: true });
+    }
+
+    handleVisibility() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.pause();
+            } else {
+                this.resume();
+            }
         });
     }
 
+    pause() {
+        if (this.isPaused) return;
+        this.isPaused = true;
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+    }
+
+    resume() {
+        if (!this.isPaused) return;
+        this.isPaused = false;
+        this.clock.start();
+        this.animate();
+    }
+
     animate() {
+        if (this.isPaused) return;
+
         const elapsedTime = this.clock.getElapsedTime();
 
         // Rotation
@@ -360,13 +391,15 @@ class CosmicUniverse {
         this.camera.position.y += (-this.mouseY * 0.005 - this.camera.position.y) * 0.05;
 
         this.renderer.render(this.scene, this.camera);
-        requestAnimationFrame(() => this.animate());
+        this.rafId = requestAnimationFrame(() => this.animate());
     }
 }
 
-// Auto-initialize background if container exists
+// Auto-initialize background if container exists and expose global controls
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('canvas-container')) {
-        new CosmicUniverse('canvas-container');
+        const universe = new CosmicUniverse('canvas-container');
+        window.pauseCosmicUniverse = () => universe.pause();
+        window.resumeCosmicUniverse = () => universe.resume();
     }
 });

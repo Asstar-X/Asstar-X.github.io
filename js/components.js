@@ -142,14 +142,14 @@ window.injectSharedComponents = function() {
         // Track mouse movement to apply smooth parallax shifting (throttled via requestAnimationFrame)
         let parallaxTimeout = null;
         document.addEventListener('mousemove', (e) => {
-            if (parallaxTimeout) return;
+            if (parallaxTimeout || bg.offsetParent === null) return;
             parallaxTimeout = requestAnimationFrame(() => {
                 const mx = (e.clientX / window.innerWidth - 0.5) * 40;
                 const my = (e.clientY / window.innerHeight - 0.5) * 40;
                 bg.style.transform = `translate3d(${mx * -0.4}px, ${my * -0.4}px, 0)`;
                 parallaxTimeout = null;
             });
-        });
+        }, { passive: true });
     }
 
     // Common Noise Overlay and Canvas Container
@@ -213,7 +213,7 @@ window.injectSharedComponents = function() {
         const angle = Math.atan2(dy, dx);
         targetTx = Math.cos(angle) * intensity;
         targetTy = Math.sin(angle) * intensity;
-    });
+    }, { passive: true });
 
     function startEyesLoop() {
         if (isEyesActive) return;
@@ -311,7 +311,7 @@ window.injectSharedComponents = function() {
         }
     });
 
-    // Prefetch internal pages during idle time or hover
+    // Smart link prefetching based on user intent (hover / touch)
     function initLinkPrefetching() {
         const links = document.querySelectorAll('a');
         const prefetchedUrls = new Set();
@@ -339,23 +339,6 @@ window.injectSharedComponents = function() {
                 link.addEventListener('touchstart', () => prefetch(link.href), { passive: true });
             }
         });
-        
-        // Also prefetch main navigation links automatically after 2 seconds
-        setTimeout(() => {
-            const navPages = ['index.html', 'nova.html', 'atlas.html', 'voice-interaction.html', 'orbit.html', 'space.html'];
-            navPages.forEach(page => {
-                const segments = window.location.pathname.split('/').filter(s => s.length > 0);
-                const depth = segments.length > 0 && segments[segments.length - 1].includes('.') ? segments.length - 1 : segments.length;
-                let rootPath = './';
-                if (depth > 0) {
-                    rootPath = '../'.repeat(depth);
-                }
-                const fullUrl = new URL(rootPath + page, window.location.href).href;
-                if (fullUrl !== window.location.href) {
-                    prefetch(fullUrl);
-                }
-            });
-        }, 2000);
     }
 
     // Initialize prefetching

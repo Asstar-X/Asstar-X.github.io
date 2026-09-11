@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Shared Utils & Components -->
     <script src="js/utils.js"></script>
-    <script>window.initGA();</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
-         crossorigin="anonymous"></script>
+    <script>window.initGA(); window.initAdSense();</script>
     
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <title>Asstar Space | Deep Universe</title>
@@ -380,7 +380,7 @@
             camera.position.set(0, 40, 180);
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ReinhardToneMapping;
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
@@ -512,7 +512,18 @@
             document.getElementById('close-modal').addEventListener('click', () => document.getElementById('planet-modal').classList.remove('active'));
         }
 
+        let isSpacePaused = false;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                isSpacePaused = true;
+            } else {
+                isSpacePaused = false;
+                requestAnimationFrame(animate);
+            }
+        });
+
         function animate() {
+            if (isSpacePaused) return;
             requestAnimationFrame(animate);
             time += 0.005;
             if (sunMesh) { sunMesh.material.uniforms.time.value = time; sunMesh.rotation.y += 0.002; }

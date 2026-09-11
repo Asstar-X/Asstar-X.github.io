@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Shared Utils & Components -->
     <script src="js/utils.js"></script>
-    <script>window.initGA();</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
-         crossorigin="anonymous"></script>
+    <script>window.initGA(); window.initAdSense();</script>
     
     <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/common.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@300;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
     <link rel="stylesheet" href="css/sprite-chat.css">
     
     <link rel="stylesheet" href="css/voice-interaction.css">
@@ -177,10 +177,10 @@
         </div>
 
         <div id="asplayer-canvas-container"></div>
-        <audio id="asplayer-audio-element" src="assets/大山.mp3" loop></audio>
+        <audio id="asplayer-audio-element" src="assets/大山.mp3" loop preload="none"></audio>
     </div>
 
-    <script src="js/script.js"></script>
-    <script src="js/voice-interaction.js"></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/voice-interaction.js" defer></script>
 </body>
 </html>

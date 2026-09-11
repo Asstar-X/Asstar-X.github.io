@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Shared Utils & Components -->
     <script src="js/utils.js"></script>
-    <script>window.initGA();</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9033198011792089"
-         crossorigin="anonymous"></script>
+    <script>window.initGA(); window.initAdSense();</script>
     
     <title>Asstar</title>
     <link rel="icon" type="image/jpeg" href="assets/images/Asstar.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="image" href="assets/images/Asstar-poster.webp">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/time-rift.css">
@@ -77,7 +78,8 @@
 
                     <!-- 视频本体 -->
                     <div class="immersive-video-wrapper">
-                        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
+                        <video class="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/images/Asstar-poster.webp">
+                            <source src="assets/Asstar.webm" type="video/webm">
                             <source src="assets/Asstar.mp4" type="video/mp4">
                         </video>
                     </div>
@@ -128,33 +130,49 @@
     <script src="js/time-rift.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Centered Video 3D Tilt Effect ---
+            // --- Centered Video 3D Tilt Effect (RAF Throttled) ---
             (function() {
                 const videoCapsule = document.getElementById('video-specimen');
                 if (!videoCapsule) return;
 
                 let rect = null;
+                let rafId = null;
+                let targetTiltX = 0;
+                let targetTiltY = 0;
 
-                videoCapsule.addEventListener('mouseenter', () => {
+                const updateRect = () => {
                     rect = videoCapsule.getBoundingClientRect();
-                });
+                };
+
+                videoCapsule.addEventListener('mouseenter', updateRect);
+                window.addEventListener('resize', () => { if (rect) updateRect(); });
 
                 videoCapsule.addEventListener('mousemove', (event) => {
-                    if (!rect) rect = videoCapsule.getBoundingClientRect();
+                    if (!rect) updateRect();
                     const mouseX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
                     const mouseY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
-                    const tiltX = -mouseY * 8; // Max 8 degrees tilt
-                    const tiltY = mouseX * 8;
-                    videoCapsule.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
-                });
+                    targetTiltX = -mouseY * 8; // Max 8 degrees tilt
+                    targetTiltY = mouseX * 8;
+
+                    if (!rafId) {
+                        rafId = requestAnimationFrame(() => {
+                            videoCapsule.style.transform = `perspective(1000px) rotateX(${targetTiltX.toFixed(2)}deg) rotateY(${targetTiltY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+                            rafId = null;
+                        });
+                    }
+                }, { passive: true });
 
                 videoCapsule.addEventListener('mouseleave', () => {
+                    if (rafId) {
+                        cancelAnimationFrame(rafId);
+                        rafId = null;
+                    }
                     rect = null;
                     videoCapsule.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
                 });
             })();
 
-            // --- Alien Specimens 3D Coverflow Carousel ---
+            // --- Alien Specimens 3D Coverflow Carousel (Lazy Loaded) ---
             (function() {
                 const specimens = Array.from({ length: 25 });
 
@@ -170,30 +188,38 @@
 
                 let activeIndex = 1; // start with 2nd card active
                 let dragMoved = false;
+                let isInitialized = false;
+                let cards = [];
+                let dots = [];
 
-                // Generate Card DOM
-                specimens.forEach((specimen, i) => {
-                    const card = document.createElement('div');
-                    card.className = 'alien-card';
-                    card.innerHTML = `
-                        <img src="assets/images/Alien${i + 1}.jpg" alt="Alien specimen" class="card-bg-img" loading="lazy">
-                        <div class="card-scan-line"></div>
-                    `;
+                function initCards() {
+                    if (isInitialized) return;
+                    isInitialized = true;
 
-                    stage.appendChild(card);
+                    // Generate Card DOM
+                    specimens.forEach((specimen, i) => {
+                        const card = document.createElement('div');
+                        card.className = 'alien-card';
+                        card.innerHTML = `
+                            <img src="assets/images/Alien${i + 1}.jpg" alt="Alien specimen" class="card-bg-img" loading="lazy">
+                            <div class="card-scan-line"></div>
+                        `;
 
-                    // Pagination dot
-                    const dot = document.createElement('div');
-                    dot.className = 'alien-dot';
-                    dot.addEventListener('click', () => {
-                        activeIndex = i;
-                        updateCoverflow();
+                        stage.appendChild(card);
+
+                        // Pagination dot
+                        const dot = document.createElement('div');
+                        dot.className = 'alien-dot';
+                        dot.addEventListener('click', () => {
+                            activeIndex = i;
+                            updateCoverflow();
+                        });
+                        pagination.appendChild(dot);
                     });
-                    pagination.appendChild(dot);
-                });
 
-                const cards = stage.querySelectorAll('.alien-card');
-                const dots = pagination.querySelectorAll('.alien-dot');
+                    cards = stage.querySelectorAll('.alien-card');
+                    dots = pagination.querySelectorAll('.alien-dot');
+                }
 
                 // Click side card to switch (using event delegation with drag detection)
                 stage.addEventListener('click', (e) => {
@@ -202,7 +228,7 @@
                         return;
                     }
                     const card = e.target.closest('.alien-card');
-                    if (card) {
+                    if (card && cards.length > 0) {
                         const index = Array.from(cards).indexOf(card);
                         if (index !== -1 && index !== activeIndex) {
                             e.stopPropagation();
@@ -213,6 +239,7 @@
                 });
 
                 function updateCoverflow() {
+                    if (!isInitialized) return;
                     cards.forEach((card, i) => {
                         const diff = i - activeIndex;
                         const absDiff = Math.abs(diff);
@@ -256,15 +283,18 @@
 
                 // Expand Overlay Trigger
                 expandBtn.addEventListener('click', () => {
+                    initCards();
                     overlay.classList.add('active');
                     document.body.style.overflow = 'hidden';
                     updateCoverflow();
+                    if (window.pauseCosmicUniverse) window.pauseCosmicUniverse();
                 });
 
                 // Close Overlay
                 function closeOverlay() {
                     overlay.classList.remove('active');
                     document.body.style.overflow = '';
+                    if (window.resumeCosmicUniverse) window.resumeCosmicUniverse();
                 }
 
                 closeBtn.addEventListener('click', closeOverlay);
