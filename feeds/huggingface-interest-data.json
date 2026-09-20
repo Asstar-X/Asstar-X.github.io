@@ -6,7 +6,7 @@
         "description": "No description available",
         "task": "text-to-speech",
         "parameters": "Unknown",
-        "likes": "336",
+        "likes": "337",
         "downloads": "3,471",
         "url": "https://huggingface.co/tencent/AuK",
         "tags": [
@@ -198,7 +198,7 @@
         "description": "No description available",
         "task": "text-to-speech",
         "parameters": "Unknown",
-        "likes": "1,979",
+        "likes": "1,980",
         "downloads": "2,572,572",
         "url": "https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice",
         "tags": [
@@ -274,21 +274,6 @@
         ]
       },
       {
-        "name": "coqui/XTTS-v2",
-        "description": "No description available",
-        "task": "text-to-speech",
-        "parameters": "Unknown",
-        "likes": "3,807",
-        "downloads": "7,160,958",
-        "url": "https://huggingface.co/coqui/XTTS-v2",
-        "tags": [
-          "coqui",
-          "text-to-speech",
-          "license:other",
-          "region:us"
-        ]
-      },
-      {
         "name": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
         "description": "No description available",
         "task": "text-to-speech",
@@ -350,6 +335,22 @@
           "speech",
           "speech-generation",
           "voice-cloning"
+        ]
+      },
+      {
+        "name": "bosonai/higgs-tts-3-4b",
+        "description": "No description available",
+        "task": "text-to-speech",
+        "parameters": "Unknown",
+        "likes": "769",
+        "downloads": "96,552",
+        "url": "https://huggingface.co/bosonai/higgs-tts-3-4b",
+        "tags": [
+          "transformers",
+          "safetensors",
+          "higgs_multimodal_qwen3",
+          "text-generation",
+          "text-to-speech"
         ]
       },
       {
@@ -417,22 +418,6 @@
         ]
       },
       {
-        "name": "bosonai/higgs-tts-3-4b",
-        "description": "No description available",
-        "task": "text-to-speech",
-        "parameters": "Unknown",
-        "likes": "768",
-        "downloads": "96,552",
-        "url": "https://huggingface.co/bosonai/higgs-tts-3-4b",
-        "tags": [
-          "transformers",
-          "safetensors",
-          "higgs_multimodal_qwen3",
-          "text-generation",
-          "text-to-speech"
-        ]
-      },
-      {
         "name": "Edge0/Audio8-TTS-Preview-0.6b",
         "description": "No description available",
         "task": "text-to-speech",
@@ -479,6 +464,22 @@
           "multimodal",
           "audio"
         ]
+      },
+      {
+        "name": "oddadmix/Nabra-7M-Distill",
+        "description": "No description available",
+        "task": "text-to-speech",
+        "parameters": "Unknown",
+        "likes": "10",
+        "downloads": "148",
+        "url": "https://huggingface.co/oddadmix/Nabra-7M-Distill",
+        "tags": [
+          "tts",
+          "arabic",
+          "kokoro",
+          "styletts2",
+          "distillation"
+        ]
       }
     ],
     "automatic-speech-recognition": [
@@ -487,7 +488,7 @@
         "description": "No description available",
         "task": "automatic-speech-recognition",
         "parameters": "Unknown",
-        "likes": "1,909",
+        "likes": "1,913",
         "downloads": "5,329,088",
         "url": "https://huggingface.co/pyannote/speaker-diarization-community-1",
         "tags": [
@@ -503,7 +504,7 @@
         "description": "No description available",
         "task": "automatic-speech-recognition",
         "parameters": "Unknown",
-        "likes": "114",
+        "likes": "121",
         "downloads": "643",
         "url": "https://huggingface.co/netease-youdao/Confucius4-R2T2",
         "tags": [
@@ -519,7 +520,7 @@
         "description": "No description available",
         "task": "automatic-speech-recognition",
         "parameters": "Unknown",
-        "likes": "3,775",
+        "likes": "3,779",
         "downloads": "7,950,173",
         "url": "https://huggingface.co/pyannote/speaker-diarization-3.1",
         "tags": [
@@ -595,6 +596,22 @@
         ]
       },
       {
+        "name": "Qwen/Qwen3-ASR-1.7B",
+        "description": "No description available",
+        "task": "automatic-speech-recognition",
+        "parameters": "Unknown",
+        "likes": "1,107",
+        "downloads": "2,221,488",
+        "url": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B",
+        "tags": [
+          "safetensors",
+          "qwen3_asr",
+          "automatic-speech-recognition",
+          "arxiv:2601.21337",
+          "license:apache-2.0"
+        ]
+      },
+      {
         "name": "CohereLabs/cohere-transcribe-03-2026",
         "description": "No description available",
         "task": "automatic-speech-recognition",
@@ -611,6 +628,22 @@
         ]
       },
       {
+        "name": "nvidia/parakeet-tdt-0.6b-v3",
+        "description": "No description available",
+        "task": "automatic-speech-recognition",
+        "parameters": "Unknown",
+        "likes": "1,133",
+        "downloads": "577,358",
+        "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+        "tags": [
+          "transformers",
+          "nemo",
+          "safetensors",
+          "gguf",
+          "parakeet_tdt"
+        ]
+      },
+      {
         "name": "microsoft/VibeVoice-ASR-Streaming-7B",
         "description": "No description available",
         "task": "automatic-speech-recognition",
@@ -624,38 +657,6 @@
           "vibevoice",
           "ASR",
           "Transcription"
-        ]
-      },
-      {
-        "name": "nvidia/parakeet-tdt-0.6b-v3",
-        "description": "No description available",
-        "task": "automatic-speech-recognition",
-        "parameters": "Unknown",
-        "likes": "1,132",
-        "downloads": "577,358",
-        "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
-        "tags": [
-          "transformers",
-          "nemo",
-          "safetensors",
-          "gguf",
-          "parakeet_tdt"
-        ]
-      },
-      {
-        "name": "Qwen/Qwen3-ASR-1.7B",
-        "description": "No description available",
-        "task": "automatic-speech-recognition",
-        "parameters": "Unknown",
-        "likes": "1,105",
-        "downloads": "2,221,488",
-        "url": "https://huggingface.co/Qwen/Qwen3-ASR-1.7B",
-        "tags": [
-          "safetensors",
-          "qwen3_asr",
-          "automatic-speech-recognition",
-          "arxiv:2601.21337",
-          "license:apache-2.0"
         ]
       },
       {
@@ -801,22 +802,6 @@
         ]
       },
       {
-        "name": "nvidia/parakeet-tdt-0.6b-v2",
-        "description": "No description available",
-        "task": "automatic-speech-recognition",
-        "parameters": "Unknown",
-        "likes": "1,546",
-        "downloads": "190,643",
-        "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2",
-        "tags": [
-          "nemo",
-          "automatic-speech-recognition",
-          "speech",
-          "audio",
-          "Transducer"
-        ]
-      },
-      {
         "name": "mistralai/Voxtral-Mini-4B-Realtime-2602",
         "description": "No description available",
         "task": "automatic-speech-recognition",
@@ -862,6 +847,22 @@
           "automatic-speech-recognition",
           "en",
           "zh"
+        ]
+      },
+      {
+        "name": "nvidia/parakeet-tdt-0.6b-v2",
+        "description": "No description available",
+        "task": "automatic-speech-recognition",
+        "parameters": "Unknown",
+        "likes": "1,546",
+        "downloads": "190,643",
+        "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2",
+        "tags": [
+          "nemo",
+          "automatic-speech-recognition",
+          "speech",
+          "audio",
+          "Transducer"
         ]
       },
       {
@@ -945,19 +946,19 @@
         ]
       },
       {
-        "name": "FunAudioLLM/SenseVoiceSmall",
+        "name": "Systran/faster-whisper-small",
         "description": "No description available",
         "task": "automatic-speech-recognition",
         "parameters": "Unknown",
-        "likes": "482",
-        "downloads": "24,346",
-        "url": "https://huggingface.co/FunAudioLLM/SenseVoiceSmall",
+        "likes": "54",
+        "downloads": "2,902,938",
+        "url": "https://huggingface.co/Systran/faster-whisper-small",
         "tags": [
-          "funasr",
-          "speech-recognition",
-          "asr",
-          "emotion-recognition",
-          "audio-event-detection"
+          "ctranslate2",
+          "audio",
+          "automatic-speech-recognition",
+          "en",
+          "zh"
         ]
       }
     ],
@@ -967,7 +968,7 @@
         "description": "No description available",
         "task": "text-to-audio",
         "parameters": "Unknown",
-        "likes": "894",
+        "likes": "900",
         "downloads": "17,403",
         "url": "https://huggingface.co/m-a-p/YuE2-3B",
         "tags": [
@@ -1107,6 +1108,22 @@
         ]
       },
       {
+        "name": "ACE-Step/Ace-Step1.5",
+        "description": "No description available",
+        "task": "text-to-audio",
+        "parameters": "Unknown",
+        "likes": "863",
+        "downloads": "57,571",
+        "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+        "tags": [
+          "transformers",
+          "diffusers",
+          "safetensors",
+          "acestep",
+          "feature-extraction"
+        ]
+      },
+      {
         "name": "becausereasons/yue2-chnsn-chanson-francaise",
         "description": "No description available",
         "task": "text-to-audio",
@@ -1120,22 +1137,6 @@
           "music-generation",
           "text-to-music",
           "song-generation"
-        ]
-      },
-      {
-        "name": "ACE-Step/Ace-Step1.5",
-        "description": "No description available",
-        "task": "text-to-audio",
-        "parameters": "Unknown",
-        "likes": "861",
-        "downloads": "57,571",
-        "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
-        "tags": [
-          "transformers",
-          "diffusers",
-          "safetensors",
-          "acestep",
-          "feature-extraction"
         ]
       },
       {
@@ -1449,7 +1450,7 @@
         "description": "No description available",
         "task": "voice-activity-detection",
         "parameters": "Unknown",
-        "likes": "1,903",
+        "likes": "1,906",
         "downloads": "5,746,572",
         "url": "https://huggingface.co/pyannote/segmentation-3.0",
         "tags": [
@@ -1971,22 +1972,6 @@
         ]
       },
       {
-        "name": "neuphonic/neucodec",
-        "description": "No description available",
-        "task": "audio-to-audio",
-        "parameters": "Unknown",
-        "likes": "137",
-        "downloads": "47,225",
-        "url": "https://huggingface.co/neuphonic/neucodec",
-        "tags": [
-          "pytorch",
-          "safetensors",
-          "neucodec",
-          "audio",
-          "speech"
-        ]
-      },
-      {
         "name": "ai-toolkit/melbandroformer",
         "description": "No description available",
         "task": "audio-to-audio",
@@ -2000,6 +1985,22 @@
           "mel-band-roformer",
           "ai-toolkit",
           "audio-to-audio"
+        ]
+      },
+      {
+        "name": "neuphonic/neucodec",
+        "description": "No description available",
+        "task": "audio-to-audio",
+        "parameters": "Unknown",
+        "likes": "137",
+        "downloads": "47,225",
+        "url": "https://huggingface.co/neuphonic/neucodec",
+        "tags": [
+          "pytorch",
+          "safetensors",
+          "neucodec",
+          "audio",
+          "speech"
         ]
       },
       {
@@ -2258,22 +2259,6 @@
         ]
       },
       {
-        "name": "mlx-community/sam-audio-large",
-        "description": "No description available",
-        "task": "audio-to-audio",
-        "parameters": "Unknown",
-        "likes": "8",
-        "downloads": "122",
-        "url": "https://huggingface.co/mlx-community/sam-audio-large",
-        "tags": [
-          "mlx-audio",
-          "safetensors",
-          "audio-to-audio",
-          "speech",
-          "speech generation"
-        ]
-      },
-      {
         "name": "HiDolen/Mini-BS-RoFormer-V2-46.8M",
         "description": "No description available",
         "task": "audio-to-audio",
@@ -2398,6 +2383,22 @@
           "license:cc-by-nc-sa-4.0",
           "region:us"
         ]
+      },
+      {
+        "name": "KRAFTON/Raon-SpeechChat-9B",
+        "description": "No description available",
+        "task": "audio-to-audio",
+        "parameters": "Unknown",
+        "likes": "47",
+        "downloads": "1,520",
+        "url": "https://huggingface.co/KRAFTON/Raon-SpeechChat-9B",
+        "tags": [
+          "transformers",
+          "safetensors",
+          "raon_duplex",
+          "feature-extraction",
+          "speech"
+        ]
       }
     ],
     "audio-classification": [
@@ -2450,38 +2451,6 @@
         ]
       },
       {
-        "name": "m-a-p/MERT-v1-95M",
-        "description": "No description available",
-        "task": "audio-classification",
-        "parameters": "Unknown",
-        "likes": "58",
-        "downloads": "171,918",
-        "url": "https://huggingface.co/m-a-p/MERT-v1-95M",
-        "tags": [
-          "transformers",
-          "pytorch",
-          "mert_model",
-          "feature-extraction",
-          "music"
-        ]
-      },
-      {
-        "name": "m-a-p/MERT-v1-330M",
-        "description": "No description available",
-        "task": "audio-classification",
-        "parameters": "Unknown",
-        "likes": "99",
-        "downloads": "156,771",
-        "url": "https://huggingface.co/m-a-p/MERT-v1-330M",
-        "tags": [
-          "transformers",
-          "pytorch",
-          "mert_model",
-          "feature-extraction",
-          "music"
-        ]
-      },
-      {
         "name": "buddybird-ai/parrot-sound-gate",
         "description": "No description available",
         "task": "audio-classification",
@@ -2511,6 +2480,38 @@
           "wav2vec2",
           "audio",
           "audio-classification"
+        ]
+      },
+      {
+        "name": "m-a-p/MERT-v1-95M",
+        "description": "No description available",
+        "task": "audio-classification",
+        "parameters": "Unknown",
+        "likes": "58",
+        "downloads": "171,918",
+        "url": "https://huggingface.co/m-a-p/MERT-v1-95M",
+        "tags": [
+          "transformers",
+          "pytorch",
+          "mert_model",
+          "feature-extraction",
+          "music"
+        ]
+      },
+      {
+        "name": "m-a-p/MERT-v1-330M",
+        "description": "No description available",
+        "task": "audio-classification",
+        "parameters": "Unknown",
+        "likes": "99",
+        "downloads": "156,771",
+        "url": "https://huggingface.co/m-a-p/MERT-v1-330M",
+        "tags": [
+          "transformers",
+          "pytorch",
+          "mert_model",
+          "feature-extraction",
+          "music"
         ]
       },
       {
@@ -3046,6 +3047,22 @@
         ]
       },
       {
+        "name": "ACE-Step/acestep-transcriber",
+        "description": "No description available",
+        "task": "audio-text-to-text",
+        "parameters": "Unknown",
+        "likes": "62",
+        "downloads": "2,143",
+        "url": "https://huggingface.co/ACE-Step/acestep-transcriber",
+        "tags": [
+          "transformers",
+          "safetensors",
+          "qwen2_5_omni",
+          "text-to-audio",
+          "music"
+        ]
+      },
+      {
         "name": "nvidia/audio-flamingo-next-hf",
         "description": "No description available",
         "task": "audio-text-to-text",
@@ -3107,6 +3124,22 @@
           "qwen3_omni_moe",
           "text-to-audio",
           "audio"
+        ]
+      },
+      {
+        "name": "SYNAPSEai1/SynapseMusicV12-Transcriber",
+        "description": "No description available",
+        "task": "audio-text-to-text",
+        "parameters": "Unknown",
+        "likes": "1",
+        "downloads": "0",
+        "url": "https://huggingface.co/SYNAPSEai1/SynapseMusicV12-Transcriber",
+        "tags": [
+          "transformers",
+          "safetensors",
+          "qwen2_5_omni",
+          "text-to-audio",
+          "music"
         ]
       },
       {
@@ -3332,38 +3365,6 @@
           "audio",
           "GGUF"
         ]
-      },
-      {
-        "name": "fixie-ai/ultravox-v0_4_1-llama-3_1-8b",
-        "description": "No description available",
-        "task": "audio-text-to-text",
-        "parameters": "Unknown",
-        "likes": "99",
-        "downloads": "174",
-        "url": "https://huggingface.co/fixie-ai/ultravox-v0_4_1-llama-3_1-8b",
-        "tags": [
-          "transformers",
-          "safetensors",
-          "ultravox",
-          "feature-extraction",
-          "audio-text-to-text"
-        ]
-      },
-      {
-        "name": "fixie-ai/ultravox-v0_4_1-llama-3_1-70b",
-        "description": "No description available",
-        "task": "audio-text-to-text",
-        "parameters": "Unknown",
-        "likes": "25",
-        "downloads": "60",
-        "url": "https://huggingface.co/fixie-ai/ultravox-v0_4_1-llama-3_1-70b",
-        "tags": [
-          "transformers",
-          "safetensors",
-          "ultravox",
-          "feature-extraction",
-          "audio-text-to-text"
-        ]
       }
     ],
     "image-text-to-video": [
@@ -3372,7 +3373,7 @@
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "5,509",
+        "likes": "5,513",
         "downloads": "4,057,444",
         "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
         "tags": [
@@ -3388,7 +3389,7 @@
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "138",
+        "likes": "139",
         "downloads": "2",
         "url": "https://huggingface.co/XGENlabs/XGEN-JING",
         "tags": [
@@ -3404,7 +3405,7 @@
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "63",
+        "likes": "64",
         "downloads": "2,406",
         "url": "https://huggingface.co/videorebirth/hyperflow",
         "tags": [
@@ -3436,7 +3437,7 @@
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "298",
+        "likes": "299",
         "downloads": "979,416",
         "url": "https://huggingface.co/unsloth/MiniMax-H3-GGUF",
         "tags": [
@@ -3484,7 +3485,7 @@
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "20",
+        "likes": "21",
         "downloads": "0",
         "url": "https://huggingface.co/TenStrip/Minimax-h3_Singularity-Lora",
         "tags": [
@@ -3544,27 +3545,11 @@
         ]
       },
       {
-        "name": "TenStrip/10Eros-Max",
-        "description": "No description available",
-        "task": "image-text-to-video",
-        "parameters": "Unknown",
-        "likes": "647",
-        "downloads": "0",
-        "url": "https://huggingface.co/TenStrip/10Eros-Max",
-        "tags": [
-          "text-to-video",
-          "image-text-to-video",
-          "image-to-video",
-          "not-for-all-audiences",
-          "base_model:MiniMaxAI/MiniMax-H3"
-        ]
-      },
-      {
         "name": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "234",
+        "likes": "235",
         "downloads": "218,909",
         "url": "https://huggingface.co/Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
         "tags": [
@@ -3576,19 +3561,19 @@
         ]
       },
       {
-        "name": "Abiray/MiniMax-H3-Pruned-GGUF",
+        "name": "TenStrip/10Eros-Max",
         "description": "No description available",
         "task": "image-text-to-video",
         "parameters": "Unknown",
-        "likes": "68",
-        "downloads": "145,913",
-        "url": "https://huggingface.co/Abiray/MiniMax-H3-Pruned-GGUF",
+        "likes": "648",
+        "downloads": "0",
+        "url": "https://huggingface.co/TenStrip/10Eros-Max",
         "tags": [
-          "gguf",
-          "comfyui",
           "text-to-video",
+          "image-text-to-video",
           "image-to-video",
-          "image-text-to-video"
+          "not-for-all-audiences",
+          "base_model:MiniMaxAI/MiniMax-H3"
         ]
       },
       {
@@ -3605,6 +3590,22 @@
           "safetensors",
           "minimax-h3",
           "ref2va"
+        ]
+      },
+      {
+        "name": "Abiray/MiniMax-H3-Pruned-GGUF",
+        "description": "No description available",
+        "task": "image-text-to-video",
+        "parameters": "Unknown",
+        "likes": "68",
+        "downloads": "145,913",
+        "url": "https://huggingface.co/Abiray/MiniMax-H3-Pruned-GGUF",
+        "tags": [
+          "gguf",
+          "comfyui",
+          "text-to-video",
+          "image-to-video",
+          "image-text-to-video"
         ]
       },
       {
@@ -3736,22 +3737,6 @@
         ]
       },
       {
-        "name": "prithivMLmods/MiniMax-H3-Facial-Realism-CloseUp",
-        "description": "No description available",
-        "task": "image-text-to-video",
-        "parameters": "Unknown",
-        "likes": "58",
-        "downloads": "6,879",
-        "url": "https://huggingface.co/prithivMLmods/MiniMax-H3-Facial-Realism-CloseUp",
-        "tags": [
-          "minimax-h3",
-          "lora",
-          "face-realism",
-          "safetensors",
-          "minimax"
-        ]
-      },
-      {
         "name": "prithivMLmods/MiniMax-H3-I2V-Anime-Motion-LoRA",
         "description": "No description available",
         "task": "image-text-to-video",
@@ -3846,6 +3831,22 @@
           "t2v",
           "lightx2v"
         ]
+      },
+      {
+        "name": "rzgar/LTX-2.3-Motion-Enhancer-n4w",
+        "description": "No description available",
+        "task": "image-text-to-video",
+        "parameters": "Unknown",
+        "likes": "8",
+        "downloads": "2,778",
+        "url": "https://huggingface.co/rzgar/LTX-2.3-Motion-Enhancer-n4w",
+        "tags": [
+          "diffusers",
+          "text-to-image",
+          "lora",
+          "template:diffusion-lora",
+          "image-text-to-video"
+        ]
       }
     ],
     "image-text-to-image": [
@@ -3854,7 +3855,7 @@
         "description": "No description available",
         "task": "image-text-to-image",
         "parameters": "Unknown",
-        "likes": "549",
+        "likes": "550",
         "downloads": "9,058",
         "url": "https://huggingface.co/HiDream-ai/HiDream-O1-Image",
         "tags": [
@@ -4333,7 +4334,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "3,374",
+        "likes": "3,377",
         "downloads": "496,684",
         "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
         "tags": [
@@ -4349,7 +4350,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "15,817",
+        "likes": "15,826",
         "downloads": "7,331,932",
         "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
         "tags": [
@@ -4365,7 +4366,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "1,452",
+        "likes": "1,461",
         "downloads": "1,217,204",
         "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
         "tags": [
@@ -4381,7 +4382,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "498",
+        "likes": "500",
         "downloads": "10,962",
         "url": "https://huggingface.co/ukisai/Swift-Qwen3.8-27b",
         "tags": [
@@ -4397,7 +4398,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "989",
+        "likes": "990",
         "downloads": "1,301,417",
         "url": "https://huggingface.co/DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF",
         "tags": [
@@ -4429,7 +4430,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "5,474",
+        "likes": "5,478",
         "downloads": "761,112",
         "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
         "tags": [
@@ -4438,22 +4439,6 @@
           "qwen4_exp",
           "image-text-to-text",
           "conversational"
-        ]
-      },
-      {
-        "name": "dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8",
-        "description": "No description available",
-        "task": "image-text-to-text",
-        "parameters": "Unknown",
-        "likes": "317",
-        "downloads": "34,688",
-        "url": "https://huggingface.co/dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8",
-        "tags": [
-          "transformers",
-          "safetensors",
-          "deepseek_v41",
-          "text-generation",
-          "deepseek"
         ]
       },
       {
@@ -4473,11 +4458,27 @@
         ]
       },
       {
+        "name": "dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8",
+        "description": "No description available",
+        "task": "image-text-to-text",
+        "parameters": "Unknown",
+        "likes": "318",
+        "downloads": "34,688",
+        "url": "https://huggingface.co/dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8",
+        "tags": [
+          "transformers",
+          "safetensors",
+          "deepseek_v41",
+          "text-generation",
+          "deepseek"
+        ]
+      },
+      {
         "name": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "181",
+        "likes": "182",
         "downloads": "42,965",
         "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
         "tags": [
@@ -4493,7 +4494,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "2,488",
+        "likes": "2,490",
         "downloads": "3,109,084",
         "url": "https://huggingface.co/zai-org/GLM-5.3-Flash",
         "tags": [
@@ -4509,7 +4510,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "1,315",
+        "likes": "1,318",
         "downloads": "2,192,290",
         "url": "https://huggingface.co/HauhauCS/Qwen3.8-27B-Uncensored-HauhauCS-Aggressive-MTP-GGUF",
         "tags": [
@@ -4525,7 +4526,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "158",
+        "likes": "159",
         "downloads": "32,563",
         "url": "https://huggingface.co/cyjin-yl/Qwen3.8-27B-Uncensored-Cyber-agentic-imatrix-GGUF",
         "tags": [
@@ -4541,7 +4542,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "146",
+        "likes": "148",
         "downloads": "1,659",
         "url": "https://huggingface.co/Accio-Lab/occamy-1.0",
         "tags": [
@@ -4557,7 +4558,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "114",
+        "likes": "117",
         "downloads": "2,203",
         "url": "https://huggingface.co/jinaai/jina-ocr-v1",
         "tags": [
@@ -4573,7 +4574,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "1,103",
+        "likes": "1,104",
         "downloads": "285,022",
         "url": "https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-GGUF",
         "tags": [
@@ -4621,7 +4622,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "11,439",
+        "likes": "11,440",
         "downloads": "2,011,419",
         "url": "https://huggingface.co/moonshotai/Kimi-K3",
         "tags": [
@@ -4653,7 +4654,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "1,006",
+        "likes": "1,007",
         "downloads": "1,580,764",
         "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF",
         "tags": [
@@ -4665,11 +4666,27 @@
         ]
       },
       {
+        "name": "byteshape/Qwen3.8-27B-GGUF",
+        "description": "No description available",
+        "task": "image-text-to-text",
+        "parameters": "Unknown",
+        "likes": "113",
+        "downloads": "31,426",
+        "url": "https://huggingface.co/byteshape/Qwen3.8-27B-GGUF",
+        "tags": [
+          "transformers",
+          "gguf",
+          "qwen3.8",
+          "byteshape",
+          "shapelearn"
+        ]
+      },
+      {
         "name": "DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP-GGUF",
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "739",
+        "likes": "740",
         "downloads": "1,516,725",
         "url": "https://huggingface.co/DavidAU/Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic-NEO-IMATRIX-MAX-MTP-GGUF",
         "tags": [
@@ -4697,19 +4714,19 @@
         ]
       },
       {
-        "name": "byteshape/Qwen3.8-27B-GGUF",
+        "name": "nvidia/DeepSeek-V4.1-Flash-NVFP4",
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "110",
-        "downloads": "31,426",
-        "url": "https://huggingface.co/byteshape/Qwen3.8-27B-GGUF",
+        "likes": "75",
+        "downloads": "2,163",
+        "url": "https://huggingface.co/nvidia/DeepSeek-V4.1-Flash-NVFP4",
         "tags": [
-          "transformers",
-          "gguf",
-          "qwen3.8",
-          "byteshape",
-          "shapelearn"
+          "Model Optimizer",
+          "safetensors",
+          "deepseek_v41",
+          "nvidia",
+          "ModelOpt"
         ]
       },
       {
@@ -4729,27 +4746,11 @@
         ]
       },
       {
-        "name": "nvidia/DeepSeek-V4.1-Flash-NVFP4",
-        "description": "No description available",
-        "task": "image-text-to-text",
-        "parameters": "Unknown",
-        "likes": "74",
-        "downloads": "2,163",
-        "url": "https://huggingface.co/nvidia/DeepSeek-V4.1-Flash-NVFP4",
-        "tags": [
-          "Model Optimizer",
-          "safetensors",
-          "deepseek_v41",
-          "nvidia",
-          "ModelOpt"
-        ]
-      },
-      {
         "name": "orcarouter/Qwen3.8-27B-Uncensored-MLX",
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "1,442",
+        "likes": "1,445",
         "downloads": "155,431",
         "url": "https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX",
         "tags": [
@@ -4765,7 +4766,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "369",
+        "likes": "370",
         "downloads": "211,355",
         "url": "https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF",
         "tags": [
@@ -4781,7 +4782,7 @@
         "description": "No description available",
         "task": "image-text-to-text",
         "parameters": "Unknown",
-        "likes": "102",
+        "likes": "103",
         "downloads": "40,733",
         "url": "https://huggingface.co/peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-GGUF-MTP",
         "tags": [
@@ -5868,6 +5869,22 @@
         ]
       },
       {
+        "name": "agent593/Thyroid-Ultrasound-Image-Classification-ViTModel",
+        "description": "No description available",
+        "task": "image-classification",
+        "parameters": "Unknown",
+        "likes": "5",
+        "downloads": "98",
+        "url": "https://huggingface.co/agent593/Thyroid-Ultrasound-Image-Classification-ViTModel",
+        "tags": [
+          "transformers",
+          "tensorboard",
+          "safetensors",
+          "vit",
+          "image-classification"
+        ]
+      },
+      {
         "name": "skshmjn/Pokemon-classifier-gen9-1025",
         "description": "No description available",
         "task": "image-classification",
@@ -6232,22 +6249,6 @@
           "safetensors",
           "image-classification",
           "license:apache-2.0"
-        ]
-      },
-      {
-        "name": "Organika/sdxl-detector",
-        "description": "No description available",
-        "task": "image-classification",
-        "parameters": "Unknown",
-        "likes": "62",
-        "downloads": "68,083",
-        "url": "https://huggingface.co/Organika/sdxl-detector",
-        "tags": [
-          "transformers",
-          "onnx",
-          "safetensors",
-          "swin",
-          "image-classification"
         ]
       }
     ],
@@ -6752,7 +6753,7 @@
         "description": "No description available",
         "task": "image-segmentation",
         "parameters": "Unknown",
-        "likes": "2,024",
+        "likes": "2,025",
         "downloads": "348,517",
         "url": "https://huggingface.co/briaai/RMBG-1.4",
         "tags": [
@@ -8180,7 +8181,7 @@
         "description": "No description available",
         "task": "image-feature-extraction",
         "parameters": "Unknown",
-        "likes": "798",
+        "likes": "799",
         "downloads": "698,065",
         "url": "https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m",
         "tags": [
@@ -8212,7 +8213,7 @@
         "description": "No description available",
         "task": "image-feature-extraction",
         "parameters": "Unknown",
-        "likes": "323",
+        "likes": "324",
         "downloads": "575,889",
         "url": "https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m",
         "tags": [
@@ -8228,7 +8229,7 @@
         "description": "No description available",
         "task": "image-feature-extraction",
         "parameters": "Unknown",
-        "likes": "238",
+        "likes": "239",
         "downloads": "437,242",
         "url": "https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m",
         "tags": [
@@ -8395,22 +8396,6 @@
           "transformers",
           "safetensors",
           "dinov3_convnext",
-          "image-feature-extraction",
-          "dino"
-        ]
-      },
-      {
-        "name": "facebook/dinov3-vitl16-pretrain-sat493m",
-        "description": "No description available",
-        "task": "image-feature-extraction",
-        "parameters": "Unknown",
-        "likes": "72",
-        "downloads": "40,549",
-        "url": "https://huggingface.co/facebook/dinov3-vitl16-pretrain-sat493m",
-        "tags": [
-          "transformers",
-          "safetensors",
-          "dinov3_vit",
           "image-feature-extraction",
           "dino"
         ]
@@ -8654,9 +8639,25 @@
           "arxiv:2412.17041",
           "arxiv:2410.23132"
         ]
+      },
+      {
+        "name": "MahmoodLab/abmil.base.uni_v2.pc108-24k",
+        "description": "No description available",
+        "task": "image-feature-extraction",
+        "parameters": "Unknown",
+        "likes": "8",
+        "downloads": "40",
+        "url": "https://huggingface.co/MahmoodLab/abmil.base.uni_v2.pc108-24k",
+        "tags": [
+          "pytorch",
+          "safetensors",
+          "abmil",
+          "histology",
+          "pathology"
+        ]
       }
     ]
   },
-  "lastUpdated": "2026-09-20T12:00:04.007909+00:00",
+  "lastUpdated": "2026-09-20T14:22:47.797031+00:00",
   "totalModels": 540
 }
